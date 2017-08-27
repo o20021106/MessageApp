@@ -1,24 +1,27 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import AddCount from './addCount.js';
-import {createStore, combineReducers} from 'redux';
-import App from './app.js';
+import thunkMiddleware from 'redux-thunk'
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import rootReducer  from './src/reducers/blogPost.js';
+import App from './src/app.js';
 
-const store = createStore(AddCount);
 
-console.log('1');
+const createStoreWithMiddleWare = applyMiddleware(thunkMiddleware)(createStore);
+const store = createStoreWithMiddleWare(rootReducer);
 
-class Counter extends React.Component{
+
+console.log(store);
+console.log(store.getState().blogPosts[0]);
+class Blog extends React.Component{
 	render(){
 		return (
 			<Provider store = {store}>
 				<App />
 			</Provider>
-			) 
+		)
 	}
 }
 
 
-
-ReactDOM.render(<Counter />,document.getElementById('root'));
+ReactDOM.render(<Blog />,document.getElementById('root'));

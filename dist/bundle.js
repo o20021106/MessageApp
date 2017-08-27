@@ -11266,13 +11266,17 @@ var _reactDom2 = _interopRequireDefault(_reactDom);
 
 var _reactRedux = __webpack_require__(85);
 
-var _addCount = __webpack_require__(225);
+var _reduxThunk = __webpack_require__(225);
 
-var _addCount2 = _interopRequireDefault(_addCount);
+var _reduxThunk2 = _interopRequireDefault(_reduxThunk);
 
 var _redux = __webpack_require__(89);
 
-var _app = __webpack_require__(226);
+var _blogPost = __webpack_require__(226);
+
+var _blogPost2 = _interopRequireDefault(_blogPost);
+
+var _app = __webpack_require__(227);
 
 var _app2 = _interopRequireDefault(_app);
 
@@ -11284,20 +11288,22 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var store = (0, _redux.createStore)(_addCount2.default);
+var createStoreWithMiddleWare = (0, _redux.applyMiddleware)(_reduxThunk2.default)(_redux.createStore);
+var store = createStoreWithMiddleWare(_blogPost2.default);
 
-console.log('1');
+console.log(store);
+console.log(store.getState().blogPosts[0]);
 
-var Counter = function (_React$Component) {
-	_inherits(Counter, _React$Component);
+var Blog = function (_React$Component) {
+	_inherits(Blog, _React$Component);
 
-	function Counter() {
-		_classCallCheck(this, Counter);
+	function Blog() {
+		_classCallCheck(this, Blog);
 
-		return _possibleConstructorReturn(this, (Counter.__proto__ || Object.getPrototypeOf(Counter)).apply(this, arguments));
+		return _possibleConstructorReturn(this, (Blog.__proto__ || Object.getPrototypeOf(Blog)).apply(this, arguments));
 	}
 
-	_createClass(Counter, [{
+	_createClass(Blog, [{
 		key: 'render',
 		value: function render() {
 			return _react2.default.createElement(
@@ -11308,10 +11314,10 @@ var Counter = function (_React$Component) {
 		}
 	}]);
 
-	return Counter;
+	return Blog;
 }(_react2.default.Component);
 
-_reactDom2.default.render(_react2.default.createElement(Counter, null), document.getElementById('root'));
+_reactDom2.default.render(_react2.default.createElement(Blog, null), document.getElementById('root'));
 
 /***/ }),
 /* 98 */
@@ -24784,21 +24790,27 @@ function verifySubselectors(mapStateToProps, mapDispatchToProps, mergeProps, dis
 "use strict";
 
 
-var initial = { count: 0 };
+exports.__esModule = true;
+function createThunkMiddleware(extraArgument) {
+  return function (_ref) {
+    var dispatch = _ref.dispatch,
+        getState = _ref.getState;
+    return function (next) {
+      return function (action) {
+        if (typeof action === 'function') {
+          return action(dispatch, getState, extraArgument);
+        }
 
-function AddCount() {
-	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initial;
-	var action = arguments[1];
-
-	switch (action.type) {
-		case 'addCount':
-			return { count: state.count + action.count };
-		default:
-			return state;
-	}
+        return next(action);
+      };
+    };
+  };
 }
 
-module.exports = AddCount;
+var thunk = createThunkMiddleware();
+thunk.withExtraArgument = createThunkMiddleware;
+
+exports['default'] = thunk;
 
 /***/ }),
 /* 226 */
@@ -24810,6 +24822,34 @@ module.exports = AddCount;
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
+var initial = { blogPosts: ['hey'] };
+
+function blogPost() {
+	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initial;
+	var action = arguments[1];
+
+	switch (action.type) {
+		case 'INIT_BLOGPOST':
+			return { blogPosts: action.blogPosts };
+			break;
+		default:
+			return state;
+	}
+}
+
+exports.default = blogPost;
+
+/***/ }),
+/* 227 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.App = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -24817,11 +24857,9 @@ var _react = __webpack_require__(24);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _changeCount = __webpack_require__(227);
-
-var _changeCount2 = _interopRequireDefault(_changeCount);
-
 var _reactRedux = __webpack_require__(85);
+
+var _action = __webpack_require__(228);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -24829,20 +24867,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
 
 function mapStateToProp(state) {
-	return { count: state.count };
+	return { blogPosts: state.blogPosts };
 }
 
-function mapDispatchToProp(dispatch) {
-	return { addcount: function addcount() {
-			return dispatch((0, _changeCount2.default)());
-		} };
-}
-console.log('2');
-
-var App = function (_React$Component) {
+var App = exports.App = function (_React$Component) {
 	_inherits(App, _React$Component);
 
 	function App() {
@@ -24852,27 +24883,48 @@ var App = function (_React$Component) {
 	}
 
 	_createClass(App, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			this.props.dispatch((0, _action.fetchPost)());
+		}
+	}, {
 		key: 'render',
 		value: function render() {
-			console.log('3');
-			var _props = this.props,
-			    count = _props.count,
-			    addcount = _props.addcount;
+			/*
+   		console.log('4');
+   		const {blogPosts,dispatch} = this.props;
+   		console.log(dispatch);
+   		blogItems = blogPosts.map(function(blogPost,index){
+   			<h1 key = {index}>{index} {blogPost.blogPost}</h1>
+   		});
+   
+   		return ( 
+   			<div>
+   				{blogItems}
+   			</div>);
+   			*/
 
+			var _props = this.props,
+			    blogPosts = _props.blogPosts,
+			    dispatch = _props.dispatch;
+
+
+			var blogItems = blogPosts.map(function (blogPost, index) {
+				return _react2.default.createElement(
+					'div',
+					{ key: index },
+					'la la',
+					blogPost.title,
+					' ',
+					blogPost.post
+				);
+			});
+
+			console.log('before state');
 			return _react2.default.createElement(
 				'div',
 				null,
-				_react2.default.createElement(
-					'h1',
-					null,
-					'count is : ',
-					count
-				),
-				_react2.default.createElement(
-					'button',
-					{ onClick: addcount },
-					'+1'
-				)
+				blogItems
 			);
 		}
 	}]);
@@ -24880,23 +24932,35 @@ var App = function (_React$Component) {
 	return App;
 }(_react2.default.Component);
 
-exports.default = (0, _reactRedux.connect)(mapStateToProp, mapDispatchToProp)(App);
+exports.default = (0, _reactRedux.connect)(mapStateToProp)(App);
 
 /***/ }),
-/* 227 */
+/* 228 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-function changeCount() {
-	return {
-		type: 'addCount',
-		count: 1
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.fetchPost = fetchPost;
+function fetchPost() {
+	return function (dispatch) {
+		fetch('/api').then(function (response) {
+			console.log('i am a response ' + response);
+			return response.json();
+		}).then(function (json) {
+			console.log('i am parse json' + json[0].title);
+			dispatch({
+				type: "INIT_BLOGPOST",
+				blogPosts: json
+			});
+		}).catch(function (err) {
+			console.log(err);
+		});
 	};
 }
-
-module.exports = changeCount;
 
 /***/ })
 /******/ ]);

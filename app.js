@@ -1,38 +1,18 @@
-/*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
+var express = require ('express');
+var index = require('./routers/index.js');
+var api = require('./routers/api.js');
+var app = express();
+var path = require('path');
+var DIST_DIR = path.join(__dirname,'dist/');
+var bodyParser = require('body-parser');
 
-import React from 'react';
-import changeCount from './changeCount';
-import { connect, Provider } from 'react-redux';
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static(DIST_DIR));
 
+app.use('/',index);
+app.use('/api',api);
 
-
-function mapStateToProp(state){
-	return{count : state.count}
-}
-
-function mapDispatchToProp(dispatch){
-	return {addcount : ()=>dispatch(changeCount())};
-}
-console.log('2');
-class App extends React.Component{
-	
-
-	render(){
-		console.log('3');
-		const {count, addcount} = this.props;
-		return ( <div>
-				<h1>count is : {count}</h1>
-				<button onClick = {addcount}>+1</button>
-			</div>);
-
-
-	}
-
-	
-	
-}
-
-
-
-
-export default connect(mapStateToProp,mapDispatchToProp)(App);
+app.listen(8000,function(){
+	console.log('server is up');
+})
