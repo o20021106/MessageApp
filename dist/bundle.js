@@ -24913,7 +24913,6 @@ var App = exports.App = function (_React$Component) {
 				return _react2.default.createElement(
 					'div',
 					{ key: index },
-					'la la',
 					blogPost.title,
 					' ',
 					blogPost.post
