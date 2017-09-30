@@ -7,8 +7,16 @@ var DIST_DIR = path.join(__dirname,'dist/');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var validator = require('express-validator');
+var config = require("./config/main.js")
 
-const dbUrl = "mongodb://ipingou:mlab800203@ds153123.mlab.com:53123/ipingou";
+
+var morgan = require('morgan');  
+var passport = require('passport');  
+var jwt = require('jsonwebtoken');  
+
+
+//const dbUrl = "mongodb://ipingou:mlab800203@ds153123.mlab.com:53123/ipingou";
+const dbUrl = config.database;
 mongoose.connect(dbUrl);
 var db = mongoose.connection;
 
@@ -17,12 +25,16 @@ db.once('open', function() {
   console.log('starting');
 });
 
+app.use(passport.initialize());  
+require('./config/passport')(passport);  
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(morgan('dev'));  
+
 app.use(validator());
 app.use(express.static(DIST_DIR));
-
 app.use('/api',api);
 app.use('/',index);
 

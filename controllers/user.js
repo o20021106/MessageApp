@@ -1,4 +1,8 @@
 var User = require("../src/models/user.js");
+var utility = require("../utility/utility.js")
+var User = require('../src/models/user');  
+var jwt = require('jsonwebtoken');  
+var config = require("../config/main")
 
 
 exports.register = {
@@ -16,7 +20,8 @@ exports.register = {
 
 		var user = new User({
 			email : req.body.email,
-			password: req.body.password
+			password: req.body.password,
+			name : req.body.name
 		})
 
 		User.findOne({email:req.body.email}, function(err,existingUser){
@@ -28,10 +33,80 @@ exports.register = {
 				if(err){
 					return res.json({message:'creating new user failed'});
 				}
-				return res.json({messige: 'user created'});
+				else{
+
+					return res.redirect("/login");
+				}
 
 			});
 
 		});
+
+
 	}
 };
+
+/*
+exports.login = {
+	post: function(req, res, next){
+		var user = new User({
+			email : req.body.email,
+			password : req.body.password
+		})
+
+		User.findOne({email: user.email}, function(err, existingUser){
+			if(err){
+				return res.json({message:" an err occured"})
+			}
+
+			existingUser.comparePassword(user.password, function(err, isMatch){
+				if(err){
+					return res.json({message:" an err occured"})
+				}
+
+				if (isMatch){
+					return res.redirect('/authenticate')
+				} 
+				else return res.json({message: "wrong password"})
+			})
+
+		})
+	}
+
+}
+*/
+exports.login = {
+	post : function(req, res) {  
+
+		  req.assert('email','Please provide a valid email address').isEmail();
+		  req.check('password', 'Please enter a password longer than 6 characters').len({min:6});
+		  var errors = req.validationErrors();
+		  if (errors){
+			return res.json({message: errors});
+		  }
+		
+
+		  User.findOne({
+		    email: req.body.email
+		  }, function(err, user) {
+		    if (err) throw err;
+		    if (!user) {
+		      res.send({ success: false, message: 'Authentication failed. User not found.' });
+		    } else {
+		      // Check if password matches
+		      user.comparePassword(req.body.password, function(err, isMatch) {
+		        if (isMatch && !err) {
+		        	console.log("match!");
+		          // Create token if the password matched and no error was thrown
+		          var token = jwt.sign(user.toObject(), config.secret, {
+		            expiresIn: 10080 // in seconds
+		          });
+		          res.json({ success: true, token: 'JWT ' + token });
+		        } else {
+		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
+		        }
+		      });
+		    }
+		  });
+		}
+}
