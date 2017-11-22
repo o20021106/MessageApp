@@ -49,6 +49,17 @@ router.post('/authenticate', function(req, res) {
   });
 });
 */
+var passport = require('passport');  
+/*router.get("/secrete",function(req,res){
+	console.log(req.headers.authorization); 
+	res.json({token: "here"});
+});
+*/
+router.get("/secrete", passport.authenticate('jwt', { session: false }), function(req, res){
+
+	console.log(req.user.email);
+  res.json("Success! You can not see this without a token");
+});
 
 
 router.get('/', function(req,res){
