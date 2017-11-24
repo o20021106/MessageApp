@@ -3,7 +3,7 @@ var express = require('express');
 var path = require('path');
 var router = express.Router();
 var userController = require('../controllers/user.js');
-
+var chatController = require('../controllers/chat.js');
 var config = require("../config/main")
 
 router.get('/register', function(req,res){
@@ -61,7 +61,7 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
   res.json("Success! You can not see this without a token");
 });
 
-
+router.get('/getRecipients', chatController.getRecipients)
 router.get('/', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));
@@ -70,6 +70,7 @@ router.get('/', function(req,res){
 
 router.post('/register',userController.register.post);
 router.post('/login',userController.login.post);
+router.post('/newMessage',passport.authenticate('jwt', { session: false }), chatController.newConversation);
 //router.post('/authenticate',userController.authenticate.post);
 
 module.exports = router;

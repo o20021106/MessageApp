@@ -1,6 +1,6 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-var conversationSchema = new Schema({
+var ConversationSchema = new Schema({
 	participants : [{ type: Schema.Types.ObjectId, ref: 'User'}]
 });
 
