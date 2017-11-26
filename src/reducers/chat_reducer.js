@@ -6,13 +6,14 @@ const initial = {recipients:[], conversations:[]}
 export default function(state = initial, action){
 	switch (action.type){
 		case LOAD_RECIPIENTS:
-			return {recipients : action.recipients};
+			return {...state, recipients : action.recipients};
 			break;
 		case LOAD_CONVERSATIONS:
-			return {conversations : action.conversations};
+			return {...state, conversations : action.conversations};
 			break;
 		default:
 			return state;
 	}
 }
 
+ 

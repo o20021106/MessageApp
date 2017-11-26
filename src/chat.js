@@ -66,10 +66,21 @@ class Chat extends React.Component{
 		})
 	}
 
-	conversationList(){
-		console.log('in conversation list');
-		console.log(this.props.conversations.length);
+	participantsNames(participants){
+		console.log('in par ');
+		console.log(participants);  
+		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
 	}
+	conversationList(){
+		if(!(this.props.conversations.length === 0)){
+			console.log('in conversation if');
+			return this.props.conversations.map(conversation =>(<div key = {conversation.conversation._id}>
+			participants: {this.participantsNames(conversation.conversation.participants)} message:{conversation.message[0].body}
+			by: {conversation.message[0].auther}</div>))
+		}
+	}
+
+
 
 	render(){
 
@@ -82,15 +93,15 @@ class Chat extends React.Component{
 				  	<input type = 'text' name = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
 				  	<input type="submit" value="Submit" ></input>
 				</form> 
-				{this.conversationList}
+				{this.conversationList()}
 			</div>)
 	}
 
-	
+ 	
 }
 
 function mapStateToProps(state) {  
-    return {recipients: state.recipients, conversations: state.conversations};
+    return { recipients: state.recipients, conversations: state.conversations};
 }
 	
 export default connect(mapStateToProps, actions)(Chat);

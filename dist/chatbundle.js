@@ -24631,15 +24631,43 @@ var Chat = function (_React$Component) {
 			});
 		}
 	}, {
+		key: 'participantsNames',
+		value: function participantsNames(participants) {
+			console.log('in par ');
+			console.log(participants);
+			return participants.map(function (participant) {
+				return _react2.default.createElement(
+					'div',
+					{ key: participant._id },
+					participant.name
+				);
+			});
+		}
+	}, {
 		key: 'conversationList',
 		value: function conversationList() {
-			console.log('in conversation list');
-			console.log(this.props.conversations.length);
+			var _this2 = this;
+
+			if (!(this.props.conversations.length === 0)) {
+				console.log('in conversation if');
+				return this.props.conversations.map(function (conversation) {
+					return _react2.default.createElement(
+						'div',
+						{ key: conversation.conversation._id },
+						'participants: ',
+						_this2.participantsNames(conversation.conversation.participants),
+						' message:',
+						conversation.message[0].body,
+						'by: ',
+						conversation.message[0].auther
+					);
+				});
+			}
 		}
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this2 = this;
+			var _this3 = this;
 
 			return _react2.default.createElement(
 				'div',
@@ -24647,21 +24675,21 @@ var Chat = function (_React$Component) {
 				_react2.default.createElement(
 					'form',
 					{ onSubmit: function onSubmit(e) {
-							return _this2.newMessage(e);
+							return _this3.newMessage(e);
 						} },
 					_react2.default.createElement(
 						'select',
 						{ name: 'recipient', onChange: function onChange(e) {
-								return _this2.changeRecipient(e);
+								return _this3.changeRecipient(e);
 							} },
 						this.userList()
 					),
 					_react2.default.createElement('input', { type: 'text', name: 'composedMessage', onChange: function onChange(e) {
-							return _this2.insertText(e);
+							return _this3.insertText(e);
 						} }),
 					_react2.default.createElement('input', { type: 'submit', value: 'Submit' })
 				),
-				this.conversationList
+				this.conversationList()
 			);
 		}
 	}]);
@@ -25222,16 +25250,18 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports.default = function () {
 	var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initial;
 	var action = arguments[1];
 
 	switch (action.type) {
 		case _type.LOAD_RECIPIENTS:
-			return { recipients: action.recipients };
+			return _extends({}, state, { recipients: action.recipients });
 			break;
 		case _type.LOAD_CONVERSATIONS:
-			return { conversations: action.conversations };
+			return _extends({}, state, { conversations: action.conversations });
 			break;
 		default:
 			return state;
