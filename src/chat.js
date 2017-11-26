@@ -2,73 +2,54 @@
 
 import React from 'react';
 import { connect, Provider } from 'react-redux';
-import {fetchPost} from './actions/action.js';
 import fetch from 'isomorphic-fetch';
+import * as actions from './actions/index'
 
-/*
-function mapStateToProp(state){
-	return{blogPosts : state.blogPosts}
-}
 
-*/ 
-
-export default class Chat extends React.Component{	
+class Chat extends React.Component{	
 	constructor(props){
 		super(props);
-		this.state = {users:[], message :'', toId:''};
-		this.recipientChosen = this.recipientChosen.bind(this);
-		this.newMessage = this.newMessage.bind(this);
-		this.sendMessage = this.sendMessage.bind(this);
+		this.state = {recipientId: '', messageBuffer:'asdfadsfasdf'};
+		this.userList = this.userList.bind(this);
+		this.changeRecipient = this.changeRecipient.bind(this);
+		this.insertText = this.insertText.bind(this);
 	}
 	componentWillMount(){
-		this.getRecipients();
+		this.props.loadConversations();
 
-	}
-	getRecipients(){
-		fetch("/getRecipients",
-		{
-			headers: {
-		      'Accept': 'application/json',
-		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
-		    },
-		    method: "GET",
-		})
-		.then(function(response) {
-		    return response.json();
-		})
-		.then(json=>{
-			console.log(json.users);
-			this.setState({users:json.users});
-			this.setState({love:json.users[0]._id});
-		})
-		.catch(err=>{
-			console.log(err);
-		});
+		this.props.loadRecipients();
 	}
 
 	userList(){
-		if(this.state.length == 0){
-			console.log('why??');
-			return 'empty'
+		if(this.props.recipients.length == 0){
+			console.log('why??');	
 		}
 		else{
 			console.log('here');
-			return this.state.users.map(user=>(<option key = {user._id} value = {user._id}>{user.name}</option>));
+			console.log(this.props.recipients.length)
+			return this.props.recipients.map(user=>(<option key = {user._id} value = {user._id}>{user.name}</option>));
 		}
 	}
 
- 	newMessage(e){
- 		
- 		this.setState({message:e.target.value})
- 		console.log(this.state.message);
- 	}
-	
-	recipientChosen(e){
-		this.setState({toId: e.target.value})
-	}
-	sendMessage(e){
+
+	changeRecipient(e){
 		e.preventDefault();
+		this.setState({recipientId: e.target.value});
+	}
+
+	insertText(e){
+		e.preventDefault();
+		this.setState({messageBuffer:e.target.value});
+	}
+
+	newMessage(e){
+		e.preventDefault();
+		var recipientId = this.state.recipientId;
+		if (recipientId ===''){
+			recipientId = this.props.recipients[0]._id;
+		}
+		console.log(recipientId);
+		console.log(this.state.messageBuffer);
 		fetch('/newMessage',
 		{
 			headers: {
@@ -78,33 +59,39 @@ export default class Chat extends React.Component{
 
 		    },
 		    method: "POST",
-		    body: JSON.stringify({recipient:this.state.toId, composedMessage:this.state.message})
+		    body: JSON.stringify({recipient:recipientId, composedMessage:this.state.messageBuffer})
 		})
 		.then(function(response) {
 		    console.log(response);
 		})
-
 	}
 
- 
+	conversationList(){
+		console.log('in conversation list');
+		console.log(this.props.conversations.length);
+	}
+
 	render(){
 
 		return (
 			<div>
-				<form onSubmit = {(e) => this.sendMessage(e)}>
-				 	<select name="recipient" onChange = {e=>this.recipientChosen(e)}>
-					    {this.userList()}
+				<form onSubmit = {(e) => this.newMessage(e)}>
+				 	<select name="recipient" onChange = {(e)=> this.changeRecipient(e)}>
+     					{this.userList()}
 				  	</select>
-				  	<input type = 'text' name = 'composedMessage' onChange = {(e) => this.newMessage(e)}></input>
-				  	<input type="submit" value="Submit"></input>
+				  	<input type = 'text' name = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
+				  	<input type="submit" value="Submit" ></input>
 				</form> 
+				{this.conversationList}
 			</div>)
 	}
 
 	
 }
 
-
-
-
-//export default connect(mapStateToProp)(App);
+function mapStateToProps(state) {  
+    return {recipients: state.recipients, conversations: state.conversations};
+}
+	
+export default connect(mapStateToProps, actions)(Chat);
+ 

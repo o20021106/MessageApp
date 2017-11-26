@@ -13,17 +13,19 @@ exports.getRecipients = function(req, res, next){
 		return res.status(200).json({ users: users })
 	})
 }
-/*
+
 exports.getConversations = function(req, res, next){
-    
+    console.log('getconversations');
 	Conversation.find({participants: req.user._id})
-	.select('_id')
+	.select('_id participants')
+	.populate('participants','name')
 	.exec(function(err,conversations){
 		if (err){
 			res.json({err:err});
 			return next(err);
 		}
-		allConversations = [];
+		console.log(conversations);
+		let allConversations = [];
 		conversations.forEach(function(conversation){
 			Message.find({conversationId: conversation._id})
 			.sort('createdAt')
@@ -34,14 +36,19 @@ exports.getConversations = function(req, res, next){
 					res.json({err:err});
 					return next(err);
 				}
-				allconversations.push(message);
+				console.log(message);
+				allConversations.push({'message': message, 'conversation': conversation});
+				if(allConversations.length === conversations.length) {
+              		return res.status(200).json({ conversations: allConversations });
+            	}
+
 			})
 		})
-		return res.status(200).json({ conversations: allConversations })
+
 	})
-	}
 }
 
+/*
 exports.getConversation = function(req,res,next){
 	Message.find({Conversation_id: req.params.conversationId})
 	.sort('-createdAt')

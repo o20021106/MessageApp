@@ -62,6 +62,8 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
 });
 
 router.get('/getRecipients', chatController.getRecipients)
+router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations)
+
 router.get('/', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));

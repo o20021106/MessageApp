@@ -4,7 +4,7 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import Chat from './src/chat'
-/*import rootReducer.....;
+import rootReducer from './src/reducers/chat_reducer';
 
 
 const createStoreWithMiddleWare = applyMiddleware(thunkMiddleware)(createStore);
@@ -19,9 +19,8 @@ class Chatroom extends React.Component{
 		)
 	}
 }
-*/
 
-
+/*
 class Chatroom extends React.Component{
 	render(){
 		console.log('inchat room');
@@ -33,5 +32,5 @@ class Chatroom extends React.Component{
 		)
 	}
 }
-
+*/
 ReactDOM.render(<Chatroom />, document.getElementById('root'));
