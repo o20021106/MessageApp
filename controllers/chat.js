@@ -48,12 +48,15 @@ exports.getConversations = function(req, res, next){
 	})
 }
 
-/*
+
 exports.getConversation = function(req,res,next){
-	Message.find({Conversation_id: req.params.conversationId})
+	console.log(' in getConversation');
+	console.log(req.params.conversationId);
+	Message.find({conversationId: req.params.conversationId})
 	.sort('-createdAt')
 	.populate('author', 'name')
 	.exec(function(err, messages){
+  
 		if(err){
 			res.json({err: err})
 			return next(err)
@@ -61,7 +64,7 @@ exports.getConversation = function(req,res,next){
 		res.status(200).json({ conversation: messages });
 	})
 }
-*/
+
 exports.newConversation = function(req, res, next){
 	if(!req.body.recipient) {
     	res.status(422).send({ error: 'Please choose a valid recipient for your message.' });

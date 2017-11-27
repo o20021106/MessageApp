@@ -74,14 +74,14 @@ class Chat extends React.Component{
 	conversationList(){
 		if(!(this.props.conversations.length === 0)){
 			console.log('in conversation if');
-			return this.props.conversations.map(conversation =>(<div key = {conversation.conversation._id}>
+			return this.props.conversations.map(conversation =>(<div key = {conversation.conversation._id} onClick = {alert}>
 			participants: {this.participantsNames(conversation.conversation.participants)} message:{conversation.message[0].body}
 			by: {conversation.message[0].auther}</div>))
 		}
 	}
 
-
-
+ 
+    
 	render(){
 
 		return (

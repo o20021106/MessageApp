@@ -3,7 +3,10 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
-import Chat from './src/chat'
+//import Chat from './src/chat';
+//import ChatWindow from './src/chatWindow';
+import ChatFrame from './src/chatFrame';
+
 import rootReducer from './src/reducers/chat_reducer';
 
 
@@ -14,7 +17,7 @@ class Chatroom extends React.Component{
 	render(){
 		return (
 			<Provider store = {store}>
-				<Chat />
+				<ChatFrame />
 			</Provider>
 		)
 	}

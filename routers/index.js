@@ -61,8 +61,12 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
   res.json("Success! You can not see this without a token");
 });
 
-router.get('/getRecipients', chatController.getRecipients)
-router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations)
+router.get('/getRecipients', chatController.getRecipients);
+router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
+router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
+
+
+
 
 router.get('/', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
