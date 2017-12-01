@@ -25,13 +25,10 @@ class Chat extends React.Component{
 			 in chat window
 			 {this.conversationDisplay()}
 			</div>)
-	} 
-
- 	  
+	}  	  
 } 
 
 function mapStateToProps(state) {
-
     return { chosenConversation: state.chosenConversation, currentConversation: state.currentConversation};
 }
 	

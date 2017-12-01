@@ -3,7 +3,10 @@
 import React from 'react';
 import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
-import * as actions from './actions/index'
+import * as actions from './actions/index';
+
+import io from 'socket.io-client';
+var socket=io();
 
 
 class Chat extends React.Component{	
@@ -15,8 +18,8 @@ class Chat extends React.Component{
 		this.insertText = this.insertText.bind(this);
 	}
 	componentWillMount(){
+		
 		this.props.loadConversations();
-
 		this.props.loadRecipients();
 	}
 
@@ -71,12 +74,22 @@ class Chat extends React.Component{
 		console.log(participants);  
 		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
 	}
+	
 	conversationList(){
 		if(!(this.props.conversations.length === 0)){
 			console.log('in conversation if');
-			return this.props.conversations.map(conversation =>(<div key = {conversation.conversation._id} onClick = {alert}>
-			participants: {this.participantsNames(conversation.conversation.participants)} message:{conversation.message[0].body}
-			by: {conversation.message[0].auther}</div>))
+			return this.props.conversations.map(conversation =>(<li key = {conversation.conversation._id} onClick = {alert}>
+				<a data-href = {'http://localhost:8000/messaages/'+conversation.conversation._id}>
+					<div>
+						participants: {this.participantsNames(conversation.conversation.participants)}
+					</div> 
+					<div>
+						{conversation.message[0].auther}
+						{conversation.message[0].body}
+					</div>
+				</a>
+
+			</li>))
 		}
 	}
 
@@ -93,7 +106,9 @@ class Chat extends React.Component{
 				  	<input type = 'text' name = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
 				  	<input type="submit" value="Submit" ></input>
 				</form> 
-				{this.conversationList()}
+				<ul>
+					{this.conversationList()}
+				</ul>
 			</div>)
 	}
 

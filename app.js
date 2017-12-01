@@ -8,6 +8,9 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var validator = require('express-validator');
 var config = require("./config/main.js")
+var server = require('http').Server(app);
+var io = require('socket.io')(server);
+
 
 
 var morgan = require('morgan');  
@@ -38,6 +41,45 @@ app.use(express.static(DIST_DIR));
 app.use('/api',api);
 app.use('/',index);
 
+server.listen(8000,function(){
+	console.log('server is up');
+});
+
+
+
+var config = require("./config/main");
+var socketioJwt = require('socketio-jwt');
+var User = require('./src/models/user');  
+
+
+
+io.use(socketioJwt.authorize({
+  secret: config.secret,
+  handshake: true
+}));
+
+io.on('connection', function(client){
+	user = User.findOne({email: socket.decoded_token.email}, function(err, user) {
+    	if (err) {
+        	console.log('err');
+        }
+        if (user) {
+            console.log('success');
+            return user;
+        }
+    });
+
+    client.on('loadConversations', function{
+    	
+    });
+    client.on('event', function(data,fn){
+  	console.log(data);
+  	fn('got it');
+  });
+  client.on('disconnect', function(){});
+});
+/*
 app.listen(8000,function(){
 	console.log('server is up');
 })
+*/

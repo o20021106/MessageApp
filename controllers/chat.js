@@ -15,7 +15,7 @@ exports.getRecipients = function(req, res, next){
 }
 
 exports.getConversations = function(req, res, next){
-    console.log('getconversations');
+    console.log('in getconversations');
 	Conversation.find({participants: req.user._id})
 	.select('_id participants')
 	.populate('participants','name')
@@ -24,7 +24,6 @@ exports.getConversations = function(req, res, next){
 			res.json({err:err});
 			return next(err);
 		}
-		console.log(conversations);
 		let allConversations = [];
 		conversations.forEach(function(conversation){
 			Message.find({conversationId: conversation._id})
@@ -36,7 +35,6 @@ exports.getConversations = function(req, res, next){
 					res.json({err:err});
 					return next(err);
 				}
-				console.log(message);
 				allConversations.push({'message': message, 'conversation': conversation});
 				if(allConversations.length === conversations.length) {
               		return res.status(200).json({ conversations: allConversations });
@@ -51,7 +49,6 @@ exports.getConversations = function(req, res, next){
 
 exports.getConversation = function(req,res,next){
 	console.log(' in getConversation');
-	console.log(req.params.conversationId);
 	Message.find({conversationId: req.params.conversationId})
 	.sort('-createdAt')
 	.populate('author', 'name')
@@ -74,11 +71,9 @@ exports.newConversation = function(req, res, next){
     	res.status(422).send({ error: 'Please enter a message.' });
     	return next();
   	}
-  	console.log(1);
   	const conversation = new Conversation({
   		participants: [req.user._id, req.body.recipient]
   	})
-  	console.log(2);
 
   	conversation.save(function(err, newConversation){
   		if(err){

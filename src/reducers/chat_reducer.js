@@ -12,7 +12,7 @@ export default function(state = initial, action){
 			return {...state, conversations : action.conversations};
 			break;
 		case CHOSEN_CONVERSATION:
-		console.log('update chosen conversation here');
+			console.log('update chosen conversation here');
 			return {...state, chosenConversation: action.chosenConversation};
 			break;
 		case CHOSEN_CONVERSATION_MESSAGES:
@@ -23,3 +23,24 @@ export default function(state = initial, action){
 }
 
   
+/*
+export default function(state = initial, action){
+	switch (action.type){
+		case LOAD_RECIPIENTS:
+			return {...state, recipients : action.recipients};
+			break;
+		case LOAD_CONVERSATIONS:
+			return {...state, conversations : action.conversations};
+			break;
+		case CHOSEN_CONVERSATION:
+			console.log('update chosen conversation here');
+			return {...state, chosenConversation: action.chosenConversation};
+			break;
+		case CHOSEN_CONVERSATION_MESSAGES:
+			return {...state, currentConversation: action.currentConversation};
+		default:
+			return state;
+	}
+}
+
+*/    
