@@ -15,6 +15,7 @@ import {LOAD_CONVERSATIONS} from './src/actions/type';
 
 const socket = new socketClient();
 socket.connect();
+socket.emit('sendMessage',{recipient: '5a151ff2e52d523bf788e67b', composedMessage: 'hi how are you'});
 const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);
 /*
 import io from 'socket.io-client';
@@ -44,7 +45,7 @@ class Chatroom extends React.Component{
 			<div>
 				<Chat />
 			</div>
-		)
+		) 
 	}
 }
 */

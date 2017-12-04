@@ -20,12 +20,14 @@ class Love extends React.Component{
 		    return response.json();
 		})
 		.then(json=>{
-			console.log('i am parse json'+json.token);
+			console.log('i am parse json'+json.data.token);
+			console.log('i am parse json'+json.data.user.name);
+
 			if (typeof(Storage) !== "undefined") {
-				localStorage.setItem("token", json.token);
+				localStorage.setItem('token', json.data.token);
+				localStorage.setItem('user', JSON.stringify(json.data.user)); 
 				console.log('here');
-				console.log(localStorage.getItem("token")) 
- 			} else {
+ 			} else { 
 			    // Sorry! No Web Storage support..
 			}
 		})
@@ -34,6 +36,36 @@ class Love extends React.Component{
 		});
 	}
 
+	love2(){
+		fetch("/login",
+		{
+		    headers: {
+		      'Accept': 'application/json',
+		      'Content-Type': 'application/json'
+		    },
+		    method: "POST",
+		    body: JSON.stringify({ password: "800203", email : "o20021106@gmail.com"})
+		})
+		.then(function(response) {
+			console.log('i am a response '+response);
+		    return response.json();
+		})
+		.then(json=>{
+			console.log('i am parse json'+json.data.token);
+			console.log('i am parse json'+json.data.user.name);
+
+			if (typeof(Storage) !== "undefined") {
+				localStorage.setItem('token', json.data.token);
+				localStorage.setItem('user', JSON.stringify(json.data.user)); 
+				console.log('here');
+ 			} else { 
+			    // Sorry! No Web Storage support..
+			}
+		})
+		.catch(err=>{
+			console.log(err);
+		});
+	}
 	try(){
 		fetch("/secrete",
 		{
@@ -66,8 +98,8 @@ class Love extends React.Component{
 
 		<div>
 		LOVE
-	       <button onClick = {this.love}>love</button>
-	       <button onClick = {this.try}>love</button>
+	       <button onClick = {this.love}>r04325008</button>
+	       <button onClick = {this.love2}>o20021106</button>
 
 		</div>);
 	}

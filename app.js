@@ -50,6 +50,7 @@ server.listen(8000,function(){
 var config = require("./config/main");
 var socketioJwt = require('socketio-jwt');
 var User = require('./src/models/user');  
+var chatControllerSocket = require('./controllers/chatSocket.js');
 
 
 
@@ -59,27 +60,35 @@ io.use(socketioJwt.authorize({
 }));
 
 io.on('connection', function(client){
-	user = User.findOne({email: socket.decoded_token.email}, function(err, user) {
-    	if (err) {
-        	console.log('err');
-        }
-        if (user) {
-            console.log('success');
-            return user;
-        }
-    });
+	console.log('in connection');
+	User.findOne({email: client.decoded_token.email})
+    .exec(function(err,user){
+    	if (err){
+    		console.log('error')
+			console.log(err);
+		}
 
-    client.on('loadConversations', function{
-    	
-    });
-    client.on('event', function(data,fn){
-  	console.log(data);
-  	fn('got it');
-  });
-  client.on('disconnect', function(){});
+	    client.on('sendMessage', function(data,fn){
+	    	console.log('in sendMessage');
+	    	console.log(user);
+	    	console.log(data);
+	    	chatControllerSocket.newMessage(user,data.recipient, data.composedMessage)
+	    	.then(response => {
+	    		console.log('in sendMessage response');
+	    		console.log(response);
+	    		fn(response)});
+	    });
+
+	    client.on('event', function(data,fn){
+	  		console.log(data);
+	  		fn('got it');
+	  	});
+  		client.on('disconnect', function(){});
+  	}) 
 });
+
 /*
 app.listen(8000,function(){
 	console.log('server is up');
 })
-*/
+*/ 

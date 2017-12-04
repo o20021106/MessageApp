@@ -9637,11 +9637,41 @@ var Love = function (_React$Component) {
 				console.log('i am a response ' + response);
 				return response.json();
 			}).then(function (json) {
-				console.log('i am parse json' + json.token);
+				console.log('i am parse json' + json.data.token);
+				console.log('i am parse json' + json.data.user.name);
+
 				if (typeof Storage !== "undefined") {
-					localStorage.setItem("token", json.token);
+					localStorage.setItem('token', json.data.token);
+					localStorage.setItem('user', JSON.stringify(json.data.user));
 					console.log('here');
-					console.log(localStorage.getItem("token"));
+				} else {
+					// Sorry! No Web Storage support..
+				}
+			}).catch(function (err) {
+				console.log(err);
+			});
+		}
+	}, {
+		key: 'love2',
+		value: function love2() {
+			(0, _isomorphicFetch2.default)("/login", {
+				headers: {
+					'Accept': 'application/json',
+					'Content-Type': 'application/json'
+				},
+				method: "POST",
+				body: JSON.stringify({ password: "800203", email: "o20021106@gmail.com" })
+			}).then(function (response) {
+				console.log('i am a response ' + response);
+				return response.json();
+			}).then(function (json) {
+				console.log('i am parse json' + json.data.token);
+				console.log('i am parse json' + json.data.user.name);
+
+				if (typeof Storage !== "undefined") {
+					localStorage.setItem('token', json.data.token);
+					localStorage.setItem('user', JSON.stringify(json.data.user));
+					console.log('here');
 				} else {
 					// Sorry! No Web Storage support..
 				}
@@ -9680,12 +9710,12 @@ var Love = function (_React$Component) {
 				_react2.default.createElement(
 					'button',
 					{ onClick: this.love },
-					'love'
+					'r04325008'
 				),
 				_react2.default.createElement(
 					'button',
-					{ onClick: this.try },
-					'love'
+					{ onClick: this.love2 },
+					'o20021106'
 				)
 			);
 		}

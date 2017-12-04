@@ -2,6 +2,7 @@ const Conversation = require("../src/models/conversation"),
 		Message = require("../src/models/message"),
 		User = require("../src/models/user");
 
+
 exports.getRecipients = function(req, res, next){
 	User.find({})
 	.select('_id name')
@@ -38,6 +39,36 @@ exports.getConversations = function(req, res, next){
 				allConversations.push({'message': message, 'conversation': conversation});
 				if(allConversations.length === conversations.length) {
               		return res.status(200).json({ conversations: allConversations });
+            	}
+
+			})
+		})
+
+	})
+}
+
+exports.getConversationsSocket = function(user){
+    console.log('in getconversations');
+	Conversation.find({participants: user._id})
+	.select('_id participants')
+	.populate('participants','name')
+	.exec(function(err,conversations){
+		if (err){
+			return {err:err};
+		}
+		let allConversations = [];
+		conversations.forEach(function(conversation){
+			Message.find({conversationId: conversation._id})
+			.sort('createdAt')
+			.limit(1)
+			.populate('author', 'name')
+			.exec(function(err, message){
+				if (err){
+					return {err:err};
+				}
+				allConversations.push({'message': message, 'conversation': conversation});
+				if(allConversations.length === conversations.length) {
+              		return { conversations: allConversations };
             	}
 
 			})

@@ -38,6 +38,7 @@ export default class socketAPI {
           console.error(response.error);
           return reject(response.error);
         }
+        console.log('response here');
         console.log(response);
         return resolve(response);
       });

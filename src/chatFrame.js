@@ -8,7 +8,7 @@ import send from './send'
 class ChatFrame extends React.Component{	
 
 	render(){
-		this.props.dispatch(send());
+	//	this.props.dispatch(send());
 		return (
 			<div>
 				<Chat />

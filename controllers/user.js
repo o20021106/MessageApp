@@ -101,7 +101,7 @@ exports.login = {
 		          var token = jwt.sign({email : user.email}, config.secret, {
 		            expiresIn: 86400 // in seconds
 		          });
-		          res.json({ success: true, token: 'bearer ' + token });
+		          res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
 		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
 		        }

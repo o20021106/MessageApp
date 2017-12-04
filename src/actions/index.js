@@ -85,6 +85,16 @@ function getCurrentConversation(conversationId, dispatch){
 		});
 }
 
+export function loadConversationsSocket(){
+  return {
+    type: 'socket',
+    promise: function(socket){
+    	console.log('inside socket here for loadConversations');
+    	return socket.emit('loadConversationsSocket','momomomomo~~~~~~~~~~~~~~');
+    }
+  }
+
+}
 
 export function loadCurrentConversation(conversationId){
 	return function(dispatch){

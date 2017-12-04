@@ -7902,7 +7902,8 @@ Object.defineProperty(exports, "__esModule", {
 var LOAD_RECIPIENTS = exports.LOAD_RECIPIENTS = 'LOAD_RECIPIENTS',
     LOAD_CONVERSATIONS = exports.LOAD_CONVERSATIONS = 'LOAD_CONVERSATIONS',
     CHOSEN_CONVERSATION_MESSAGES = exports.CHOSEN_CONVERSATION_MESSAGES = 'CHOSEN_CONVERSATION_MESSAGES',
-    CHOSEN_CONVERSATION = exports.CHOSEN_CONVERSATION = 'CHOSEN_CONVERSATION';
+    CHOSEN_CONVERSATION = exports.CHOSEN_CONVERSATION = 'CHOSEN_CONVERSATION',
+    LOAD_CONVERSATIONS_SOCKET = exports.LOAD_CONVERSATIONS_SOCKET = 'LOAD_CONVERSATIONS_SOCKET';
 
 /***/ }),
 /* 62 */
@@ -13054,6 +13055,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadRecipients = loadRecipients;
 exports.loadConversations = loadConversations;
+exports.loadConversationsSocket = loadConversationsSocket;
 exports.loadCurrentConversation = loadCurrentConversation;
 
 var _type = __webpack_require__(61);
@@ -13125,6 +13127,16 @@ function getCurrentConversation(conversationId, dispatch) {
 	}).catch(function (err) {
 		console.log(err);
 	});
+}
+
+function loadConversationsSocket() {
+	return {
+		type: 'socket',
+		promise: function promise(socket) {
+			console.log('inside socket here for loadConversations');
+			return socket.emit('loadConversationsSocket', 'momomomomo~~~~~~~~~~~~~~');
+		}
+	};
 }
 
 function loadCurrentConversation(conversationId) {
@@ -15114,6 +15126,7 @@ exports.default = socketMiddleware;
 	};
 }
 */
+
 function socketMiddleware(socket) {
   // Socket param is the client. We'll show how to set this up later.
   return function (_ref) {
@@ -15144,7 +15157,8 @@ function socketMiddleware(socket) {
 
         promise(socket).then(function (result) {
           console.log('in result');
-          return next({ result: result, type: SUCCESS });
+          //return next({result, type: SUCCESS });
+          return next({ result: result });
         }).catch(function (error) {
           return next({ error: error, type: FAILURE });
         });
@@ -15213,6 +15227,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var socket = new _socketClient2.default();
 socket.connect();
+socket.emit('sendMessage', { recipient: '5a151ff2e52d523bf788e67b', composedMessage: 'hi how are you' });
 var createStoreWithMiddleWare = (0, _redux.applyMiddleware)((0, _socketMiddleware2.default)(socket), _reduxThunk2.default)(_redux.createStore);
 /*
 import io from 'socket.io-client';
@@ -15254,7 +15269,7 @@ class Chatroom extends React.Component{
 			<div>
 				<Chat />
 			</div>
-		)
+		) 
 	}
 }
 */
@@ -28582,7 +28597,7 @@ var ChatFrame = function (_React$Component) {
 	_createClass(ChatFrame, [{
 		key: 'render',
 		value: function render() {
-			this.props.dispatch((0, _send2.default)());
+			//	this.props.dispatch(send());
 			return _react2.default.createElement(
 				'div',
 				null,
@@ -28638,8 +28653,6 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
 
-var socket = (0, _socket2.default)();
-
 var Chat = function (_React$Component) {
 	_inherits(Chat, _React$Component);
 
@@ -28658,7 +28671,7 @@ var Chat = function (_React$Component) {
 	_createClass(Chat, [{
 		key: 'componentWillMount',
 		value: function componentWillMount() {
-
+			this.props.loadConversationsSocket();
 			this.props.loadConversations();
 			this.props.loadRecipients();
 		}
@@ -28766,6 +28779,7 @@ var Chat = function (_React$Component) {
 			return _react2.default.createElement(
 				'div',
 				null,
+				JSON.parse(localStorage.getItem("user")).name,
 				_react2.default.createElement(
 					'form',
 					{ onSubmit: function onSubmit(e) {
@@ -32453,6 +32467,7 @@ var socketAPI = function () {
             console.error(response.error);
             return reject(response.error);
           }
+          console.log('response here');
           console.log(response);
           return resolve(response);
         });
@@ -32961,6 +32976,9 @@ exports.default = function () {
 			return _extends({}, state, { recipients: action.recipients });
 			break;
 		case _type.LOAD_CONVERSATIONS:
+			return _extends({}, state, { conversations: action.conversations });
+			break;
+		case _type.LOAD_CONVERSATIONS_SOCKET:
 			return _extends({}, state, { conversations: action.conversations });
 			break;
 		case _type.CHOSEN_CONVERSATION:

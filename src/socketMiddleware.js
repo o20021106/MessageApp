@@ -20,6 +20,7 @@
 	};
 }
 */
+
 export default function socketMiddleware(socket) {
   // Socket param is the client. We'll show how to set this up later.
   return ({dispatch, getState}) => next => action => {
@@ -44,7 +45,8 @@ export default function socketMiddleware(socket) {
     
     promise(socket).then((result) => {
       	console.log('in result');
-        return next({result, type: SUCCESS });
+        //return next({result, type: SUCCESS });
+        return next({result});
       })
       .catch((error) => {
         return next({error, type: FAILURE });

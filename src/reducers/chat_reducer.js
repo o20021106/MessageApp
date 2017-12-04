@@ -1,4 +1,9 @@
-import {LOAD_RECIPIENTS,LOAD_CONVERSATIONS, CHOSEN_CONVERSATION, CHOSEN_CONVERSATION_MESSAGES} from '../actions/type.js';
+import {LOAD_RECIPIENTS,
+	LOAD_CONVERSATIONS, 
+	CHOSEN_CONVERSATION, 
+	CHOSEN_CONVERSATION_MESSAGES,
+	LOAD_CONVERSATIONS_SOCKET
+	} from '../actions/type.js';
 
 const initial = {recipients:[1234], conversations:[], chosenConversation:'no one chosen', currentConversation:[]};
 
@@ -9,6 +14,9 @@ export default function(state = initial, action){
 			return {...state, recipients : action.recipients};
 			break;
 		case LOAD_CONVERSATIONS:
+			return {...state, conversations : action.conversations};
+			break;
+		case LOAD_CONVERSATIONS_SOCKET:
 			return {...state, conversations : action.conversations};
 			break;
 		case CHOSEN_CONVERSATION:

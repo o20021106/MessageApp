@@ -6,7 +6,6 @@ import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
 
 import io from 'socket.io-client';
-var socket=io();
 
 
 class Chat extends React.Component{	
@@ -18,7 +17,7 @@ class Chat extends React.Component{
 		this.insertText = this.insertText.bind(this);
 	}
 	componentWillMount(){
-		
+        this.props.loadConversationsSocket();
 		this.props.loadConversations();
 		this.props.loadRecipients();
 	}
@@ -99,6 +98,7 @@ class Chat extends React.Component{
 
 		return (
 			<div>
+			{JSON.parse(localStorage.getItem("user")).name}
 				<form onSubmit = {(e) => this.newMessage(e)}>
 				 	<select name="recipient" onChange = {(e)=> this.changeRecipient(e)}>
      					{this.userList()}
