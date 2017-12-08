@@ -27,6 +27,14 @@ export function loadRecipients(){
 	}
 }
 
+
+export function setChosenConversation(conversationId){
+    return function(dispatch){
+    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
+    	getCurrentConversation(conversationId, dispatch);
+    }
+}
+
 export function loadConversations(){
 	return function(dispatch){
 		fetch("/getConversations",
@@ -59,6 +67,7 @@ export function loadConversations(){
 		});
 	}
 }
+
 
 function getCurrentConversation(conversationId, dispatch){
 	fetch("/getConversation/"+conversationId,

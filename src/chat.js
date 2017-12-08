@@ -74,11 +74,20 @@ class Chat extends React.Component{
 		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
 	}
 	
+	selectConversation(e,conversationId){
+		e.preventDefault();
+		console.log(e.currentTarget.tagName);
+		let data = e.currentTarget.getAttribute('data-href');
+		this.props.setChosenConversation(conversationId)
+	}
+
 	conversationList(){
 		if(!(this.props.conversations.length === 0)){
 			console.log('in conversation if');
-			return this.props.conversations.map(conversation =>(<li key = {conversation.conversation._id} onClick = {alert}>
-				<a data-href = {'http://localhost:8000/messaages/'+conversation.conversation._id}>
+
+
+			return this.props.conversations.map(conversation =>(<li key = {conversation.conversation._id} >
+				<a data-href = {'http://localhost:8000/messaages/'+conversation.conversation._id} onClick = {(e) =>this.selectConversation(e,conversation.conversation._id)}>
 					<div>
 						participants: {this.participantsNames(conversation.conversation.participants)}
 					</div> 

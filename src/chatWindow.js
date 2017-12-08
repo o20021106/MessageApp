@@ -6,10 +6,11 @@ import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index'
 
 
-class Chat extends React.Component{	
+class ChatWindow extends React.Component{	
 	constructor(props){
 		super(props);	
 	}
+
 
 	conversationDisplay(){
 		var messages = this.props.currentConversation;
@@ -32,5 +33,5 @@ function mapStateToProps(state) {
     return { chosenConversation: state.chosenConversation, currentConversation: state.currentConversation};
 }
 	
-export default connect(mapStateToProps, actions)(Chat);
+export default connect(mapStateToProps, actions)(ChatWindow);
     

@@ -13054,6 +13054,7 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 exports.loadRecipients = loadRecipients;
+exports.setChosenConversation = setChosenConversation;
 exports.loadConversations = loadConversations;
 exports.loadConversationsSocket = loadConversationsSocket;
 exports.loadCurrentConversation = loadCurrentConversation;
@@ -13078,6 +13079,13 @@ function loadRecipients() {
 		}).catch(function (err) {
 			console.log(err);
 		});
+	};
+}
+
+function setChosenConversation(conversationId) {
+	return function (dispatch) {
+		dispatch({ type: _type.CHOSEN_CONVERSATION, chosenConversation: conversationId });
+		getCurrentConversation(conversationId, dispatch);
 	};
 }
 
@@ -28741,19 +28749,30 @@ var Chat = function (_React$Component) {
 			});
 		}
 	}, {
+		key: 'selectConversation',
+		value: function selectConversation(e, conversationId) {
+			e.preventDefault();
+			console.log(e.currentTarget.tagName);
+			var data = e.currentTarget.getAttribute('data-href');
+			this.props.setChosenConversation(conversationId);
+		}
+	}, {
 		key: 'conversationList',
 		value: function conversationList() {
 			var _this2 = this;
 
 			if (!(this.props.conversations.length === 0)) {
 				console.log('in conversation if');
+
 				return this.props.conversations.map(function (conversation) {
 					return _react2.default.createElement(
 						'li',
-						{ key: conversation.conversation._id, onClick: alert },
+						{ key: conversation.conversation._id },
 						_react2.default.createElement(
 							'a',
-							{ 'data-href': 'http://localhost:8000/messaages/' + conversation.conversation._id },
+							{ 'data-href': 'http://localhost:8000/messaages/' + conversation.conversation._id, onClick: function onClick(e) {
+									return _this2.selectConversation(e, conversation.conversation._id);
+								} },
 							_react2.default.createElement(
 								'div',
 								null,
@@ -32324,16 +32343,16 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
 
-var Chat = function (_React$Component) {
-	_inherits(Chat, _React$Component);
+var ChatWindow = function (_React$Component) {
+	_inherits(ChatWindow, _React$Component);
 
-	function Chat(props) {
-		_classCallCheck(this, Chat);
+	function ChatWindow(props) {
+		_classCallCheck(this, ChatWindow);
 
-		return _possibleConstructorReturn(this, (Chat.__proto__ || Object.getPrototypeOf(Chat)).call(this, props));
+		return _possibleConstructorReturn(this, (ChatWindow.__proto__ || Object.getPrototypeOf(ChatWindow)).call(this, props));
 	}
 
-	_createClass(Chat, [{
+	_createClass(ChatWindow, [{
 		key: 'conversationDisplay',
 		value: function conversationDisplay() {
 			var messages = this.props.currentConversation;
@@ -32363,14 +32382,14 @@ var Chat = function (_React$Component) {
 		}
 	}]);
 
-	return Chat;
+	return ChatWindow;
 }(_react2.default.Component);
 
 function mapStateToProps(state) {
 	return { chosenConversation: state.chosenConversation, currentConversation: state.currentConversation };
 }
 
-exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)(Chat);
+exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)(ChatWindow);
 
 /***/ }),
 /* 277 */
