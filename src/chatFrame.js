@@ -4,11 +4,9 @@ import React from 'react';
 import {connect} from 'react-redux';
 import Chat from './chat';
 import ChatWindow from './chatWindow';
-import send from './send'
 class ChatFrame extends React.Component{	
 
 	render(){
-	//	this.props.dispatch(send());
 		return (
 			<div>
 				<Chat />

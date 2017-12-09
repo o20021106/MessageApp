@@ -39,17 +39,16 @@ export default class socketAPI {
           return reject(response.error);
         }
         console.log('response here');
-        console.log(response);
+        console.log(response.message);
         return resolve(response);
-      });
-    }); 
+      }); 
+    });  
   }
 
   on(event, fun) {
     // No promise is needed here, but we're expecting one in the middleware.
     return new Promise((resolve, reject) => {
       if (!this.socket) return reject('No socket connection.');
-
       this.socket.on(event, fun);
       resolve();
     });

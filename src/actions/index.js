@@ -132,3 +132,22 @@ export function loadCurrentConversation(conversationId){
 	}
 }
 
+export function newMessageSocket(composedMessage, conversationId){
+	return {
+		type: 'socket',
+        promise: function(socket){
+    	console.log('inside socket here');
+    	return socket.emit('newMessage',{composedMessage:composedMessage, conversationId:conversationId});
+    	}
+	}
+}
+
+export function newMessageSocket(composedMessage, conversationId){
+	return {
+		type: 'socket',
+        promise: function(socket){
+    	console.log('inside socket here');
+    	return socket.on('newMessage',{composedMessage:composedMessage, conversationId:conversationId});
+    	}
+	}
+}

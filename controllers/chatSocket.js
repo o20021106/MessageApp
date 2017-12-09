@@ -2,7 +2,7 @@ var Promise = require ('promise');
 const Conversation = require("../src/models/conversation"),
 		Message = require("../src/models/message"),
 		User = require("../src/models/user");
-
+/*
 exports.newMessage = function(user, recipient, composedMessage){
 	console.log('before promise');
 	return new Promise((resolve, reject) =>{
@@ -49,4 +49,39 @@ exports.newMessage = function(user, recipient, composedMessage){
   		})
 
 	})
+}
+*/
+exports.newMessage = function(user, conversationId, composedMessage){
+	console.log('before promise');
+	return new Promise((resolve, reject) =>{
+		console.log('in promise');
+		console.log(conversationId);
+		console.log(composedMessage);
+		if(!conversationId) {
+			console.log('conversation wrong');
+    		return reject({ error: 'Please choose a valid conversation for your message.' });
+  		}
+  		if(!composedMessage) {
+  			console.log('composed message wrong')
+  			return reject({ error: 'Please enter a message.' });
+	  	}
+
+	  	console.log('before constructed conversation');
+	  	console.log(conversationId);
+	  	console.log(user);
+        console.log(user._id);
+        const message = new Message({
+	  	  		conversationId: conversationId,
+	      		body: composedMessage,
+	      		author: user._id
+  			});   
+  		message.save(function(err, newMessage) {
+	    	if (err) {
+	    		console.log('new message save err');
+	        	return reject({ error: err });
+	     	}
+	     	console.log('in message');
+	      	return resolve({ message: 'message sent'});
+    	});
+  	})  
 }

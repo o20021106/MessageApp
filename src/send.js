@@ -1,9 +1,9 @@
-export default function send() {
+export default function send(composedMessage,conversationId) {
   return {
     type: 'socket',
     promise: function(socket){
     	console.log('inside socket here');
-    	return socket.emit('event','momomomomo~~~~~~~~~~~~~~');
+    	return socket.emit('message',{compsedMessage:compsedMessage, conversationId:conversationId});
     }
   }
 }

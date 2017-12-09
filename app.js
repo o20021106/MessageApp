@@ -50,6 +50,7 @@ server.listen(8000,function(){
 var config = require("./config/main");
 var socketioJwt = require('socketio-jwt');
 var User = require('./src/models/user');  
+var Conversation = require('./src/models/conversation');  
 var chatControllerSocket = require('./controllers/chatSocket.js');
 
 
@@ -65,8 +66,18 @@ io.on('connection', function(client){
     .exec(function(err,user){
     	if (err){
     		console.log('error')
-			console.log(err);
+			return console.log(err);
 		}
+
+    	Conversation.find({participants: user._id})
+    	.select('_id')
+    	.exec(function(err, conversations){
+    		conversations.forEach(function(conversation){
+    			client.join(conversation._id);
+    		}
+
+    	});
+
 
 	    client.on('sendMessage', function(data,fn){
 	    	console.log('in sendMessage');
@@ -76,7 +87,21 @@ io.on('connection', function(client){
 	    	.then(response => {
 	    		console.log('in sendMessage response');
 	    		console.log(response);
-	    		fn(response)});
+	    		fn(response);
+	    	});
+	    });
+
+	    client.on('newMessage', function(data,fn){
+	    	console.log('in newMessage');
+	    	console.log(user);
+	    	console.log(data);
+	    	chatControllerSocket.newMessage(user,data.conversationId, data.composedMessage)
+	    	.then(response => {
+	    		console.log('in newMessage response');
+	    		console.log(response);
+	    		io.to(data.conversationId).emit('newMessage', {...data, author: user.name});
+	    		fn(response);
+	    	});
 	    });
 
 	    client.on('event', function(data,fn){

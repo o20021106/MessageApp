@@ -13058,6 +13058,7 @@ exports.setChosenConversation = setChosenConversation;
 exports.loadConversations = loadConversations;
 exports.loadConversationsSocket = loadConversationsSocket;
 exports.loadCurrentConversation = loadCurrentConversation;
+exports.newMessageSocket = newMessageSocket;
 
 var _type = __webpack_require__(61);
 
@@ -13167,6 +13168,16 @@ function loadCurrentConversation(conversationId) {
 		}).catch(function (err) {
 			console.log(err);
 		});
+	};
+}
+
+function newMessageSocket(composedMessage, conversationId) {
+	return {
+		type: 'socket',
+		promise: function promise(socket) {
+			console.log('inside socket here');
+			return socket.emit('newMessage', { composedMessage: composedMessage, conversationId: conversationId });
+		}
 	};
 }
 
@@ -15163,10 +15174,11 @@ function socketMiddleware(socket) {
         console.log('in socket promise combo~');
         console.log(typeof promise === 'undefined' ? 'undefined' : _typeof(promise));
 
-        promise(socket).then(function (result) {
+        promise(socket).then(function (response) {
           console.log('in result');
+          console.log(response);
           //return next({result, type: SUCCESS });
-          return next({ result: result });
+          return next(response);
         }).catch(function (error) {
           return next({ error: error, type: FAILURE });
         });
@@ -28581,10 +28593,6 @@ var _chatWindow = __webpack_require__(276);
 
 var _chatWindow2 = _interopRequireDefault(_chatWindow);
 
-var _send = __webpack_require__(277);
-
-var _send2 = _interopRequireDefault(_send);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -28605,7 +28613,6 @@ var ChatFrame = function (_React$Component) {
 	_createClass(ChatFrame, [{
 		key: 'render',
 		value: function render() {
-			//	this.props.dispatch(send());
 			return _react2.default.createElement(
 				'div',
 				null,
@@ -32333,6 +32340,10 @@ var _index = __webpack_require__(109);
 
 var actions = _interopRequireWildcard(_index);
 
+var _send = __webpack_require__(277);
+
+var _send2 = _interopRequireDefault(_send);
+
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -32349,7 +32360,11 @@ var ChatWindow = function (_React$Component) {
 	function ChatWindow(props) {
 		_classCallCheck(this, ChatWindow);
 
-		return _possibleConstructorReturn(this, (ChatWindow.__proto__ || Object.getPrototypeOf(ChatWindow)).call(this, props));
+		var _this = _possibleConstructorReturn(this, (ChatWindow.__proto__ || Object.getPrototypeOf(ChatWindow)).call(this, props));
+
+		_this.state = { messageBuffer: 'asdfadsfasdf' };
+
+		return _this;
 	}
 
 	_createClass(ChatWindow, [{
@@ -32371,13 +32386,37 @@ var ChatWindow = function (_React$Component) {
 			}
 		}
 	}, {
+		key: 'insertText',
+		value: function insertText(e) {
+			e.preventDefault();
+			this.setState({ messageBuffer: e.target.value });
+		}
+	}, {
+		key: 'newMessage',
+		value: function newMessage(e) {
+			e.preventDefault();
+			this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
+		}
+	}, {
 		key: 'render',
 		value: function render() {
+			var _this2 = this;
+
 			return _react2.default.createElement(
 				'div',
 				null,
 				'in chat window',
-				this.conversationDisplay()
+				this.conversationDisplay(),
+				_react2.default.createElement(
+					'form',
+					{ onSubmit: function onSubmit(e) {
+							return _this2.newMessage(e);
+						} },
+					_react2.default.createElement('input', { type: 'text', name: 'composedMessage', onChange: function onChange(e) {
+							return _this2.insertText(e);
+						} }),
+					_react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+				)
 			);
 		}
 	}]);
@@ -32402,12 +32441,12 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.default = send;
-function send() {
+function send(composedMessage, conversationId) {
   return {
     type: 'socket',
     promise: function promise(socket) {
       console.log('inside socket here');
-      return socket.emit('event', 'momomomomo~~~~~~~~~~~~~~');
+      return socket.emit('message', { compsedMessage: compsedMessage, conversationId: conversationId });
     }
   };
 }
@@ -32487,7 +32526,7 @@ var socketAPI = function () {
             return reject(response.error);
           }
           console.log('response here');
-          console.log(response);
+          console.log(response.message);
           return resolve(response);
         });
       });
@@ -32500,7 +32539,6 @@ var socketAPI = function () {
       // No promise is needed here, but we're expecting one in the middleware.
       return new _promise2.default(function (resolve, reject) {
         if (!_this4.socket) return reject('No socket connection.');
-
         _this4.socket.on(event, fun);
         resolve();
       });
