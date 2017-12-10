@@ -7904,7 +7904,9 @@ var LOAD_RECIPIENTS = exports.LOAD_RECIPIENTS = 'LOAD_RECIPIENTS',
     CHOSEN_CONVERSATION_MESSAGES = exports.CHOSEN_CONVERSATION_MESSAGES = 'CHOSEN_CONVERSATION_MESSAGES',
     CHOSEN_CONVERSATION = exports.CHOSEN_CONVERSATION = 'CHOSEN_CONVERSATION',
     LOAD_CONVERSATIONS_SOCKET = exports.LOAD_CONVERSATIONS_SOCKET = 'LOAD_CONVERSATIONS_SOCKET',
-    UPDATE_CONVERSATION_MESSAGES = exports.UPDATE_CONVERSATION_MESSAGES = 'UPDATE_CONVERSATION_MESSAGES';
+    UPDATE_CONVERSATION_MESSAGES = exports.UPDATE_CONVERSATION_MESSAGES = 'UPDATE_CONVERSATION_MESSAGES',
+    NEW_CONVERSATION = exports.NEW_CONVERSATION = 'NEW_CONVERSATION',
+    UPDATE_RECIPIENT = exports.UPDATE_RECIPIENT = 'UPDATE_RECIPIENT';
 
 /***/ }),
 /* 62 */
@@ -13057,10 +13059,10 @@ Object.defineProperty(exports, "__esModule", {
 exports.loadRecipients = loadRecipients;
 exports.setChosenConversation = setChosenConversation;
 exports.loadConversations = loadConversations;
-exports.loadConversationsSocket = loadConversationsSocket;
 exports.loadCurrentConversation = loadCurrentConversation;
 exports.newMessageSocket = newMessageSocket;
-exports.onNewMessageSocket = onNewMessageSocket;
+exports.newConversationSocket = newConversationSocket;
+exports.getConversationByRecipientId = getConversationByRecipientId;
 
 var _type = __webpack_require__(61);
 
@@ -13140,16 +13142,6 @@ function getCurrentConversation(conversationId, dispatch) {
 	});
 }
 
-function loadConversationsSocket() {
-	return {
-		type: 'socket',
-		promise: function promise(socket) {
-			console.log('inside socket here for loadConversations');
-			return socket.emit('loadConversationsSocket', 'momomomomo~~~~~~~~~~~~~~');
-		}
-	};
-}
-
 function loadCurrentConversation(conversationId) {
 	return function (dispatch) {
 		fetch("/getConversation/" + conversationId, {
@@ -13183,16 +13175,41 @@ function newMessageSocket(composedMessage, conversationId) {
 	};
 }
 
-function onNewMessageSocket() {
+function newConversationSocket(composedMessage, recipientId) {
+	console.log('in new conversation socket');
 	return {
 		type: 'socket',
-		promise: function promise(socket) {
-			console.log('inside socket here');
-			return socket.on('newMessage', function (data) {
-
-				//{composedMessage:composedMessage, conversationId:conversationId}
-			});
+		promise: function promise(socket, next) {
+			console.log('creating new conversation action creator');
+			return socket.emit('newConversation', { composedMessage: composedMessage, recipientId: recipientId });
 		}
+	};
+}
+
+function getConversationByRecipientId(recipientId) {
+	return function (dispatch) {
+		console.log('recipientId');
+		console.log(recipientId);
+		fetch("/getConversationByRecipientId/" + recipientId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json',
+				'Authorization': localStorage.getItem("token")
+			},
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log('return conversation by recipientId');
+			if (json.status) {
+				dispatch({ type: _type.CHOSEN_CONVERSATION, chosenConversation: null });
+				dispatch({ type: _type.UPDATE_RECIPIENT, latestRecipient: recipientId });
+			} else {
+				dispatch({ type: _type.CHOSEN_CONVERSATION, chosenConversation: json.conversationId });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
 	};
 }
 
@@ -28714,7 +28731,6 @@ var Chat = function (_React$Component) {
 	_createClass(Chat, [{
 		key: 'componentWillMount',
 		value: function componentWillMount() {
-			this.props.loadConversationsSocket();
 			this.props.loadConversations();
 			this.props.loadRecipients();
 		}
@@ -28740,12 +28756,23 @@ var Chat = function (_React$Component) {
 		value: function changeRecipient(e) {
 			e.preventDefault();
 			this.setState({ recipientId: e.target.value });
+			//should change current conversation if there's a conversation betweetn the two
+			//check if it is the same conversation as current (will receive props)
+			console.log('in change recipient');
+			console.log(e.target.value);
+			this.props.getConversationByRecipientId(e.target.value);
 		}
 	}, {
 		key: 'insertText',
 		value: function insertText(e) {
 			e.preventDefault();
 			this.setState({ messageBuffer: e.target.value });
+		}
+	}, {
+		key: 'newConversation',
+		value: function newConversation(e) {
+			e.preventDefault();
+			this.props.newConversationSocket(this.state.messageBuffer, this.state.recipientId);
 		}
 	}, {
 		key: 'newMessage',
@@ -32398,6 +32425,10 @@ var ChatWindow = function (_React$Component) {
 	_createClass(ChatWindow, [{
 		key: 'conversationDisplay',
 		value: function conversationDisplay() {
+			if (this.props.chosenConversation === null) {
+
+				return 'start a conversation';
+			}
 			var messages = this.props.currentConversation;
 
 			if (messages.length !== 0) {
@@ -32430,7 +32461,14 @@ var ChatWindow = function (_React$Component) {
 		key: 'newMessage',
 		value: function newMessage(e) {
 			e.preventDefault();
-			this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
+			console.log('latest recipient');
+			console.log(latestRecipient);
+			if (this.props.latestRecipient !== null) {
+				console.log('a new conversation');
+				this.props.newConversationSocket(this.state.messageBuffer, this.latestRecipient);
+			} else {
+				this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
+			}
 		}
 	}, {
 		key: 'render',
@@ -33080,20 +33118,18 @@ exports.default = function () {
 		case _type.CHOSEN_CONVERSATION_MESSAGES:
 			return _extends({}, state, { currentConversation: action.currentConversation });
 		case _type.UPDATE_CONVERSATION_MESSAGES:
-			console.log('in up date!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-			console.log(action.message);
-			console.log(state.currentConversation);
 			var currentConversation = state.currentConversation.slice();
 			currentConversation.push(action.message[0]);
-			/*console.log(state.currentConversation);
-   let currentConversation = state.currentConversation.push({...message});
-   console.log(currentConversation);
-   console.log(state.currentConversation);
-   var currentConversation1 = state.currentConversation.push({...message});
-   console.log(currentConversation1);
-   console.log(state.currentConversation); 
-   */
 			return _extends({}, state, { currentConversation: currentConversation });
+		case _type.NEW_CONVERSATION:
+			console.log('in new conversation');
+			var conversations = state.conversations.slice();
+			conversations.push(action.payload);
+
+			return _extends({}, state, { conversations: conversations, latestRecipient: null });
+		case _type.UPDATE_RECIPIENT:
+			return _extends({}, state, { latestRecipient: action.recipientId });
+
 		default:
 			return state;
 	}
@@ -33122,7 +33158,7 @@ export default function(state = initial, action){
 }
 
 */
-var initial = { recipients: [1234], conversations: [], chosenConversation: 'no one chosen', currentConversation: [] };
+var initial = { recipients: [1234], conversations: [], chosenConversation: 'no one chosen', currentConversation: [], latestRecipient: null };
 
 /***/ }),
 /* 288 */

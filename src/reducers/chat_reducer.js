@@ -3,10 +3,12 @@ import {LOAD_RECIPIENTS,
 	CHOSEN_CONVERSATION, 
 	CHOSEN_CONVERSATION_MESSAGES,
 	LOAD_CONVERSATIONS_SOCKET,
-	UPDATE_CONVERSATION_MESSAGES
+	UPDATE_CONVERSATION_MESSAGES,
+	NEW_CONVERSATION,
+	UPDATE_RECIPIENT
 	} from '../actions/type.js';
 
-const initial = {recipients:[1234], conversations:[], chosenConversation:'no one chosen', currentConversation:[]};
+const initial = {recipients:[1234], conversations:[], chosenConversation:'no one chosen', currentConversation:[], latestRecipient:null};
 
 
 export default function(state = initial, action){
@@ -27,20 +29,18 @@ export default function(state = initial, action){
 		case CHOSEN_CONVERSATION_MESSAGES:
 			return {...state, currentConversation: action.currentConversation};
 		case UPDATE_CONVERSATION_MESSAGES:
-			console.log('in up date!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-			console.log(action.message)
-			console.log(state.currentConversation);
 			var currentConversation = state.currentConversation.slice();
 			currentConversation.push(action.message[0]);
-			/*console.log(state.currentConversation);
-			let currentConversation = state.currentConversation.push({...message});
-			console.log(currentConversation);
-			console.log(state.currentConversation);
-			var currentConversation1 = state.currentConversation.push({...message});
-			console.log(currentConversation1);
-			console.log(state.currentConversation); 
-			*/
 			return {...state, currentConversation:currentConversation}
+		case NEW_CONVERSATION:
+			console.log('in new conversation');
+			var conversations = state.conversations.slice();
+			conversations.push(action.payload);
+
+			return {...state, conversations:conversations, latestRecipient:null}
+		case UPDATE_RECIPIENT:
+			return {...state, latestRecipient:action.recipientId}
+
 		default:
 			return state;
 	}

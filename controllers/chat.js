@@ -15,6 +15,29 @@ exports.getRecipients = function(req, res, next){
 	})
 }
 
+exports.getConversationByRecipientId = function(req,res,next){
+	console.log(' in getConversationByRecipeintId');
+//	options= {upsert: true, new: true};
+	Conversation.findOne({participants: [req.user._id, req.params.recipientId]},function(err,conversation){
+		if(err){
+			return res.json({error:err})
+		}
+		if(!conversation){
+			return res.status(200).json({status: 'noConversation'})
+		}
+		return res.status(200).json({coversationId: conversation._id})
+	})
+/*	Conversation.findOneAndUpdate({participants: [req.user._id, req.params.recipientId]},options, function(err, conversation){
+		if(err){
+			
+			return res.json({err:err})
+		}
+		console.log('conversation in here~~~~~');
+		return res.status(200).json({conversation:conversation})
+
+	})*/
+}
+
 exports.getConversations = function(req, res, next){
     console.log('in getconversations');
 	Conversation.find({participants: req.user._id})

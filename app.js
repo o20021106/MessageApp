@@ -105,6 +105,18 @@ io.on('connection', function(client){
 	    	});
 	    });
 
+	    client.on('newConversation', function(data,fn){
+	    	console.log('in newConversation');
+	    	chatControllerSocket.newConversation(user, data.recipientId, data.composedMessage)
+	    	.then(response =>{
+	    		console.log('in newConversation response');
+	    		console.log(response);
+	    		client.join(response.conversation._id);
+	    		fn({type: 'NEW_CONVERSATION', payload: response});
+	    	});
+
+	    });
+
 	    client.on('event', function(data,fn){
 	  		console.log(data);
 	  		fn('got it');

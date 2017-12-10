@@ -64,6 +64,8 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
 router.get('/getRecipients', chatController.getRecipients);
 router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
 router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
+router.get('/getConversationByRecipientId/:recipientId', passport.authenticate('jwt', { session: false }), chatController.getConversationByRecipientId);
+
 
 
 

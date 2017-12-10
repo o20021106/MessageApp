@@ -1,4 +1,4 @@
-import {LOAD_RECIPIENTS, LOAD_CONVERSATIONS, CHOSEN_CONVERSATION, CHOSEN_CONVERSATION_MESSAGES } from './type'
+import {LOAD_RECIPIENTS, LOAD_CONVERSATIONS, CHOSEN_CONVERSATION, CHOSEN_CONVERSATION_MESSAGES, UPDATE_RECIPIENT } from './type'
 
 export function loadRecipients(){
 	return function(dispatch){
@@ -94,16 +94,7 @@ function getCurrentConversation(conversationId, dispatch){
 		});
 }
 
-export function loadConversationsSocket(){
-  return {
-    type: 'socket',
-    promise: function(socket){
-    	console.log('inside socket here for loadConversations');
-    	return socket.emit('loadConversationsSocket','momomomomo~~~~~~~~~~~~~~');
-    }
-  }
 
-}
 
 export function loadCurrentConversation(conversationId){
 	return function(dispatch){
@@ -142,15 +133,50 @@ export function newMessageSocket(composedMessage, conversationId){
 	}
 }
 
-export function onNewMessageSocket(){
+
+export function newConversationSocket(composedMessage, recipientId){
+	console.log('in new conversation socket');
 	return {
 		type: 'socket',
-        promise: function(socket){
-    	console.log('inside socket here');
-    	return socket.on('newMessage',function(data){
+		promise: function(socket, next){
+			console.log('creating new conversation action creator');
+			return socket.emit('newConversation', {composedMessage: composedMessage, recipientId:recipientId})
+		}
+	}
 
-    		//{composedMessage:composedMessage, conversationId:conversationId}
-    	});
-    	}
+}
+
+ 
+
+export function getConversationByRecipientId(recipientId){
+	return function(dispatch){
+		console.log('recipientId');
+		console.log(recipientId);
+		fetch("/getConversationByRecipientId/"+recipientId,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			      'Authorization' : localStorage.getItem("token")
+			    },
+			    method: "GET",
+			})
+			.then(function(response) {
+			    return response.json();
+			})
+			.then(json=>{
+				console.log('return conversation by recipientId');
+				if(json.status){
+					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: null});
+					dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
+
+				}
+				else{
+					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: json.conversationId});
+				}
+			})
+			.catch(err=>{
+				console.log(err);
+			});
 	}
 }

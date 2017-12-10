@@ -95,3 +95,46 @@ exports.newMessage = function(user, conversationId, composedMessage){
     	});
   	})  
 }  
+
+exports.newConversation = function(user, recipientId, composedMessage,){
+	return new Promise((resolve, reject)=>{
+		console.log('in new COnversation before if');
+		if(!composedMessage) {
+	  		return reject({message:'wrong composedMessage'})
+	  	}
+	  	if(!recipientId) {
+	  		return reject({message:'wrong recipient'})
+	  	}
+		console.log('after new COnversation before if');
+
+		
+	  	const conversation = new Conversation({
+	  		participants: [user._id, recipientId]
+	  	})
+
+	  	conversation.save(function(err, newConversation){
+	  		if(err){
+	  			return reject({error:err})
+	  		}
+	  		const message = new Message({
+	  	  		conversationId: newConversation._id,
+	      		body: composedMessage,
+	      		author: user._id
+	  		});
+			console.log('new conversation before message save');
+
+	  		message.save(function(err, newMessage) {
+	    		if (err) {
+	    			return reject({error:err})
+	     		}
+	     		Conversation.populate(newConversation, 'participants', function(err, newConversation){
+	     			return resolve({
+	     				message :newMessage,
+	     				conversation:newConversation
+	     			})
+	     		})
+	    	});
+
+	  	});
+	})
+}

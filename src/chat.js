@@ -17,7 +17,6 @@ class Chat extends React.Component{
 		this.insertText = this.insertText.bind(this);
 	}
 	componentWillMount(){
-        this.props.loadConversationsSocket();
 		this.props.loadConversations();
 		this.props.loadRecipients();
 	}
@@ -37,11 +36,21 @@ class Chat extends React.Component{
 	changeRecipient(e){
 		e.preventDefault();
 		this.setState({recipientId: e.target.value});
+		//should change current conversation if there's a conversation betweetn the two
+		//check if it is the same conversation as current (will receive props)
+		console.log('in change recipient');
+		console.log(e.target.value);
+		this.props.getConversationByRecipientId(e.target.value);
 	}
 
 	insertText(e){
 		e.preventDefault();
 		this.setState({messageBuffer:e.target.value});
+	}
+
+	newConversation(e){
+		e.preventDefault();
+		this.props.newConversationSocket(this.state.messageBuffer, this.state.recipientId);
 	}
 
 	newMessage(e){
@@ -118,6 +127,7 @@ class Chat extends React.Component{
 				<ul>
 					{this.conversationList()}
 				</ul>
+				
 			</div>)
 	}
 

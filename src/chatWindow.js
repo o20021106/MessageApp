@@ -16,6 +16,10 @@ class ChatWindow extends React.Component{
 
 
 	conversationDisplay(){
+		if(this.props.chosenConversation === null){
+
+			return 'start a conversation'
+		}
 		var messages = this.props.currentConversation;
 
 
@@ -37,7 +41,15 @@ class ChatWindow extends React.Component{
 	}
 	newMessage(e){
 		e.preventDefault();
-		this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
+		console.log('latest recipient');
+		console.log(latestRecipient);
+		if(this.props.latestRecipient !== null){
+			console.log('a new conversation');
+			this.props.newConversationSocket(this.state.messageBuffer, this.latestRecipient);
+		}
+		else{
+			this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
+		}
 	}   
     
 	render(){
