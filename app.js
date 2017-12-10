@@ -73,8 +73,9 @@ io.on('connection', function(client){
     	.select('_id')
     	.exec(function(err, conversations){
     		conversations.forEach(function(conversation){
+    			console.log('join '+conversation._id);
     			client.join(conversation._id);
-    		}
+    		})
 
     	});
 
@@ -99,8 +100,8 @@ io.on('connection', function(client){
 	    	.then(response => {
 	    		console.log('in newMessage response');
 	    		console.log(response);
-	    		io.to(data.conversationId).emit('newMessage', {...data, author: user.name});
-	    		fn(response);
+	    		io.to(data.conversationId).emit('newMessage', {message: response.message});
+	    		fn(response.status);
 	    	});
 	    });
 

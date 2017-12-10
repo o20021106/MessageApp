@@ -81,7 +81,17 @@ exports.newMessage = function(user, conversationId, composedMessage){
 	        	return reject({ error: err });
 	     	}
 	     	console.log('in message');
-	      	return resolve({ message: 'message sent'});
+	     	Message.find({_id : newMessage.id})
+	     	.populate('author','name')
+	     	.exec(function(err, rMessage){
+	     		if (err) {
+	    		console.log('new message save err');
+	        	return reject({ error: err });
+	     		}
+
+	     		return resolve({status: 'message sent', message : rMessage});
+	     	})
+//	      	return resolve({ message: newMessage});
     	});
   	})  
-}
+}  

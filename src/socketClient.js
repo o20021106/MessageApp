@@ -39,7 +39,7 @@ export default class socketAPI {
           return reject(response.error);
         }
         console.log('response here');
-        console.log(response.message);
+        console.log(response);
         return resolve(response);
       }); 
     });  

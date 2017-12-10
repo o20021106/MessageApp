@@ -135,19 +135,22 @@ export function loadCurrentConversation(conversationId){
 export function newMessageSocket(composedMessage, conversationId){
 	return {
 		type: 'socket',
-        promise: function(socket){
+        promise: function(socket,next){
     	console.log('inside socket here');
     	return socket.emit('newMessage',{composedMessage:composedMessage, conversationId:conversationId});
     	}
 	}
 }
 
-export function newMessageSocket(composedMessage, conversationId){
+export function onNewMessageSocket(){
 	return {
 		type: 'socket',
         promise: function(socket){
     	console.log('inside socket here');
-    	return socket.on('newMessage',{composedMessage:composedMessage, conversationId:conversationId});
+    	return socket.on('newMessage',function(data){
+
+    		//{composedMessage:composedMessage, conversationId:conversationId}
+    	});
     	}
 	}
 }

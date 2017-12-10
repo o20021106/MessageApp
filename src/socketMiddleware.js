@@ -43,7 +43,7 @@ export default function socketMiddleware(socket) {
     console.log('in socket promise combo~')
     console.log(typeof(promise));
     
-    promise(socket).then((response) => {
+    promise(socket, next).then((response) => {
       	console.log('in result');
         console.log(response);
         //return next({result, type: SUCCESS });
@@ -55,4 +55,4 @@ export default function socketMiddleware(socket) {
   };
 }
 
-  
+   

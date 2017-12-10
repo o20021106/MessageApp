@@ -44,7 +44,7 @@ class Love extends React.Component{
 		      'Content-Type': 'application/json'
 		    },
 		    method: "POST",
-		    body: JSON.stringify({ password: "800203", email : "o20021106@gmail.com"})
+		    body: JSON.stringify({ password: "800203", email : "sandy@gmail.com"})
 		})
 		.then(function(response) {
 			console.log('i am a response '+response);
@@ -99,7 +99,7 @@ class Love extends React.Component{
 		<div>
 		LOVE
 	       <button onClick = {this.love}>r04325008</button>
-	       <button onClick = {this.love2}>o20021106</button>
+	       <button onClick = {this.love2}>sandy</button>
 
 		</div>);
 	}

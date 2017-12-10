@@ -18,7 +18,16 @@ class ChatWindow extends React.Component{
 	conversationDisplay(){
 		var messages = this.props.currentConversation;
 
-		if(messages.length !==0){
+
+
+		if(messages.length !==0){		
+			console.log('here in display');
+			console.log(messages[0].body);
+			console.log(messages);
+			console.log(messages.length);
+			if(messages instanceof Array){
+				console.log('array');  
+			}
 			return messages.map(message=>(<div key ={message._id}>name: {message.author.name}  message:{message.body}</div>));
 		}
 	}
@@ -29,7 +38,7 @@ class ChatWindow extends React.Component{
 	newMessage(e){
 		e.preventDefault();
 		this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
-	}
+	}   
     
 	render(){
 		return (

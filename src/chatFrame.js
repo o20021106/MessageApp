@@ -7,6 +7,20 @@ import ChatWindow from './chatWindow';
 class ChatFrame extends React.Component{	
 
 	render(){
+		this.props.dispatch(
+			{
+				type: 'socket',
+        		promise: function(socket,next){
+    				console.log('inside socket for on');
+    				return socket.on('newMessage',function(data){
+    					console.log('inside callback function for on');
+    					next({type:'UPDATE_CONVERSATION_MESSAGES', message: data.message});
+
+    		//{composedMessage:composedMessage, conversationId:conversationId}
+    				});
+    			}
+			});
+
 		return (
 			<div>
 				<Chat />
@@ -16,6 +30,6 @@ class ChatFrame extends React.Component{
 
  	
 }
-
+ 
 export default connect()(ChatFrame);
  

@@ -7903,7 +7903,8 @@ var LOAD_RECIPIENTS = exports.LOAD_RECIPIENTS = 'LOAD_RECIPIENTS',
     LOAD_CONVERSATIONS = exports.LOAD_CONVERSATIONS = 'LOAD_CONVERSATIONS',
     CHOSEN_CONVERSATION_MESSAGES = exports.CHOSEN_CONVERSATION_MESSAGES = 'CHOSEN_CONVERSATION_MESSAGES',
     CHOSEN_CONVERSATION = exports.CHOSEN_CONVERSATION = 'CHOSEN_CONVERSATION',
-    LOAD_CONVERSATIONS_SOCKET = exports.LOAD_CONVERSATIONS_SOCKET = 'LOAD_CONVERSATIONS_SOCKET';
+    LOAD_CONVERSATIONS_SOCKET = exports.LOAD_CONVERSATIONS_SOCKET = 'LOAD_CONVERSATIONS_SOCKET',
+    UPDATE_CONVERSATION_MESSAGES = exports.UPDATE_CONVERSATION_MESSAGES = 'UPDATE_CONVERSATION_MESSAGES';
 
 /***/ }),
 /* 62 */
@@ -13059,6 +13060,7 @@ exports.loadConversations = loadConversations;
 exports.loadConversationsSocket = loadConversationsSocket;
 exports.loadCurrentConversation = loadCurrentConversation;
 exports.newMessageSocket = newMessageSocket;
+exports.onNewMessageSocket = onNewMessageSocket;
 
 var _type = __webpack_require__(61);
 
@@ -13174,9 +13176,22 @@ function loadCurrentConversation(conversationId) {
 function newMessageSocket(composedMessage, conversationId) {
 	return {
 		type: 'socket',
-		promise: function promise(socket) {
+		promise: function promise(socket, next) {
 			console.log('inside socket here');
 			return socket.emit('newMessage', { composedMessage: composedMessage, conversationId: conversationId });
+		}
+	};
+}
+
+function onNewMessageSocket() {
+	return {
+		type: 'socket',
+		promise: function promise(socket) {
+			console.log('inside socket here');
+			return socket.on('newMessage', function (data) {
+
+				//{composedMessage:composedMessage, conversationId:conversationId}
+			});
 		}
 	};
 }
@@ -15174,7 +15189,7 @@ function socketMiddleware(socket) {
         console.log('in socket promise combo~');
         console.log(typeof promise === 'undefined' ? 'undefined' : _typeof(promise));
 
-        promise(socket).then(function (response) {
+        promise(socket, next).then(function (response) {
           console.log('in result');
           console.log(response);
           //return next({result, type: SUCCESS });
@@ -15247,7 +15262,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 var socket = new _socketClient2.default();
 socket.connect();
-socket.emit('sendMessage', { recipient: '5a151ff2e52d523bf788e67b', composedMessage: 'hi how are you' });
+
 var createStoreWithMiddleWare = (0, _redux.applyMiddleware)((0, _socketMiddleware2.default)(socket), _reduxThunk2.default)(_redux.createStore);
 /*
 import io from 'socket.io-client';
@@ -28574,7 +28589,7 @@ exports['default'] = thunk;
 
 
 Object.defineProperty(exports, "__esModule", {
-	value: true
+  value: true
 });
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -28602,27 +28617,40 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; } /*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
 
 var ChatFrame = function (_React$Component) {
-	_inherits(ChatFrame, _React$Component);
+  _inherits(ChatFrame, _React$Component);
 
-	function ChatFrame() {
-		_classCallCheck(this, ChatFrame);
+  function ChatFrame() {
+    _classCallCheck(this, ChatFrame);
 
-		return _possibleConstructorReturn(this, (ChatFrame.__proto__ || Object.getPrototypeOf(ChatFrame)).apply(this, arguments));
-	}
+    return _possibleConstructorReturn(this, (ChatFrame.__proto__ || Object.getPrototypeOf(ChatFrame)).apply(this, arguments));
+  }
 
-	_createClass(ChatFrame, [{
-		key: 'render',
-		value: function render() {
-			return _react2.default.createElement(
-				'div',
-				null,
-				_react2.default.createElement(_chat2.default, null),
-				_react2.default.createElement(_chatWindow2.default, null)
-			);
-		}
-	}]);
+  _createClass(ChatFrame, [{
+    key: 'render',
+    value: function render() {
+      this.props.dispatch({
+        type: 'socket',
+        promise: function promise(socket, next) {
+          console.log('inside socket for on');
+          return socket.on('newMessage', function (data) {
+            console.log('inside callback function for on');
+            next({ type: 'UPDATE_CONVERSATION_MESSAGES', message: data.message });
 
-	return ChatFrame;
+            //{composedMessage:composedMessage, conversationId:conversationId}
+          });
+        }
+      });
+
+      return _react2.default.createElement(
+        'div',
+        null,
+        _react2.default.createElement(_chat2.default, null),
+        _react2.default.createElement(_chatWindow2.default, null)
+      );
+    }
+  }]);
+
+  return ChatFrame;
 }(_react2.default.Component);
 
 exports.default = (0, _reactRedux.connect)()(ChatFrame);
@@ -32373,6 +32401,13 @@ var ChatWindow = function (_React$Component) {
 			var messages = this.props.currentConversation;
 
 			if (messages.length !== 0) {
+				console.log('here in display');
+				console.log(messages[0].body);
+				console.log(messages);
+				console.log(messages.length);
+				if (messages instanceof Array) {
+					console.log('array');
+				}
 				return messages.map(function (message) {
 					return _react2.default.createElement(
 						'div',
@@ -32526,7 +32561,7 @@ var socketAPI = function () {
             return reject(response.error);
           }
           console.log('response here');
-          console.log(response.message);
+          console.log(response);
           return resolve(response);
         });
       });
@@ -33044,6 +33079,21 @@ exports.default = function () {
 			break;
 		case _type.CHOSEN_CONVERSATION_MESSAGES:
 			return _extends({}, state, { currentConversation: action.currentConversation });
+		case _type.UPDATE_CONVERSATION_MESSAGES:
+			console.log('in up date!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+			console.log(action.message);
+			console.log(state.currentConversation);
+			var currentConversation = state.currentConversation.slice();
+			currentConversation.push(action.message[0]);
+			/*console.log(state.currentConversation);
+   let currentConversation = state.currentConversation.push({...message});
+   console.log(currentConversation);
+   console.log(state.currentConversation);
+   var currentConversation1 = state.currentConversation.push({...message});
+   console.log(currentConversation1);
+   console.log(state.currentConversation); 
+   */
+			return _extends({}, state, { currentConversation: currentConversation });
 		default:
 			return state;
 	}

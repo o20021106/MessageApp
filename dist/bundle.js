@@ -9660,7 +9660,7 @@ var Love = function (_React$Component) {
 					'Content-Type': 'application/json'
 				},
 				method: "POST",
-				body: JSON.stringify({ password: "800203", email: "o20021106@gmail.com" })
+				body: JSON.stringify({ password: "800203", email: "sandy@gmail.com" })
 			}).then(function (response) {
 				console.log('i am a response ' + response);
 				return response.json();
@@ -9715,7 +9715,7 @@ var Love = function (_React$Component) {
 				_react2.default.createElement(
 					'button',
 					{ onClick: this.love2 },
-					'o20021106'
+					'sandy'
 				)
 			);
 		}
