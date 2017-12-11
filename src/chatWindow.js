@@ -42,10 +42,11 @@ class ChatWindow extends React.Component{
 	newMessage(e){
 		e.preventDefault();
 		console.log('latest recipient');
-		console.log(latestRecipient);
-		if(this.props.latestRecipient !== null){
+		console.log(this.props.latestRecipient);
+		console.log(this.props.chosenConversation);
+		if(this.props.chosenConversation === null){
 			console.log('a new conversation');
-			this.props.newConversationSocket(this.state.messageBuffer, this.latestRecipient);
+			this.props.newConversationSocket(this.state.messageBuffer, this.props.latestRecipient);
 		}
 		else{
 			this.props.newMessageSocket(this.state.messageBuffer, this.props.chosenConversation);
@@ -66,7 +67,9 @@ class ChatWindow extends React.Component{
 } 
 
 function mapStateToProps(state) {
-    return { chosenConversation: state.chosenConversation, currentConversation: state.currentConversation};
+    return { chosenConversation: state.chosenConversation, 
+    	currentConversation: state.currentConversation, 
+    	latestRecipient:state.latestRecipient};
 }
 	
 export default connect(mapStateToProps, actions)(ChatWindow);

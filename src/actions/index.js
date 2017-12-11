@@ -35,6 +35,10 @@ export function setChosenConversation(conversationId){
     }
 }
 
+export function setLatestRecipient(){
+    return {type:UPDATE_RECIPIENT, latestRecipient: null}
+}
+
 export function loadConversations(){
 	return function(dispatch){
 		fetch("/getConversations",
@@ -140,6 +144,7 @@ export function newConversationSocket(composedMessage, recipientId){
 		type: 'socket',
 		promise: function(socket, next){
 			console.log('creating new conversation action creator');
+			console.log(recipientId);
 			return socket.emit('newConversation', {composedMessage: composedMessage, recipientId:recipientId})
 		}
 	}
@@ -152,6 +157,8 @@ export function getConversationByRecipientId(recipientId){
 	return function(dispatch){
 		console.log('recipientId');
 		console.log(recipientId);
+		dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
+
 		fetch("/getConversationByRecipientId/"+recipientId,
 			{
 				headers: {
@@ -166,13 +173,12 @@ export function getConversationByRecipientId(recipientId){
 			})
 			.then(json=>{
 				console.log('return conversation by recipientId');
+				console.log(json);
 				if(json.status){
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: null});
-					dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
-
+					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: null, latestRecipient:recipientId});
 				}
 				else{
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: json.conversationId});
+					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: json.conversationId, messages: json.conversation});
 				}
 			})
 			.catch(err=>{

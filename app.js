@@ -52,7 +52,7 @@ var socketioJwt = require('socketio-jwt');
 var User = require('./src/models/user');  
 var Conversation = require('./src/models/conversation');  
 var chatControllerSocket = require('./controllers/chatSocket.js');
-
+var clients = {} //key: userId  value: socket id
 
 
 io.use(socketioJwt.authorize({
@@ -68,6 +68,9 @@ io.on('connection', function(client){
     		console.log('error')
 			return console.log(err);
 		}
+
+        clients[user._id] = client.id;
+
 
     	Conversation.find({participants: user._id})
     	.select('_id')
@@ -90,7 +93,7 @@ io.on('connection', function(client){
 	    		console.log(response);
 	    		fn(response);
 	    	});
-	    });
+	    }); 
 
 	    client.on('newMessage', function(data,fn){
 	    	console.log('in newMessage');
@@ -107,13 +110,22 @@ io.on('connection', function(client){
 
 	    client.on('newConversation', function(data,fn){
 	    	console.log('in newConversation');
+	    	console.log(data);
 	    	chatControllerSocket.newConversation(user, data.recipientId, data.composedMessage)
 	    	.then(response =>{
 	    		console.log('in newConversation response');
 	    		console.log(response);
 	    		client.join(response.conversation._id);
-	    		fn({type: 'NEW_CONVERSATION', payload: response});
-	    	});
+
+	    		if(data.recipientId in clients){
+	    			console.log('new conversation with someone online');
+		    		console.log(io.sockets.connected[clients[data.recipientId]]);
+
+	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
+	    			io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
+	    		}
+	    		fn({type: 'NEW_CONVERSATION', payload: response, latestRecipient: data.recipientId});
+	    	}); 
 
 	    });
 
@@ -121,10 +133,13 @@ io.on('connection', function(client){
 	  		console.log(data);
 	  		fn('got it');
 	  	});
-  		client.on('disconnect', function(){});
+  		client.on('disconnect', function(){
+  			if (user._id in clients){
+  				delete clients[user._id]
+  			}
+  		});
   	}) 
 });
-
 /*
 app.listen(8000,function(){
 	console.log('server is up');

@@ -21,6 +21,25 @@ class ChatFrame extends React.Component{
     			}
 			});
 
+		this.props.dispatch(
+			{
+				type: 'socket',
+        		promise: function(socket,next){
+    				console.log('inside socket for on');
+    				return socket.on('NEW_CONVERSATION_APPROACH',function(data){
+    					console.log('ireceived a new conversation!!!!!!!!!!!!!!!!!!!!!!');
+    					console.log(data);
+    					next({type:'NEW_CONVERSATION', ...data});
+ 
+
+
+    		//{composedMessage:composedMessage, conversationId:conversationId}
+    				});
+    			}
+			});
+
+
+
 		return (
 			<div>
 				<Chat />

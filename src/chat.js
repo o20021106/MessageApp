@@ -87,7 +87,8 @@ class Chat extends React.Component{
 		e.preventDefault();
 		console.log(e.currentTarget.tagName);
 		let data = e.currentTarget.getAttribute('data-href');
-		this.props.setChosenConversation(conversationId)
+		this.props.setChosenConversation(conversationId);
+		this.props.setLatestRecipient();
 	}
 
 	conversationList(){

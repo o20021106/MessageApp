@@ -2,6 +2,7 @@ const Conversation = require("../src/models/conversation"),
 		Message = require("../src/models/message"),
 		User = require("../src/models/user");
 
+var Promise = require ('promise');
 
 exports.getRecipients = function(req, res, next){
 	User.find({})
@@ -18,24 +19,27 @@ exports.getRecipients = function(req, res, next){
 exports.getConversationByRecipientId = function(req,res,next){
 	console.log(' in getConversationByRecipeintId');
 //	options= {upsert: true, new: true};
-	Conversation.findOne({participants: [req.user._id, req.params.recipientId]},function(err,conversation){
+//$or: [{a: 1}, {b: 1}]
+//db.shapes.find({'shape.id':{$all:[1,2]},shape:{$size:2}}); 
+
+	Conversation.findOne({$and: [{participants: {$all:[req.user._id, req.params.recipientId]}}, {participants: {$size :2} }]},function(err,conversation){
+//	Conversation.findOne({participants: [req.user._id, req.params.recipientId]},function(err,conversation){
 		if(err){
 			return res.json({error:err})
 		}
 		if(!conversation){
 			return res.status(200).json({status: 'noConversation'})
 		}
-		return res.status(200).json({coversationId: conversation._id})
-	})
-/*	Conversation.findOneAndUpdate({participants: [req.user._id, req.params.recipientId]},options, function(err, conversation){
-		if(err){
-			
-			return res.json({err:err})
-		}
-		console.log('conversation in here~~~~~');
-		return res.status(200).json({conversation:conversation})
+		console.log([req.user._id, req.params.recipientId])
+		console.log(conversation);
+		var messages = getConversation1(conversation._id);
+		messages.then(response=>{
+			return res.status(200).json({conversationId: conversation._id, conversation:response.conversation})
+		}) 
 
-	})*/
+		
+	})
+
 }
 
 exports.getConversations = function(req, res, next){
@@ -99,6 +103,23 @@ exports.getConversationsSocket = function(user){
 
 	})
 }
+
+
+var getConversation1 = function(conversationId){
+	return new Promise((resolve,reject)=>{
+		console.log(' in getConversation');
+		Message.find({conversationId: conversationId})
+		.sort('-createdAt')
+		.populate('author', 'name')
+		.exec(function(err, messages){
+			if(err){
+				return reject( {error:err})
+			}
+			return resolve({ conversation: messages })
+		})
+	})
+}
+
 
 
 exports.getConversation = function(req,res,next){
