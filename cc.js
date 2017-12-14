@@ -7,11 +7,10 @@ import {createStore, combineReducers, applyMiddleware} from 'redux';
 //import ChatWindow from './src/chatWindow';
 import ChatFrame from './src/chatFrame';
 import socketClient from './src/socketClient';
-import rootReducer from './src/reducers/chat_reducer';
+import rootReducer from './src/reducers/chatReducer2';
 import configureStore from './src/configureStore';
 import socketMiddleware from './src/socketMiddleware';
 import {LOAD_CONVERSATIONS} from './src/actions/type';
-
 
 const socket = new socketClient();
 socket.connect();
@@ -24,6 +23,8 @@ socket.emit('event','love',function(response){console.log(resoponse)});
 */
 //const createStoreWithMiddleWare = applyMiddleware(thunkMiddleware)(createStore);
 const store = createStoreWithMiddleWare(rootReducer);
+
+
 
 class Chatroom extends React.Component{
 

@@ -2,8 +2,11 @@
 
 import React from 'react';
 import {connect} from 'react-redux';
-import Chat from './chat';
+import Chat from './chat2';
 import ChatWindow from './chatWindow';
+
+
+
 class ChatFrame extends React.Component{	
 
 	render(){
@@ -14,19 +17,19 @@ class ChatFrame extends React.Component{
     				console.log('inside socket for on');
     				return socket.on('newMessage',function(data){
     					console.log('inside callback function for on');
-    					next({type:'UPDATE_CONVERSATION_MESSAGES', message: data.message});
+    					next({type:'RECIEVE_NEW_MESSAGE', message: data.message, chosenId:data.chosenId, conversationType:data.conversationType,});
 
     		//{composedMessage:composedMessage, conversationId:conversationId}
     				});
     			}
-			});
+			}); 
 
 		this.props.dispatch(
 			{
 				type: 'socket',
         		promise: function(socket,next){
     				console.log('inside socket for on');
-    				return socket.on('NEW_CONVERSATION_APPROACH',function(data){
+    				return socket.on('NEW_CONVERSATION',function(data){
     					console.log('ireceived a new conversation!!!!!!!!!!!!!!!!!!!!!!');
     					console.log(data);
     					next({type:'NEW_CONVERSATION', ...data});
@@ -38,12 +41,27 @@ class ChatFrame extends React.Component{
     			}
 			});
 
+		this.props.dispatch(
+			{
+				type: 'socket',
+        		promise: function(socket,next){
+    				console.log('inside socket for on');
+    				return socket.on('REDIRECT',function(destination){
+    					console.log('Redirect to!!!!!!!!!!!!!!!!!!!!!!');
+    					window.history.pushState('data to be passed', 'Title of the page', '/conversation/aaaa');
+						//window.location.href = destination;
+
+    		//{composedMessage:composedMessage, conversationId:conversationId}
+    				});
+    			}
+			});
 
 
 		return (
 			<div>
+
 				<Chat />
-				<ChatWindow />
+			
 			</div>)
 	}
 

@@ -21,6 +21,9 @@
 }
 */
 
+import { Redirect } from 'react-router';
+
+
 export default function socketMiddleware(socket) {
   // Socket param is the client. We'll show how to set this up later.
   return ({dispatch, getState}) => next => action => {
@@ -47,6 +50,7 @@ export default function socketMiddleware(socket) {
       	console.log('in result');
         console.log(response);
         //return next({result, type: SUCCESS });
+
         return next(response);
       })
       .catch((error) => {

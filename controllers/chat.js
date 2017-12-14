@@ -12,7 +12,31 @@ exports.getRecipients = function(req, res, next){
 			res.json({err:err});
 			return next(err);
 		}
-		return res.status(200).json({ users: users })
+		userConversations = []
+		users.forEach(function(user){
+			console.log('in recipient user');
+			Conversation.findOne({$and: [{participants: {$all:[req.user._id, user._id]}}, {participants: {$size :2} }]})
+			.select('_id')
+			.exec(function(err, conversation){
+				console.log('in recipient user2');
+
+				if(err){
+					console.log('in recipient user3');
+
+					return res.json({error:err});
+				}
+				var userTemp = {_id:user._id, name: user.name};
+
+				if(conversation){
+					userTemp.conversationId= conversation._id;				
+				}
+				userConversations.push(userTemp);
+
+				if(userConversations.length === users.length){
+              		return res.status(200).json({ users: userConversations});
+				}
+			})
+		})
 	})
 }
 
@@ -34,7 +58,8 @@ exports.getConversationByRecipientId = function(req,res,next){
 		console.log(conversation);
 		var messages = getConversation1(conversation._id);
 		messages.then(response=>{
-			return res.status(200).json({conversationId: conversation._id, conversation:response.conversation})
+			return res.status(200).json({'message': response.messages, 'conversation': conversation})
+			//return res.status(200).json({conversationId: conversation._id, conversation:response.conversation})
 		}) 
 
 		
@@ -115,7 +140,7 @@ var getConversation1 = function(conversationId){
 			if(err){
 				return reject( {error:err})
 			}
-			return resolve({ conversation: messages })
+			return resolve({ messages: messages })
 		})
 	})
 }

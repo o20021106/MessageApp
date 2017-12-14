@@ -2,9 +2,29 @@ import React from 'react';
 import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
-import ChatWindow from './chatWindow';
+import ChatWindowTest from './chatWindowTest';
 import io from 'socket.io-client';
+import {  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom';
 
+class Test extends React.Component{	
+
+	componeneDidMount(){
+		if (this.props.match.path === '/conversation/:conversationId'){
+			this.props.setChosenConversation(this.props.match.params.conversationId);
+		}
+	}
+
+	render(){
+
+		return this.props.match.path === '/conversation/:conversationId' ? (<div>{this.props.match.params.conversationId}</div>) : (<div>{this.props.match.params.recipientId}</div>)
+	}
+}
+
+
+ 
 
 class Chat extends React.Component{	
 	constructor(props){
@@ -21,12 +41,20 @@ class Chat extends React.Component{
 
 	userList(){
 		if(this.props.recipients.length == 0){
-			console.log('why??');	
+			console.log('User has zero conversation yet');	
 		}
 		else{
 			console.log('here');
-			console.log(this.props.recipients.length)
-			return this.props.recipients.map(user=>(<option key = {user._id} value = {user._id}>{user.name}</option>));
+			console.log(this.props.recipients.length);
+			return this.props.recipients.map(function(user){
+				return (
+					<div key = {user._id}>
+						<Link to = {`/recipient/${user._id}`}  >
+							{user.name}
+						</Link>
+					</div>
+					)
+			})
 		}
 	}
 
@@ -43,6 +71,7 @@ class Chat extends React.Component{
 	}
 
 	participantsNames(participants){ 
+		console.log('in participant');
 		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
 	}
 	
@@ -54,19 +83,31 @@ class Chat extends React.Component{
 	}
 
 	conversationList(){
+		console.log('in conversation');
 		if(!(this.props.conversations.length === 0)){
-			return this.props.conversations.map(conversation =>(
+			console.log('inside inside');
+			return this.props.conversations.map(function(conversation){
+				
+				console.log(conversation.conversation.participants[0]._id);
+				console.log(localStorage.getItem('user')._id);
+				var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
+				console.log(localStorage.getItem("user"));
+				
+				console.log(participant);
+				console.log(conversation.conversation.participants);
+				return(
 				<li key = {conversation.conversation._id} >
-					<a data-href = {'http://localhost:8000/messaages/'+conversation.conversation._id} onClick = {(e) =>this.selectConversation(e,conversation.conversation._id)}>
+					<Link to = {`/recipient/${participant[0]._id}`} >
 						<div>
-							participants: {this.participantsNames(conversation.conversation.participants)}
+							participant: {participant[0].name}
 						</div> 
 						<div>
 							{conversation.message[0].auther}
 							{conversation.message[0].body}
 						</div>
-					</a>
-				</li>))
+					</Link>
+				</li>)
+			})
 		}
 	}
 
@@ -76,22 +117,24 @@ class Chat extends React.Component{
 
 		return (
 			<div>
-			{JSON.parse(localStorage.getItem("user")).name}
-				<form>
-				 	<select name="recipient" onChange = {(e)=> this.changeRecipient(e)}>
-     					{this.userList()}
-				  	</select>
-				</form> 
-				<ul>
-					{this.conversationList()}
-				</ul>
-				<ChatWindow/>
-
+				{JSON.parse(localStorage.getItem("user")).name}
+				<Router>
+					<div>
+						{this.userList()}
+						{this.conversationList()}
+						<Route path= '/recipient/:recipientId'component = {ChatWindowTest}/>
+						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>
+					</div>
+				</Router>	
 			</div>)
 	}
 
  	
 }
+
+
+
+
 
 function mapStateToProps(state) {  
     return { recipients: state.recipients, conversations: state.conversations};

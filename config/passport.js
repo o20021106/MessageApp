@@ -11,7 +11,7 @@ module.exports = function(passport) {
 
     console.log('in payload');
     console.log(jwt_payload.email)
-    User.findOne({email: jwt_payload.email}, function(err, user) {
+    User.findOne({_id: jwt_payload.id}, function(err, user) {
       if (err) {
         console.log('err');
         return done(err, false);

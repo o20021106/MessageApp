@@ -62,12 +62,12 @@ io.use(socketioJwt.authorize({
 
 io.on('connection', function(client){
 	console.log('in connection');
-	User.findOne({email: client.decoded_token.email})
+	User.findOne({_id: client.decoded_token.id})
     .exec(function(err,user){
-    	if (err){
+    	if (err){ 
     		console.log('error')
 			return console.log(err);
-		}
+		} 
 
         clients[user._id] = client.id;
 
@@ -103,7 +103,7 @@ io.on('connection', function(client){
 	    	.then(response => {
 	    		console.log('in newMessage response');
 	    		console.log(response);
-	    		io.to(data.conversationId).emit('newMessage', {message: response.message});
+	    		io.to(data.conversationId).emit('newMessage', {message: response.message, chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
 	    		fn(response.status);
 	    	});
 	    });
@@ -116,18 +116,27 @@ io.on('connection', function(client){
 	    		console.log('in newConversation response');
 	    		console.log(response);
 	    		client.join(response.conversation._id);
-
+ 
 	    		if(data.recipientId in clients){
 	    			console.log('new conversation with someone online');
 		    		console.log(io.sockets.connected[clients[data.recipientId]]);
 
 	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
-	    			io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
+	    			io.to(response.conversation._id).emit('NEW_CONVERSATION', 
+	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
+	    			//io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
 	    		}
-	    		fn({type: 'NEW_CONVERSATION', payload: response, latestRecipient: data.recipientId});
+	    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
+	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
+	    			//io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
+
+	    		fn({type: 'NOTHING'});
+	    		//fn({type: 'NEW_CONVERSATION', payload: response, latestRecipient: data.recipientId, userId: user._id});
+	    		//console.log('before redirectI!NG!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+	    		//io.to(client.id).emit('REDIRECT', 'whererugoing');
 	    	}); 
 
-	    });
+	    }); 
 
 	    client.on('event', function(data,fn){
 	  		console.log(data);

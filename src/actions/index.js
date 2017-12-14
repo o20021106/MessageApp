@@ -1,4 +1,12 @@
-import {LOAD_RECIPIENTS, LOAD_CONVERSATIONS, CHOSEN_CONVERSATION, CHOSEN_CONVERSATION_MESSAGES, UPDATE_RECIPIENT } from './type'
+import {LOAD_RECIPIENTS, 
+	LOAD_CONVERSATIONS, 
+	CHOSEN_CONVERSATION_AND_MESSAGES,
+	CHOSEN_CONVERSATION, 
+	CHOSEN_CONVERSATION_MESSAGES, 
+	UPDATE_RECIPIENT ,
+	CONVERSATION_BY_RECIPIENT,
+	CHOSEN_RECIPIENT,
+	CONVERSATION_MESSAGES } from './type'
 
 export function loadRecipients(){
 	return function(dispatch){
@@ -17,7 +25,7 @@ export function loadRecipients(){
 		.then(json=>{
 			console.log(json.users);
 			console.log('load recipients here!!');
-			dispatch({type: LOAD_RECIPIENTS, recipients: json.users});
+			dispatch({type: LOAD_RECIPIENTS, recipients: json.users, conversationType: 'RECIPIENT'});
 		})
 		.catch(err=>{
 			console.log(err);
@@ -26,14 +34,154 @@ export function loadRecipients(){
 
 	}
 }
+/*
+export function setChosenConversation(conversationId){
+	return function(dispatch){
+		fetch("/getConversation/"+conversationId,
+		{
+			headers: {
+		      'Accept': 'application/json', 
+		      'Content-Type': 'application/json',
+		      'Authorization' : localStorage.getItem("token")
+		    },
+		    method: "GET",
+		})
+		.then(function(response) {
+		    return response.json();
+		})
+		.then(json=>{
+			dispatch({type: CHOSEN_CONVERSATION_AND_MESSAGES, 
+				chosenConversation: conversationId, 
+				currentConversation: json.conversation});
+			return json;
+		})
+		.catch(err=>{
+			console.log(err);
+		});
+	}
+}
+*/
+
+
+export function setChosenRecipient(recipientId, conversationId, status){
+    return function(dispatch){
+    	console.log(recipientId);
+    	console.log('in set chosenRecipient!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    	var convExist = 'CON_EXIST';
+		var conNExist = 'CON_N_EXIST';
+		var notLoaded = 'NOT_LOADED';
+
+    	dispatch({type:CHOSEN_RECIPIENT, recipientId: recipientId});
+ 		
+ 		switch (status){
+			case convExist:
+				getConversationByConId(recipientId,conversationId, dispatch);
+				break;
+			case conNExist:
+				break;
+			case notLoaded:
+				getConversationByReId(recipientId,dispatch, 'RECIPIENT');
+				break;
+    }
+}
+
+
+function getConversationByConId(recipientId, conversationId, dispatch){
+	fetch("/getConversation/"+conversationId,
+		{
+			headers: {
+		      'Accept': 'application/json', 
+		      'Content-Type': 'application/json',
+		      'Authorization' : localStorage.getItem("token")
+		    },
+		    method: "GET",
+		})
+		.then(function(response) {
+		    return response.json();
+		})
+		.then(json=>{
+			//console.log('messages');			
+			//console.log(json);
+			//console.log('load curruent conversations here!!');
+			dispatch({type: CONVERSATION_MESSAGES , 
+				messages: json.conversation, 
+				conversationId: conversationId, 
+				recipientId:recipientId,
+				conversationType: 'RECIPIENT'});
+			return json;
+		})
+		.catch(err=>{
+			console.log(err);
+		});
+}
+
+
+function getConversationByReId(recipientId, dispatch, conversationType){
+		fetch("/getConversationByRecipientId/"+recipientId,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			      'Authorization' : localStorage.getItem("token")
+			    },
+			    method: "GET",
+			})
+			.then(function(response) {
+			    return response.json();
+			})
+			.then(json=>{
+				console.log('return conversation by recipientId');
+				console.log(json);
+				if(json.status){
+					//no existing conversation
+					dispatch({type: CONVERSATION_BY_RECIPIENT, 
+						conversationId: null, 
+						chosenId: recipientId,
+						conversationType: conversationType});
+				}
+				else{
+					//conversation already exists
+					console.log(json);
+					dispatch({type: CONVERSATION_BY_RECIPIENT, 
+						conversationId: json.conversation._id, 
+						payload: json, 
+						chosenId: recipientId,
+						conversationType: conversationType});
+				}
+			})
+			.catch(err=>{
+				console.log(err);
+			});
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export function setChosenConversation(conversationId){
     return function(dispatch){
+    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
     	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
     	getCurrentConversation(conversationId, dispatch);
     }
 }
+
 
 export function setLatestRecipient(){
     return {type:UPDATE_RECIPIENT, latestRecipient: null}
@@ -90,7 +238,7 @@ function getCurrentConversation(conversationId, dispatch){
 			//console.log('messages');			
 			//console.log(json);
 			//console.log('load curruent conversations here!!');
-			dispatch({type: CHOSEN_CONVERSATION_MESSAGES , currentConversation: json.conversation});
+			dispatch({type: CHOSEN_CONVERSATION_MESSAGES , currentConversation: json.conversation, currentConversationId: conversationId});
 			return json;
 		})
 		.catch(err=>{
@@ -127,17 +275,31 @@ export function loadCurrentConversation(conversationId){
 	}
 }
 
-export function newMessageSocket(composedMessage, conversationId){
+export function newMessageSocket(conversationType, recipientId, composedMessage, conversationId){
 	return {
 		type: 'socket',
         promise: function(socket,next){
     	console.log('inside socket here');
-    	return socket.emit('newMessage',{composedMessage:composedMessage, conversationId:conversationId});
+    	return socket.emit('newMessage',{composedMessage:composedMessage, conversationId:conversationId,recipientId:recipientId, conversationType: conversationType});
     	}
 	}
 }
 
+export function newConversationSocket(conversationType, composedMessage, recipientId){
+	console.log('in new conversation socket');
+	return {
+		type: 'socket',
+		promise: function(socket, next){
+			console.log('creating new conversation action creator');
+			console.log(recipientId);
+			return socket.emit('newConversation', {composedMessage: composedMessage, recipientId:recipientId, conversationType:conversationType})
+		}
+	}
 
+}
+
+
+/*
 export function newConversationSocket(composedMessage, recipientId){
 	console.log('in new conversation socket');
 	return {
@@ -150,9 +312,45 @@ export function newConversationSocket(composedMessage, recipientId){
 	}
 
 }
+*/
 
+export function getConversationByRecipientId(recipientId){
+	return function(dispatch){
+		console.log('recipientId');
+		console.log(recipientId);
+		dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
+
+		fetch("/getConversationByRecipientId/"+recipientId,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			      'Authorization' : localStorage.getItem("token")
+			    },
+			    method: "GET",
+			})
+			.then(function(response) {
+			    return response.json();
+			})
+			.then(json=>{
+				console.log('return conversation by recipientId');
+				console.log(json);
+				if(json.status){
+					//no existing conversation
+					dispatch({type: CONVERSATION_BY_RECIPIENT, chosenConversation: null, latestRecipient:recipientId});
+				}
+				else{
+					//conversation already exists
+					dispatch({type: CONVERSATION_BY_RECIPIENT, chosenConversation: json.conversationId, messages: json.conversation});
+				}
+			})
+			.catch(err=>{
+				console.log(err);
+			});
+	}
+}
  
-
+/*
 export function getConversationByRecipientId(recipientId){
 	return function(dispatch){
 		console.log('recipientId');
@@ -186,3 +384,4 @@ export function getConversationByRecipientId(recipientId){
 			});
 	}
 }
+*/

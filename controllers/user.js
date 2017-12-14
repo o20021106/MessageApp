@@ -98,7 +98,9 @@ exports.login = {
 		        if (isMatch && !err) {
 		        	console.log("match!");
 		          // Create token if the password matched and no error was thrown
-		          var token = jwt.sign({email : user.email}, config.secret, {
+		          var token = jwt.sign({id : user._id}, config.secret, {
+
+		          //var token = jwt.sign({email : user.email}, config.secret, {
 		            expiresIn: 86400 // in seconds
 		          });
 		          res.json({ success: true, data:{token: 'bearer ' + token, user : user }});

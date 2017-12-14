@@ -1,12 +1,30 @@
-/*reference https://rhadow.github.io/2015/07/30/beginner-redux/*/
-
 import React from 'react';
 import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
-
+import ChatWindowTest from './chatWindowTest';
 import io from 'socket.io-client';
+import {  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom';
 
+class Test extends React.Component{	
+
+	componeneDidMount(){
+		if (this.props.match.path === '/conversation/:conversationId'){
+			this.props.setChosenConversation(this.props.match.params.conversationId);
+		}
+	}
+
+	render(){
+
+		return this.props.match.path === '/conversation/:conversationId' ? (<div>{this.props.match.params.conversationId}</div>) : (<div>{this.props.match.params.recipientId}</div>)
+	}
+}
+
+
+ 
 
 class Chat extends React.Component{	
 	constructor(props){
@@ -23,12 +41,20 @@ class Chat extends React.Component{
 
 	userList(){
 		if(this.props.recipients.length == 0){
-			console.log('why??');	
+			console.log('User has zero conversation yet');	
 		}
 		else{
 			console.log('here');
-			console.log(this.props.recipients.length)
-			return this.props.recipients.map(user=>(<option key = {user._id} value = {user._id}>{user.name}</option>));
+			console.log(this.props.recipients.length);
+			return this.props.recipients.map(function(user){
+				return (
+					<div key = {user._id}>
+						<Link to = {`/recipient/${user._id}`}  >
+							{user.name}
+						</Link>
+					</div>
+					)
+			})
 		}
 	}
 
@@ -36,10 +62,6 @@ class Chat extends React.Component{
 	changeRecipient(e){
 		e.preventDefault();
 		this.setState({recipientId: e.target.value});
-		//should change current conversation if there's a conversation betweetn the two
-		//check if it is the same conversation as current (will receive props)
-		console.log('in change recipient');
-		console.log(e.target.value);
 		this.props.getConversationByRecipientId(e.target.value);
 	}
 
@@ -47,6 +69,74 @@ class Chat extends React.Component{
 		e.preventDefault();
 		this.setState({messageBuffer:e.target.value});
 	}
+
+	participantsNames(participants){ 
+		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
+	}
+	
+	selectConversation(e,conversationId){
+		e.preventDefault();
+		let data = e.currentTarget.getAttribute('data-href');
+		this.props.setChosenConversation(conversationId);
+		this.props.setLatestRecipient();
+	}
+
+	conversationList(){
+		console.log('in conversation');
+		if(!(this.props.conversations.length === 0)){
+			console.log('inside inside');
+			return this.props.conversations.map(conversation =>(
+				<li key = {conversation.conversation._id} >
+					<Link to = {`/recipient/${conversation.conversation._id}`} >
+						<div>
+							participants: {this.participantsNames(conversation.conversation.participants)}
+						</div> 
+						<div>
+							{conversation.message[0].auther}
+							{conversation.message[0].body}
+						</div>
+					</Link>
+				</li>))
+		}
+	}
+
+ 
+    
+	render(){
+
+		return (
+			<div>
+				{JSON.parse(localStorage.getItem("user")).name}
+				<Router>
+					<div>
+						{this.userList()}
+						{this.conversationList()}
+						<Route path= '/recipient/:recipientId'component = {ChatWindowTest}/>
+						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>
+					</div>
+				</Router>	
+			</div>)
+	}
+
+ 	
+}
+
+
+
+
+
+function mapStateToProps(state) {  
+    return { recipients: state.recipients, conversations: state.conversations};
+}
+	
+export default connect(mapStateToProps, actions)(Chat);
+ 
+
+
+
+
+
+/*
 
 	newConversation(e){
 		e.preventDefault();
@@ -76,68 +166,4 @@ class Chat extends React.Component{
 		    console.log(response);
 		})
 	}
-
-	participantsNames(participants){
-		console.log('in par ');
-		console.log(participants);  
-		return participants.map(participant => (<div key= {participant._id}>{participant.name}</div>));
-	}
-	
-	selectConversation(e,conversationId){
-		e.preventDefault();
-		console.log(e.currentTarget.tagName);
-		let data = e.currentTarget.getAttribute('data-href');
-		this.props.setChosenConversation(conversationId);
-		this.props.setLatestRecipient();
-	}
-
-	conversationList(){
-		if(!(this.props.conversations.length === 0)){
-			console.log('in conversation if');
-
-
-			return this.props.conversations.map(conversation =>(<li key = {conversation.conversation._id} >
-				<a data-href = {'http://localhost:8000/messaages/'+conversation.conversation._id} onClick = {(e) =>this.selectConversation(e,conversation.conversation._id)}>
-					<div>
-						participants: {this.participantsNames(conversation.conversation.participants)}
-					</div> 
-					<div>
-						{conversation.message[0].auther}
-						{conversation.message[0].body}
-					</div>
-				</a>
-
-			</li>))
-		}
-	}
-
- 
-    
-	render(){
-
-		return (
-			<div>
-			{JSON.parse(localStorage.getItem("user")).name}
-				<form onSubmit = {(e) => this.newMessage(e)}>
-				 	<select name="recipient" onChange = {(e)=> this.changeRecipient(e)}>
-     					{this.userList()}
-				  	</select>
-				  	<input type = 'text' name = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
-				  	<input type="submit" value="Submit" ></input>
-				</form> 
-				<ul>
-					{this.conversationList()}
-				</ul>
-				
-			</div>)
-	}
-
- 	
-}
-
-function mapStateToProps(state) {  
-    return { recipients: state.recipients, conversations: state.conversations};
-}
-	
-export default connect(mapStateToProps, actions)(Chat);
- 
+*/
