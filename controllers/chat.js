@@ -80,7 +80,7 @@ exports.getConversations = function(req, res, next){
 		let allConversations = [];
 		conversations.forEach(function(conversation){
 			Message.find({conversationId: conversation._id})
-			.sort('createdAt')
+			.sort('-createdAt')
 			.limit(1)
 			.populate('author', 'name')
 			.exec(function(err, message){
@@ -134,7 +134,7 @@ var getConversation1 = function(conversationId){
 	return new Promise((resolve,reject)=>{
 		console.log(' in getConversation');
 		Message.find({conversationId: conversationId})
-		.sort('-createdAt')
+		.sort({ createdAt : 1})
 		.populate('author', 'name')
 		.exec(function(err, messages){
 			if(err){
@@ -149,8 +149,9 @@ var getConversation1 = function(conversationId){
 
 exports.getConversation = function(req,res,next){
 	console.log(' in getConversation');
+	console.log('here in get conversation')
 	Message.find({conversationId: req.params.conversationId})
-	.sort('-createdAt')
+	.sort({ createdAt : 1})
 	.populate('author', 'name')
 	.exec(function(err, messages){
   
