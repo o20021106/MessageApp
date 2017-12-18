@@ -9631,6 +9631,7 @@ var Love = function (_React$Component) {
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
+				credentials: 'same-origin',
 				method: "POST",
 				body: JSON.stringify({ password: "800203", email: "r04325008@ntu.edu.tw" })
 			}).then(function (response) {
@@ -9659,6 +9660,7 @@ var Love = function (_React$Component) {
 					'Accept': 'application/json',
 					'Content-Type': 'application/json'
 				},
+				credentials: 'same-origin',
 				method: "POST",
 				body: JSON.stringify({ password: "800203", email: "sandy@gmail.com" })
 			}).then(function (response) {
@@ -9675,25 +9677,6 @@ var Love = function (_React$Component) {
 				} else {
 					// Sorry! No Web Storage support..
 				}
-			}).catch(function (err) {
-				console.log(err);
-			});
-		}
-	}, {
-		key: 'try',
-		value: function _try() {
-			(0, _isomorphicFetch2.default)("/secrete", {
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json',
-					'Authorization': localStorage.getItem("token")
-				},
-				method: "GET"
-			}).then(function (response) {
-				console.log('i am a response ' + response);
-				return response.json();
-			}).then(function (json) {
-				console.log('i am parse json' + json);
 			}).catch(function (err) {
 				console.log(err);
 			});

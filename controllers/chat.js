@@ -1,8 +1,80 @@
 const Conversation = require("../src/models/conversation"),
 		Message = require("../src/models/message"),
 		User = require("../src/models/user");
+var path = require('path');
+
 
 var Promise = require ('promise');
+
+
+exports.chatLoad = function(req,res,next){
+	User.findOne({_id:req.params.recipientId})
+	.exec(function(err,recipient){
+		console.log('after exec');
+		if(err){
+			console.log('err');
+			console.log(req.user);
+			Conversation.findOne({$and: [{participants: {$in:[req.user._id]}}, {participants: {$size :2} }]})
+			.sort({ createdAt : -1})
+			.limit(1)
+			.exec(function(err, conversation){
+				if(err){
+					console.log('err2');
+					return res.json({error: err})
+				}
+
+				if(conversation){
+					console.log('existing conversation');
+
+					var recipient = conversation.participants.filter(function(participant){
+
+						return String(participant) !== String(req.user._id)}
+						);
+					console.log(recipient);
+					return res.redirect('/recipient/'+recipient);
+				}
+				else{
+					return res.redirect('/');
+				}
+			})
+		}else{
+			if(recipient){
+				console.log('recipient found');
+				console.log(path.join(__dirname, '/../index.html'));
+				return res.status(200).sendFile(path.join(__dirname, '/../index.html'));
+			}
+			else{
+				console.log('recipient not found');
+
+				
+				Conversation.findOne({$and: [{participants: {$in:req.user._id}}, {participants: {$size :2} }]})
+				.sort({ createdAt : -1})
+				.limit(1)
+				.exec(function(err, conversation){
+					if(err){
+						console.log('err3');
+						return res.json({error, err})
+					}
+
+					if(conversation){
+
+						console.log('existing conversation2');
+
+						var recipient = conversation.participants.filter(function(participant){
+
+							return String(participant) !== String(req.user._id)}
+							);
+						return res.redirect('/recipient/'+recipient);
+
+					}
+					else{
+						return res.redirect('/');
+					}
+				})			
+			}
+		}
+	})
+}
 
 exports.getRecipients = function(req, res, next){
 	User.find({})

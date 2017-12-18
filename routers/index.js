@@ -6,6 +6,7 @@ var userController = require('../controllers/user.js');
 var chatController = require('../controllers/chat.js');
 var config = require("../config/main")
 
+
 router.get('/register', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../register.html'));
@@ -55,6 +56,12 @@ var passport = require('passport');
 	res.json({token: "here"});
 });
 */
+
+
+router.get('/testing', passport.authenticate('jwt', { session: false }), function(req, res){
+  console.log(req.user.email);
+  res.json("Success! You can not see this without a token");
+});
 router.get("/secrete", passport.authenticate('jwt', { session: false }), function(req, res){
 
 	console.log(req.user.email);
@@ -65,21 +72,14 @@ router.get('/getRecipients', passport.authenticate('jwt', { session: false }), c
 router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
 router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
 router.get('/getConversationByRecipientId/:recipientId', passport.authenticate('jwt', { session: false }), chatController.getConversationByRecipientId);
-
-
+router.get('/recipient/:recipientId', passport.authenticate('jwt', { session: false }),chatController.chatLoad);
+/*
 router.get('/recipient/:recipientId', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));
 
 })
-
-router.get('/conversation/:conversationId', function(req,res){
-    //res.sendFile(path.join(__dirname, '/../index.html'));
-    res.sendFile(path.join(__dirname, '/../index.html'));
-
-})
-
-
+*/
 router.get('/', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));

@@ -15,8 +15,9 @@ export function loadRecipients(){
 			headers: {
 		      'Accept': 'application/json',
 		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
+		      //'Authorization' : localStorage.getItem("token")
 		    },
+		    credentials: 'same-origin',
 		    method: "GET",
 		})
 		.then(function(response) {
@@ -34,34 +35,6 @@ export function loadRecipients(){
 
 	}
 }
-/*
-export function setChosenConversation(conversationId){
-	return function(dispatch){
-		fetch("/getConversation/"+conversationId,
-		{
-			headers: {
-		      'Accept': 'application/json', 
-		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
-		    },
-		    method: "GET",
-		})
-		.then(function(response) {
-		    return response.json();
-		})
-		.then(json=>{
-			dispatch({type: CHOSEN_CONVERSATION_AND_MESSAGES, 
-				chosenConversation: conversationId, 
-				currentConversation: json.conversation});
-			return json;
-		})
-		.catch(err=>{
-			console.log(err);
-		});
-	}
-}
-*/
-
 
 export function setChosenRecipient(recipientId, conversationId, status){
     return function(dispatch){
@@ -92,8 +65,9 @@ function getConversationByConId(recipientId, conversationId, dispatch){
 			headers: {
 		      'Accept': 'application/json', 
 		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
+		      //'Authorization' : localStorage.getItem("token")
 		    },
+		    credentials: 'same-origin',
 		    method: "GET",
 		})
 		.then(function(response) {
@@ -122,8 +96,9 @@ function getConversationByReId(recipientId, dispatch, conversationType){
 				headers: {
 			      'Accept': 'application/json', 
 			      'Content-Type': 'application/json',
-			      'Authorization' : localStorage.getItem("token")
+			      //'Authorization' : localStorage.getItem("token")
 			    },
+			    credentials: 'same-origin',
 			    method: "GET",
 			})
 			.then(function(response) {
@@ -173,7 +148,7 @@ function getConversationByReId(recipientId, dispatch, conversationType){
 
 
 
-
+/*
 export function setChosenConversation(conversationId){
     return function(dispatch){
     	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
@@ -181,12 +156,12 @@ export function setChosenConversation(conversationId){
     	getCurrentConversation(conversationId, dispatch);
     }
 }
-
-
+*/
+/*
 export function setLatestRecipient(){
     return {type:UPDATE_RECIPIENT, latestRecipient: null}
 }
-
+*/
 export function loadConversations(){
 	return function(dispatch){
 		fetch("/getConversations",
@@ -194,8 +169,9 @@ export function loadConversations(){
 			headers: {
 		      'Accept': 'application/json',
 		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
+		      //'Authorization' : localStorage.getItem("token")
 		    },
+		    credentials: 'same-origin',
 		    method: "GET",
 		})
 		.then(function(response) {
@@ -227,8 +203,9 @@ function getCurrentConversation(conversationId, dispatch){
 			headers: {
 		      'Accept': 'application/json', 
 		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
+		      //'Authorization' : localStorage.getItem("token")
 		    },
+		    credentials: 'same-origin',
 		    method: "GET",
 		})
 		.then(function(response) {
@@ -255,8 +232,9 @@ export function loadCurrentConversation(conversationId){
 			headers: {
 		      'Accept': 'application/json',
 		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
+		      //'Authorization' : localStorage.getItem("token")
 		    },
+		    credentials: 'same-origin',
 		    method: "GET",
 		})
 		.then(function(response) {
@@ -299,21 +277,6 @@ export function newConversationSocket(conversationType, composedMessage, recipie
 }
 
 
-/*
-export function newConversationSocket(composedMessage, recipientId){
-	console.log('in new conversation socket');
-	return {
-		type: 'socket',
-		promise: function(socket, next){
-			console.log('creating new conversation action creator');
-			console.log(recipientId);
-			return socket.emit('newConversation', {composedMessage: composedMessage, recipientId:recipientId})
-		}
-	}
-
-}
-*/
-
 export function getConversationByRecipientId(recipientId){
 	return function(dispatch){
 		console.log('recipientId');
@@ -325,8 +288,9 @@ export function getConversationByRecipientId(recipientId){
 				headers: {
 			      'Accept': 'application/json', 
 			      'Content-Type': 'application/json',
-			      'Authorization' : localStorage.getItem("token")
+			      //'Authorization' : localStorage.getItem("token")
 			    },
+			    credentials: 'same-origin',
 			    method: "GET",
 			})
 			.then(function(response) {
@@ -350,38 +314,3 @@ export function getConversationByRecipientId(recipientId){
 	}
 }
  
-/*
-export function getConversationByRecipientId(recipientId){
-	return function(dispatch){
-		console.log('recipientId');
-		console.log(recipientId);
-		dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
-
-		fetch("/getConversationByRecipientId/"+recipientId,
-			{
-				headers: {
-			      'Accept': 'application/json', 
-			      'Content-Type': 'application/json',
-			      'Authorization' : localStorage.getItem("token")
-			    },
-			    method: "GET",
-			})
-			.then(function(response) {
-			    return response.json();
-			})
-			.then(json=>{
-				console.log('return conversation by recipientId');
-				console.log(json);
-				if(json.status){
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: null, latestRecipient:recipientId});
-				}
-				else{
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: json.conversationId, messages: json.conversation});
-				}
-			})
-			.catch(err=>{
-				console.log(err);
-			});
-	}
-}
-*/
