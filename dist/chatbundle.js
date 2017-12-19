@@ -8485,8 +8485,6 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadRecipients = loadRecipients;
 exports.setChosenRecipient = setChosenRecipient;
-exports.setChosenConversation = setChosenConversation;
-exports.setLatestRecipient = setLatestRecipient;
 exports.loadConversations = loadConversations;
 exports.loadCurrentConversation = loadCurrentConversation;
 exports.newMessageSocket = newMessageSocket;
@@ -8500,9 +8498,10 @@ function loadRecipients() {
 		fetch("/getRecipients", {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8515,33 +8514,6 @@ function loadRecipients() {
 		});
 	};
 }
-/*
-export function setChosenConversation(conversationId){
-	return function(dispatch){
-		fetch("/getConversation/"+conversationId,
-		{
-			headers: {
-		      'Accept': 'application/json', 
-		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
-		    },
-		    method: "GET",
-		})
-		.then(function(response) {
-		    return response.json();
-		})
-		.then(json=>{
-			dispatch({type: CHOSEN_CONVERSATION_AND_MESSAGES, 
-				chosenConversation: conversationId, 
-				currentConversation: json.conversation});
-			return json;
-		})
-		.catch(err=>{
-			console.log(err);
-		});
-	}
-}
-*/
 
 function setChosenRecipient(recipientId, conversationId, status) {
 	return function (dispatch) {
@@ -8569,9 +8541,10 @@ function setChosenRecipient(recipientId, conversationId, status) {
 		fetch("/getConversation/" + conversationId, {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8594,9 +8567,10 @@ function setChosenRecipient(recipientId, conversationId, status) {
 		fetch("/getConversationByRecipientId/" + recipientId, {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8624,26 +8598,29 @@ function setChosenRecipient(recipientId, conversationId, status) {
 	}
 }
 
-function setChosenConversation(conversationId) {
-	return function (dispatch) {
-		console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-		dispatch({ type: _type.CHOSEN_CONVERSATION, chosenConversation: conversationId });
-		getCurrentConversation(conversationId, dispatch);
-	};
+/*
+export function setChosenConversation(conversationId){
+    return function(dispatch){
+    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
+    	getCurrentConversation(conversationId, dispatch);
+    }
 }
-
-function setLatestRecipient() {
-	return { type: _type.UPDATE_RECIPIENT, latestRecipient: null };
+*/
+/*
+export function setLatestRecipient(){
+    return {type:UPDATE_RECIPIENT, latestRecipient: null}
 }
-
+*/
 function loadConversations() {
 	return function (dispatch) {
 		fetch("/getConversations", {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8667,9 +8644,10 @@ function getCurrentConversation(conversationId, dispatch) {
 	fetch("/getConversation/" + conversationId, {
 		headers: {
 			'Accept': 'application/json',
-			'Content-Type': 'application/json',
-			'Authorization': localStorage.getItem("token")
+			'Content-Type': 'application/json'
+			//'Authorization' : localStorage.getItem("token")
 		},
+		credentials: 'same-origin',
 		method: "GET"
 	}).then(function (response) {
 		return response.json();
@@ -8689,9 +8667,10 @@ function loadCurrentConversation(conversationId) {
 		fetch("/getConversation/" + conversationId, {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8729,21 +8708,6 @@ function newConversationSocket(conversationType, composedMessage, recipientId) {
 	};
 }
 
-/*
-export function newConversationSocket(composedMessage, recipientId){
-	console.log('in new conversation socket');
-	return {
-		type: 'socket',
-		promise: function(socket, next){
-			console.log('creating new conversation action creator');
-			console.log(recipientId);
-			return socket.emit('newConversation', {composedMessage: composedMessage, recipientId:recipientId})
-		}
-	}
-
-}
-*/
-
 function getConversationByRecipientId(recipientId) {
 	return function (dispatch) {
 		console.log('recipientId');
@@ -8753,9 +8717,10 @@ function getConversationByRecipientId(recipientId) {
 		fetch("/getConversationByRecipientId/" + recipientId, {
 			headers: {
 				'Accept': 'application/json',
-				'Content-Type': 'application/json',
-				'Authorization': localStorage.getItem("token")
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
 			},
+			credentials: 'same-origin',
 			method: "GET"
 		}).then(function (response) {
 			return response.json();
@@ -8774,42 +8739,6 @@ function getConversationByRecipientId(recipientId) {
 		});
 	};
 }
-
-/*
-export function getConversationByRecipientId(recipientId){
-	return function(dispatch){
-		console.log('recipientId');
-		console.log(recipientId);
-		dispatch({type: UPDATE_RECIPIENT, latestRecipient: recipientId});
-
-		fetch("/getConversationByRecipientId/"+recipientId,
-			{
-				headers: {
-			      'Accept': 'application/json', 
-			      'Content-Type': 'application/json',
-			      'Authorization' : localStorage.getItem("token")
-			    },
-			    method: "GET",
-			})
-			.then(function(response) {
-			    return response.json();
-			})
-			.then(json=>{
-				console.log('return conversation by recipientId');
-				console.log(json);
-				if(json.status){
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: null, latestRecipient:recipientId});
-				}
-				else{
-					dispatch({type: CHOSEN_CONVERSATION, chosenConversation: json.conversationId, messages: json.conversation});
-				}
-			})
-			.catch(err=>{
-				console.log(err);
-			});
-	}
-}
-*/
 
 /***/ }),
 /* 71 */
@@ -31688,6 +31617,8 @@ var ChatWindowTest = function (_React$Component) {
 		key: 'newMessage',
 		value: function newMessage(e) {
 			e.preventDefault();
+			e.target.querySelector('#composedMessage').value = '';
+
 			if (!this.props.recipientConversationId[this.props.match.params.recipientId]) {
 				this.props.newConversationSocket('RECIPIENT', this.state.messageBuffer, this.props.match.params.recipientId);
 			} else {
@@ -31716,7 +31647,7 @@ var ChatWindowTest = function (_React$Component) {
 					{ onSubmit: function onSubmit(e) {
 							return _this2.newMessage(e);
 						} },
-					_react2.default.createElement('input', { type: 'text', name: 'composedMessage', onChange: function onChange(e) {
+					_react2.default.createElement('input', { type: 'text', id: 'composedMessage', onChange: function onChange(e) {
 							return _this2.insertText(e);
 						} }),
 					_react2.default.createElement('input', { type: 'submit', value: 'Submit' })

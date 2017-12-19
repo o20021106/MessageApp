@@ -136,6 +136,8 @@ class ChatWindowTest extends React.Component{
 
 	newMessage(e){
 		e.preventDefault();
+		e.target.querySelector('#composedMessage').value = '';
+
 		if(!this.props.recipientConversationId[this.props.match.params.recipientId]){
 			this.props.newConversationSocket('RECIPIENT', this.state.messageBuffer, this.props.match.params.recipientId);
 		}
@@ -158,7 +160,7 @@ class ChatWindowTest extends React.Component{
 					{this.conversationDisplay()}
 				
 			 		<form onSubmit = {(e) => this.newMessage(e)}>
-					 	<input type = 'text' name = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
+					 	<input type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
 						<input type = 'submit' value="Submit" ></input>
 
 				 	</form>

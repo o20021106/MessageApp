@@ -12,6 +12,7 @@ class Love extends React.Component{
 		      'Accept': 'application/json',
 		      'Content-Type': 'application/json'
 		    },
+		    credentials: 'same-origin',
 		    method: "POST",
 		    body: JSON.stringify({ password: "800203", email : "r04325008@ntu.edu.tw"})
 		})
@@ -43,6 +44,7 @@ class Love extends React.Component{
 		      'Accept': 'application/json',
 		      'Content-Type': 'application/json'
 		    },
+		    credentials: 'same-origin',
 		    method: "POST",
 		    body: JSON.stringify({ password: "800203", email : "sandy@gmail.com"})
 		})
@@ -66,27 +68,7 @@ class Love extends React.Component{
 			console.log(err);
 		});
 	}
-	try(){
-		fetch("/secrete",
-		{
-		    headers: {
-		      'Accept': 'application/json',
-		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token")
-		    },
-		    method: "GET",
-		})
-		.then(function(response) {
-			console.log('i am a response '+response);
-		    return response.json();
-		})
-		.then(json=>{
-			console.log('i am parse json'+json);
-		})
-		.catch(err=>{
-			console.log(err);
-		});
-	}
+
 
 	
 

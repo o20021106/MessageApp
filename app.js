@@ -11,11 +11,12 @@ var config = require("./config/main.js")
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
-
-
+//var upload = multer({ dest: 'uploads/' })
 var morgan = require('morgan');  
 var passport = require('passport');  
 var jwt = require('jsonwebtoken');  
+var cookieParser = require('cookie-parser');
+var Datauri = require('datauri');
 
 
 //const dbUrl = "mongodb://ipingou:mlab800203@ds153123.mlab.com:53123/ipingou";
@@ -28,8 +29,20 @@ db.once('open', function() {
   console.log('starting');
 });
 
+app.use(cookieParser());
+app.get('/cookie', function(req,res){
+	res.cookie('love', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5Y2ZhYWExNGIxZDc1NWIzZTI0Nzg1MCIsImlhdCI6MTUxMzYwMDYxMiwiZXhwIjoxNTEzNjg3MDEyfQ.1M6Uu1D_jmT7f5rc1TIUtJTpu2zVZpk86D2WjrAX2LI').send('hey got cookie');
+
+})
+
+
+
 app.use(passport.initialize());  
 require('./config/passport')(passport);  
+
+
+
+
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));

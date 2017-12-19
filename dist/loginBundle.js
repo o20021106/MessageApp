@@ -9612,20 +9612,24 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-console.log("love");
+var Login = function (_React$Component) {
+	_inherits(Login, _React$Component);
 
-var Love = function (_React$Component) {
-	_inherits(Love, _React$Component);
+	function Login() {
+		_classCallCheck(this, Login);
 
-	function Love() {
-		_classCallCheck(this, Love);
-
-		return _possibleConstructorReturn(this, (Love.__proto__ || Object.getPrototypeOf(Love)).apply(this, arguments));
+		return _possibleConstructorReturn(this, (Login.__proto__ || Object.getPrototypeOf(Login)).apply(this, arguments));
 	}
 
-	_createClass(Love, [{
-		key: 'love',
-		value: function love() {
+	_createClass(Login, [{
+		key: 'login',
+		value: function login(e) {
+			console.log(e.currentTarget);
+			e.preventDefault();
+
+			email = e.currentTarget.querySelector('#email').value;
+			password = e.currentTarget.querySelector('#password').value;
+
 			(0, _isomorphicFetch2.default)("/login", {
 				headers: {
 					'Accept': 'application/json',
@@ -9633,7 +9637,7 @@ var Love = function (_React$Component) {
 				},
 				credentials: 'same-origin',
 				method: "POST",
-				body: JSON.stringify({ password: "800203", email: "r04325008@ntu.edu.tw" })
+				body: JSON.stringify({ password: password, email: email })
 			}).then(function (response) {
 				console.log('i am a response ' + response);
 				return response.json();
@@ -9644,35 +9648,7 @@ var Love = function (_React$Component) {
 				if (typeof Storage !== "undefined") {
 					localStorage.setItem('token', json.data.token);
 					localStorage.setItem('user', JSON.stringify(json.data.user));
-					console.log('here');
-				} else {
-					// Sorry! No Web Storage support..
-				}
-			}).catch(function (err) {
-				console.log(err);
-			});
-		}
-	}, {
-		key: 'love2',
-		value: function love2() {
-			(0, _isomorphicFetch2.default)("/login", {
-				headers: {
-					'Accept': 'application/json',
-					'Content-Type': 'application/json'
-				},
-				credentials: 'same-origin',
-				method: "POST",
-				body: JSON.stringify({ password: "800203", email: "sandy@gmail.com" })
-			}).then(function (response) {
-				console.log('i am a response ' + response);
-				return response.json();
-			}).then(function (json) {
-				console.log('i am parse json' + json.data.token);
-				console.log('i am parse json' + json.data.user.name);
-
-				if (typeof Storage !== "undefined") {
-					localStorage.setItem('token', json.data.token);
-					localStorage.setItem('user', JSON.stringify(json.data.user));
+					window.location.href = json.url;
 					console.log('here');
 				} else {
 					// Sorry! No Web Storage support..
@@ -9684,54 +9660,33 @@ var Love = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
+			var _this2 = this;
+
 			console.log("YOU");
 
 			return _react2.default.createElement(
 				'div',
 				null,
-				'LOVE',
 				_react2.default.createElement(
-					'button',
-					{ onClick: this.love },
-					'r04325008'
-				),
-				_react2.default.createElement(
-					'button',
-					{ onClick: this.love2 },
-					'sandy'
+					'form',
+					{ onSubmit: function onSubmit(e) {
+							return _this2.login(e);
+						} },
+					'email :',
+					_react2.default.createElement('input', { id: 'email', name: 'email', type: 'text' }),
+					_react2.default.createElement('br', null),
+					'password :',
+					_react2.default.createElement('input', { id: 'password', name: 'password', type: 'password' }),
+					_react2.default.createElement('input', { type: 'submit', value: 'submit' })
 				)
 			);
 		}
 	}]);
 
-	return Love;
+	return Login;
 }(_react2.default.Component);
 
-_reactDom2.default.render(_react2.default.createElement(Love, null), document.getElementById('root'));
-
-/*
-fetch("secrete",
-		{
-		    headers: {
-		      'Accept': 'application/json',
-		      'Content-Type': 'application/json'
-		    },
-		    method: "POST",
-		    body: JSON.stringify({ comment: e.newComment.value, userName: e.userName.value})
-})
-	.then(function(response) {
-		console.log('i am a response '+response);
-	    return response.json();
-	})
-	.then(json=>{
-		console.log('i am parse json'+json.data[0].userName);
-		this.setState({data: json.data});
-	})
-	.catch(err=>{
-		console.log(err);
-});
-
-*/
+_reactDom2.default.render(_react2.default.createElement(Login, null), document.getElementById('root'));
 
 /***/ }),
 /* 82 */
@@ -22687,4 +22642,4 @@ module.exports = ReactDOMInvalidARIAHook;
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=bundle.js.map
+//# sourceMappingURL=loginBundle.js.map

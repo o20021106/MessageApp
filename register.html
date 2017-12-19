@@ -1,12 +1,12 @@
 <html>
 	<body>
-		<form action = "/register" method = "post">
+		<form action = "/register" enctype= 'multipart/form-data' method = "post">
 			email :<input name = "email" type = "text"><br>
 			password :<input name = "password" type = "password"><br>
 			name :<input name = "name" type = "text">
+			profile picture: <input type = 'file' name = 'avatar'>
 
 			<input type ="submit" value = "submit">
 		</form>
-		<a href = "/login">login</a>
 	</body>
 </html>
