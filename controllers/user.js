@@ -152,7 +152,11 @@ exports.login = {
 		            expiresIn: 86400 // in seconds
 		          });
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
+<<<<<<< HEAD
 		          res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http://localhost:8000/'});
+=======
+		          res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
+>>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5
 		        } else {
 		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
 		        }
@@ -161,6 +165,7 @@ exports.login = {
 		  });
 		}
 }
+<<<<<<< HEAD
 
 
 
@@ -168,3 +173,5 @@ exports.login = {
 
 
 
+=======
+>>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5

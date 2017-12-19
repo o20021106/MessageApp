@@ -16,8 +16,11 @@ var morgan = require('morgan');
 var passport = require('passport');  
 var jwt = require('jsonwebtoken');  
 var cookieParser = require('cookie-parser');
+<<<<<<< HEAD
 var Datauri = require('datauri');
 
+=======
+>>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5
 
 //const dbUrl = "mongodb://ipingou:mlab800203@ds153123.mlab.com:53123/ipingou";
 const dbUrl = config.database;
@@ -36,6 +39,12 @@ app.get('/cookie', function(req,res){
 })
 
 
+<<<<<<< HEAD
+=======
+app.get('/cookieGet', function(req,res){
+	console.log('cookies'+req.cookies.test);
+})
+>>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5
 
 app.use(passport.initialize());  
 require('./config/passport')(passport);  

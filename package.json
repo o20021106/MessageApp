@@ -11,10 +11,14 @@
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^1.0.3",
+<<<<<<< HEAD
     "cloudinary": "^1.9.1",
     "cookie-parser": "^1.4.3",
     "crypto": "^1.0.1",
     "datauri": "^1.0.5",
+=======
+    "cookie-parser": "^1.4.3",
+>>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5
     "express": "^4.15.4",
     "express-validator": "^4.0.0",
     "isomorphic-fetch": "^2.2.1",
