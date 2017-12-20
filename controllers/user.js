@@ -29,8 +29,29 @@ exports.register = {
 		       console.log('err');
 		    }
 		    else if (!req.file) { 
-		      console.log("No file received");
+		    	console.log("No file received");
+     		    var avatarURL= config.avatarDefault;
 
+		      	var user = new User({
+					email : req.body.email,
+					password: req.body.password,
+					name : req.body.name,
+					avatarURL: avatarURL
+				})
+
+				User.findOne({email:req.body.email}, function(err,existingUser){
+					if(existingUser){
+						return res.json({message:'an user with a same email adress already exists.'});
+					}
+					user.save(function(err, newUser){
+						if(err){
+							return res.json({message:'creating new user failed'});
+						}
+						else{
+							return res.redirect("/login");
+						}
+					});
+				})
 		    } 
 		    else {
 			    req.assert('email','Please provide a valid email address').isEmail();
@@ -152,11 +173,9 @@ exports.login = {
 		            expiresIn: 86400 // in seconds
 		          });
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-<<<<<<< HEAD
 		          res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http://localhost:8000/'});
-=======
-		          res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
->>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5
+
+		          //res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
 		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
 		        }
@@ -165,13 +184,3 @@ exports.login = {
 		  });
 		}
 }
-<<<<<<< HEAD
-
-
-
-
-
-
-
-=======
->>>>>>> 26f58f20c9fc833e8bded35f32640b7b29e58fe5

@@ -2,10 +2,10 @@ const path = require('path');
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  entry: './login.js',
+  entry: './cc.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'loginBundle.js',
+    filename: 'chatbundle.js',
   },
   module: {
     loaders: [{
