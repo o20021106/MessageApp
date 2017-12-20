@@ -9,8 +9,8 @@ class Login extends React.Component{
 		e.preventDefault();
 
 
-		email = e.currentTarget.querySelector('#email').value;
-		password = e.currentTarget.querySelector('#password').value;
+		var email = e.currentTarget.querySelector('#email').value;
+		var password = e.currentTarget.querySelector('#password').value;
 
 		fetch("/login",
 		{

@@ -4,6 +4,7 @@ var path = require('path');
 var router = express.Router();
 var userController = require('../controllers/user.js');
 var chatController = require('../controllers/chat.js');
+var searchController = require('../controllers/search.js');
 var config = require("../config/main")
 
 
@@ -68,6 +69,7 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
   res.json("Success! You can not see this without a token");
 });
 
+router.get('/searchUser', passport.authenticate('jwt', { session: false }), searchController.searchUser.get);
 router.get('/getRecipients', passport.authenticate('jwt', { session: false }), chatController.getRecipients);
 router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
 router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
@@ -80,12 +82,15 @@ router.get('/recipient/:recipientId', function(req,res){
 
 })
 */
-router.get('/', function(req,res){
+router.get('/message', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));
 
 })
-
+router.get('/', function(req,res){
+    //res.sendFile(path.join(__dirname, '/../index.html'));
+    res.redirect('/message')
+})
 router.post('/register',userController.register.post);
 
 router.post('/login',userController.login.post);

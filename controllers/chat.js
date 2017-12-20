@@ -34,7 +34,7 @@ exports.chatLoad = function(req,res,next){
 					return res.redirect('/recipient/'+recipient);
 				}
 				else{
-					return res.redirect('/');
+					return res.redirect('/message');
 				}
 			})
 		}else{
@@ -146,8 +146,14 @@ exports.getConversations = function(req, res, next){
 	.populate('participants','name')
 	.exec(function(err,conversations){
 		if (err){
+			console.log('conv err');
+			console.log(err);
 			res.json({err:err});
 			return next(err);
+		}
+		else if (conversations.length === 0) {
+			console.log('in here')
+		    return res.status(200).json({ conversations: [] });
 		}
 		let allConversations = [];
 		conversations.forEach(function(conversation){
@@ -157,10 +163,16 @@ exports.getConversations = function(req, res, next){
 			.populate('author', 'name')
 			.exec(function(err, message){
 				if (err){
+					console.log('conv2 err');
+					console.log(err);
 					res.json({err:err});
 					return next(err);
 				}
 				allConversations.push({'message': message, 'conversation': conversation});
+				console.log('length');
+				console.log(allConversations.length);
+				console.log(conversations.length);
+
 				if(allConversations.length === conversations.length) {
               		return res.status(200).json({ conversations: allConversations });
             	}

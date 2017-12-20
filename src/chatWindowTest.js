@@ -2,7 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
+import {  BrowserRouter as Router,
+  Route,
+  Link
+} from 'react-router-dom';
 import { Redirect } from 'react-router';
+import SearchUser from './searchUser';
+import ConversationList from './conversationList';
+
+
 
 class ChatWindowTest extends React.Component{	
 
@@ -71,39 +79,34 @@ class ChatWindowTest extends React.Component{
 		}
 	}		
 
-
-/*
-
-			//check if a conversation betwen the two exists
-			if(Object.keys(this.props.recipientConversationId).length !== 0){
-				console.log('loaded');
-				console.log(nextProps.match.params.recipientId);
-				console.log(this.props.recipientConversationId);
-
-				if(this.props.recipientConversationId[nextProps.match.params.recipientId]){
-					console.log(this.props.recipientConversationId[nextProps.match.params.recipientId]);
-					this.props.setChosenRecipient( nextProps.match.params.recipientId,
-						this.props.recipientConversationId[nextProps.match.params.recipientId]);
-					console.log('not loaded yet 4');
-				}
-				else{
-					console.log('not existing -----------------------------------');
-					this.props.setChosenRecipient( nextProps.match.params.recipientId, null);
-					console.log(nextProps.match.params.recipientId);
-				}
-				
-			}
-			else{
-					
-					
-
-					console.log(Object.keys(this.props.recipientConversationId).length);
-					
-			}
-	
+	conversationList(){
+		console.log('in conversation');
+		if(!(this.props.conversations.length === 0)){
+			console.log('inside inside');
+			return this.props.conversations.map(function(conversation){
+				console.log('conversation!!!!!!!!!!!!!!!!!!');
+				console.log(conversation.conversation.participants[0]._id);
+				console.log(localStorage.getItem('user')._id);
+				var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
+				console.log(localStorage.getItem("user"));
+				console.log(conversation);
+				console.log(participant);
+				console.log(conversation.conversation.participants);
+				return(
+					<li key = {conversation.conversation._id} >
+						<Link to = {`/recipient/${participant[0]._id}`} >
+							<div>
+								participant: {participant[0].name}
+							</div> 
+							<div>
+								{conversation.message[0].auther}
+								{conversation.message[0].body}
+							</div>
+						</Link>
+					</li>)
+			})
 		}
-*/		
-	
+	}
 
 	conversationDisplay(){
 		console.log('indisplay');
@@ -157,8 +160,9 @@ class ChatWindowTest extends React.Component{
 				<div>
 					{this.props.chosenConversation}<br/>
 					{this.props.match.params.conversationId}
+					<SearchUser/>
+					<ConversationList/>
 					{this.conversationDisplay()}
-				
 			 		<form onSubmit = {(e) => this.newMessage(e)}>
 					 	<input type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
 						<input type = 'submit' value="Submit" ></input>
@@ -180,7 +184,8 @@ function mapStateToProps(state) {
     	latestRecipient:state.latestRecipient,
     	currentConversationId: state.currentConversationId,
     	recipientConversationId: state.recipientConversationId,
-    	conversationData : state.conversationData}
+    	conversationData : state.conversationData,
+    	conversations: state.conversations}
 }
 	
 export default connect(mapStateToProps, actions)(ChatWindowTest);

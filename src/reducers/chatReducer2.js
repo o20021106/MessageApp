@@ -10,11 +10,14 @@ import {LOAD_RECIPIENTS,
 	CONVERSATION_BY_RECIPIENT,
 	CHOSEN_RECIPIENT,
 	CONVERSATION_MESSAGES,
-	RECIEVE_NEW_MESSAGE } from '../actions/type.js';
+	RECIEVE_NEW_MESSAGE,
+	LOAD_SEARCH_USER ,
+	CLEAR_SEARCH} from '../actions/type.js';
 
 const initial = {
 	recipients:[], 
 	recipientConversationId:{}, 
+	searchedUsers:[],
 	conversations:[], 
 
 	conversationData: {conversationType: null, chosenId: null, messages:[]},
@@ -46,7 +49,10 @@ export default function(state = initial, action){
 			console.log(action.conversations);  
 			return {...state, conversations : action.conversations};
 			break;
-
+		case LOAD_SEARCH_USER:
+			return {...state, searchedUsers:action.users}
+		case CLEAR_SEARCH:
+			return {...state, searchedUsers:[]}
 		case CHOSEN_RECIPIENT:
 			console.log('in chosen recipient');
 			var conversationData = Object.assign({},state.conversationData);

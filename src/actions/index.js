@@ -6,7 +6,9 @@ import {LOAD_RECIPIENTS,
 	UPDATE_RECIPIENT ,
 	CONVERSATION_BY_RECIPIENT,
 	CHOSEN_RECIPIENT,
-	CONVERSATION_MESSAGES } from './type'
+	CONVERSATION_MESSAGES,
+	LOAD_SEARCH_USER,
+	CLEAR_SEARCH} from './type'
 
 export function loadRecipients(){
 	return function(dispatch){
@@ -314,3 +316,40 @@ export function getConversationByRecipientId(recipientId){
 	}
 }
  
+export function searchUser(keyWord){
+	return function(dispatch){
+		if (keyWord === ''){
+			console.log('emptystring');
+			return 	dispatch({type: LOAD_SEARCH_USER, users:[]});
+
+		}
+		dispatch({type: LOAD_SEARCH_USER, users:[]});
+		fetch(`/searchUser?keyword=${keyWord}`,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			    },
+			    credentials: 'same-origin',
+			    method: "GET"
+
+			})
+		.then(function(response) {
+		    return response.json();
+		})
+		.then(json =>{
+			console.log(json);
+			if(json.users){
+				dispatch({type: LOAD_SEARCH_USER, users:json.users});
+			}
+		})
+		.catch(err=>{
+			console.log(err);
+		});
+
+	}
+}
+
+export function clearSearch(){
+	return {type:CLEAR_SEARCH }
+}

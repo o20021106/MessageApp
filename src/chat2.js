@@ -3,25 +3,14 @@ import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
 import ChatWindowTest from './chatWindowTest';
+import Test from './test';
 import io from 'socket.io-client';
 import {  BrowserRouter as Router,
   Route,
   Link
 } from 'react-router-dom';
+import { Redirect } from 'react-router';
 
-class Test extends React.Component{	
-
-	componeneDidMount(){
-		if (this.props.match.path === '/conversation/:conversationId'){
-			this.props.setChosenConversation(this.props.match.params.conversationId);
-		}
-	}
-
-	render(){
-
-		return this.props.match.path === '/conversation/:conversationId' ? (<div>{this.props.match.params.conversationId}</div>) : (<div>{this.props.match.params.recipientId}</div>)
-	}
-}
 
 
  
@@ -29,10 +18,11 @@ class Test extends React.Component{
 class Chat extends React.Component{	
 	constructor(props){
 		super(props);
-		this.state = {recipientId: '', messageBuffer:'asdfadsfasdf'};
+		this.state = {recipientId: '', messageBuffer:'asdfadsfasdf', timeoutId: null};
 		this.userList = this.userList.bind(this);
 		this.changeRecipient = this.changeRecipient.bind(this);
 		this.insertText = this.insertText.bind(this);
+		this.keyUpHnadler = this.keyUpHnadler.bind(this);
 	}
 	componentWillMount(){
 		this.props.loadConversations();
@@ -111,17 +101,50 @@ class Chat extends React.Component{
 		}
 	}
 
- 
+
+
+	keyUpHnadler(e){
+		e.preventDefault();
+		var keyWord = e.currentTarget.value;
+		console.log(keyWord);
+		console.log('timeoutId'+this.state.timeoutId);
+		clearTimeout(this.state.timeoutId);
+		var timeoutId = setTimeout(this.props.searchUser, 500,keyWord);
+		console.log(timeoutId);
+		this.setState({timeoutId:timeoutId});
+
+	}
+
+	searchedUsersList(){
+		console.log('here in searched user');
+		console.log(this.props.searchedUsers);
+		if(this.props.searchedUsers.length !==0){
+			return this.props.searchedUsers.map(function(user){
+				return (
+					<div key = {user._id}>
+						<img src = {user.avatarURL} width = '50'></img>
+						<Link to = {`/recipient/${user._id}`}  >
+							{user.name}
+						</Link>
+					</div>
+					)
+			}) 
+		}
+	}
+
+
     
 	render(){
+		var recipients=this.props.recipients;
 
 		return (
 			<div>
 				{JSON.parse(localStorage.getItem("user")).name}
 				<Router>
 					<div>
-						{this.userList()}
-						{this.conversationList()}
+						
+
+						<Route exact path= '/message' component = {Test} />
 						<Route path= '/recipient/:recipientId'component = {ChatWindowTest}/>
 						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>
 					</div>
@@ -137,44 +160,10 @@ class Chat extends React.Component{
 
 
 function mapStateToProps(state) {  
-    return { recipients: state.recipients, conversations: state.conversations};
+    return { recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers};
 }
 	
 export default connect(mapStateToProps, actions)(Chat);
  
 
 
-
-
-
-/*
-
-	newConversation(e){
-		e.preventDefault();
-		this.props.newConversationSocket(this.state.messageBuffer, this.state.recipientId);
-	}
-
-	newMessage(e){
-		e.preventDefault();
-		var recipientId = this.state.recipientId;
-		if (recipientId ===''){
-			recipientId = this.props.recipients[0]._id;
-		}
-		console.log(recipientId);
-		console.log(this.state.messageBuffer);
-		fetch('/newMessage',
-		{
-			headers: {
-		      'Accept': 'application/json',
-		      'Content-Type': 'application/json',
-		      'Authorization' : localStorage.getItem("token"),
-
-		    },
-		    method: "POST",
-		    body: JSON.stringify({recipient:recipientId, composedMessage:this.state.messageBuffer})
-		})
-		.then(function(response) {
-		    console.log(response);
-		})
-	}
-*/
