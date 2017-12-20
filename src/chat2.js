@@ -131,20 +131,33 @@ class Chat extends React.Component{
 			}) 
 		}
 	}
+<<<<<<< HEAD
 
 
     
 	render(){
 		var recipients=this.props.recipients;
 
+=======
+    
+	render(){
+		window.onresize = function(e){alert('hi')};
+>>>>>>> c0611266efa6f5ae698e6a32cd06147f10acd9e8
 		return (
 			<div>
 				{JSON.parse(localStorage.getItem("user")).name}
 				<Router>
 					<div>
+<<<<<<< HEAD
 						
 
 						<Route exact path= '/message' component = {Test} />
+=======
+						<input type = 'search' onKeyUp = {(e) =>this.keyUpHnadler(e)}></input>
+						{this.searchedUsersList()}
+						{this.userList()}
+						{this.conversationList()}
+>>>>>>> c0611266efa6f5ae698e6a32cd06147f10acd9e8
 						<Route path= '/recipient/:recipientId'component = {ChatWindowTest}/>
 						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>
 					</div>

@@ -7,8 +7,12 @@ import {LOAD_RECIPIENTS,
 	CONVERSATION_BY_RECIPIENT,
 	CHOSEN_RECIPIENT,
 	CONVERSATION_MESSAGES,
+<<<<<<< HEAD
 	LOAD_SEARCH_USER,
 	CLEAR_SEARCH} from './type'
+=======
+	LOAD_SEARCH_USER} from './type'
+>>>>>>> c0611266efa6f5ae698e6a32cd06147f10acd9e8
 
 export function loadRecipients(){
 	return function(dispatch){
@@ -348,8 +352,11 @@ export function searchUser(keyWord){
 		});
 
 	}
+<<<<<<< HEAD
 }
 
 export function clearSearch(){
 	return {type:CLEAR_SEARCH }
+=======
+>>>>>>> c0611266efa6f5ae698e6a32cd06147f10acd9e8
 }
