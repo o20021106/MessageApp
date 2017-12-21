@@ -57,12 +57,9 @@ class ChatFrame extends React.Component{
 			});
 
 
-		return (
-			<div>
-
-				<Chat />
+		return <Chat />
 			
-			</div>)
+
 	}
 
  	

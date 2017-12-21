@@ -37,17 +37,4 @@ class Chatroom extends React.Component{
 	}
 }
 
-/*
-class Chatroom extends React.Component{
-	render(){
-		console.log('inchat room');
-
-		return (
-			<div>
-				<Chat />
-			</div>
-		) 
-	}
-}
-*/
 ReactDOM.render(<Chatroom />, document.getElementById('root'));

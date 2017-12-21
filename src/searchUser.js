@@ -39,11 +39,26 @@ class SearchUser extends React.Component{
 	searchedUsersList(){
 		console.log('here in searched user');
 		console.log(this.props.searchedUsers);
+		
+
+
+		const avatarStyle = {
+			borderRadius: '50%',
+			width: '50px',
+			height:'50px',
+			objectFit: 'cover',
+			display: 'inline-block'
+		}
+
+		const listItemStyle = {
+			padding : '12px 12px'
+		}
+
 		if(this.props.searchedUsers.length !==0){
 			return this.props.searchedUsers.map(user=>{
 				return (
-					<div key = {user._id}>
-						<img src = {user.avatarURL} width = '50'></img>
+					<div style = {listItemStyle} key = {user._id}>
+						<img src = {user.avatarURL} style = {avatarStyle}></img>
 						<Link to = {`/recipient/${user._id}`} onClick = {this.props.clearSearch} >
 							{user.name}
 						</Link>
@@ -54,9 +69,27 @@ class SearchUser extends React.Component{
 	}
 
 	render(){
+
+		const searchBoxStyle = {
+			padding: '12px 12px',
+			border: 0,
+
+
+		}
+		const searchBarStyle = {
+			height:'30px',
+			width: '100%',
+			backgroundColor: 'red',
+			padding: '0 28px',
+			borderRadius: '5px',
+			borderStyle: 'none'
+		}
 		return(
 			<div>
-				<input type = 'search' onKeyUp = {(e) =>this.keyUpHnadler(e)}></input>
+				<div style = {searchBoxStyle}>
+					<input style ={searchBarStyle} type = 'search' onKeyUp = {(e) =>this.keyUpHnadler(e)}></input>
+					
+				</div>
 				{this.searchedUsersList()}
 			</div>
 		)

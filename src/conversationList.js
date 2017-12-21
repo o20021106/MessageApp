@@ -42,7 +42,7 @@ class ConversationList extends React.Component{
 	render(){
 
 
-		return(<div>
+		return(<div style = {{flexShrink:3,overFlow: 'scroll',background:'red'}}>
 
 			{this.conversationList()}
 
