@@ -8,6 +8,8 @@ import {BrowserRouter as Router,
   Link
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import ConversationColumn from './conversationColumn';
+
 
 
 
@@ -49,111 +51,16 @@ class Messages extends React.Component{
 	render(){
 
 		console.log('in test');
-		if(screen.width>=960 & this.props.conversations.length!=0){
+		if(window.innerWidth>=960 & this.props.conversations.length!=0){
 			console.log('width>=960 IN TEST');
 			console.log(this.props.conversations.length);
 			console.log('screen width >= 960');
 			console.log(this.props.conversations[0].conversation.participants);
-			var recipient=this.props.conversations[0].conversation.participants.filter(participant => participant._id!==localStorage.getItem('user')._id);
+			var recipient=this.props.conversations[0].conversation.participants.filter(participant => participant._id!==JSON.parse(localStorage.getItem('user'))._id);
 			return <Redirect to = {`/recipient/${recipient[0]._id}`} />
 		}
 		else{
-			return (
-				<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100vh'}}>
-					<SearchUser/>
-					<div style = {{flex:1, backgroundColor:'blue',overflowY:'scroll'}}>
-				<p>
-				
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-								hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				hi
-				<br></br>
-				</p>
-				</div>
-				</div>
-			)			
+			return <ConversationColumn/>		
 		}
 	}
 

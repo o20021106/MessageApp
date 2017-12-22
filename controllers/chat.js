@@ -140,10 +140,10 @@ exports.getConversationByRecipientId = function(req,res,next){
 }
 
 exports.getConversations = function(req, res, next){
-    console.log('in getconversations');
+    console.log('in getconversations here');
 	Conversation.find({participants: req.user._id})
 	.select('_id participants')
-	.populate('participants','name')
+	.populate('participants','name avatarURL')
 	.exec(function(err,conversations){
 		if (err){
 			console.log('conv err');
@@ -160,7 +160,7 @@ exports.getConversations = function(req, res, next){
 			Message.find({conversationId: conversation._id})
 			.sort('-createdAt')
 			.limit(1)
-			.populate('author', 'name')
+			.populate('author', 'name _id')
 			.exec(function(err, message){
 				if (err){
 					console.log('conv2 err');

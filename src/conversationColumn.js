@@ -25,25 +25,82 @@ class ConversationColumn extends React.Component{
 		console.log('in conversation');
 		if(!(this.props.conversations.length === 0)){
 
-			const listItemStyle = {
+			const navLinkStyle = {
+				boxSizing: 'border-box',
 				display:'block',
-				padding : '12px 12px'
+				paddingLeft : 12,
+				display: 'flex',
+				height: 64, 
+				width : '100%',				
+				textDecoration: 'none'
+
 			}
+			const listStyle = {
+				padding:0,
+				margin:0,
+				listStyleType: 'none',
+				width : '100%'
+			}
+			const avatarStyle = {
+				borderRadius: '50%',
+				width: '50px',
+				height:'50px',
+				objectFit: 'cover',
+				display: 'inline-block'
+			}
+			const nameStyle ={
+				textOverflow : 'ellipsis',
+				flex: 1,
+				whiteSpace: 'nowrap',
+				overflow:'hidden'
+
+			}
+			const nameTimeStyle = {
+				display: 'flex',
+			}
+			const conversationInfoStyle = {
+				display: 'flex',
+				flexDirection: 'column',
+				justifyContent: 'center',
+				flex:1,
+				paddingRight:12,
+				minWidth: 0,
+			}
+			const messageStyle = {
+				textOverflow : 'ellipsis',
+				whiteSpace: 'nowrap',
+				overflow:'hidden',
+
+			}
+			const imageWrapperStyle = {
+				display:'flex',
+				alignItems: 'center',
+				marginRight: 12
+			}
+
+
 
 			return (
 				<div>
-					<ul>{
+					<ul style = {listStyle}>{
 						this.props.conversations.map(function(conversation){
 							var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
 							return(
-								<li style = {listItemStyle} key = {conversation.conversation._id} >
-									<NavLink to = {`/recipient/${participant[0]._id}`} >
-										<div>
-											participant: {participant[0].name}
-										</div> 
-										<div>
-											{conversation.message[0].auther}
-											{conversation.message[0].body}
+								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
+									<NavLink style = {navLinkStyle}  to = {`/recipient/${participant[0]._id}`} >
+										
+										<div style = {imageWrapperStyle}>
+											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
+										</div>
+										<div style = {conversationInfoStyle}>
+											<div style={nameTimeStyle}>
+												<span style = {nameStyle}>{participant[0].name}</span>
+												<span>{conversation.message[0].createdAt}</span>
+											</div> 
+											<div style = {messageStyle}>
+												{conversation.message[0].author._id === JSON.parse(localStorage.getItem('user'))._id ? 
+													'You' : conversation.message[0].author.name}:{conversation.message[0].body}
+											</div>
 										</div>
 									</NavLink>
 								</li>
@@ -103,7 +160,9 @@ class ConversationColumn extends React.Component{
 
 		const linkStyle = {
 			color:'white',
-			textDecoration: 'none'
+			textDecoration: 'none',
+			fontSize: '14px',
+			fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif'
 		}
 
 
@@ -140,18 +199,20 @@ class ConversationColumn extends React.Component{
 			borderStyle: 'none'
 		}
 		const searchedUsersListStyle = {
-			display: this.state.keyWord === '' ? 'none': 'block'
+			display: this.state.keyWord === '' ? 'none': 'block',
+			width : '100%'
 		}
 
 		const conversationListStyle = {
-			display: this.state.keyWord === '' ? 'block': 'none'
+			display: this.state.keyWord === '' ? 'block': 'none',
+			width : '100%'
 		}
 
 
 
 
 		return(
-			<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100vh'}}>
+			<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100vh', width:'100%'}}>
 						
 				<div style = {searchBoxStyle}>
 					<input style ={searchBarStyle} type = 'search'  onChange = {(e)=>{this.insertKeyWord(e)}} onKeyUp = {(e) =>this.keyUpHnadler(e)}></input>				
@@ -179,11 +240,73 @@ class ConversationColumn extends React.Component{
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
+						hi<br></br>						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
 						hi<br></br>
 
 					</div>
 					<div style = {conversationListStyle}>
 						{this.conversationList()}
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+												hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+												hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>

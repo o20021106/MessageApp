@@ -3,7 +3,7 @@ import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
 import ChatWindowTest from './chatWindowTest';
-import ConversationColumn from './conversationColumn';
+import Messages from './messages';
 import io from 'socket.io-client';
 import {  BrowserRouter as Router,
   Route,
@@ -51,14 +51,13 @@ class Chat extends React.Component{
 
     
 	render(){
-		window.onresize = function(e){alert('hi')};
 		return (
 				//{JSON.parse(localStorage.getItem("user")).name}
 				<Router>
 					<div style = {{height:'100vh', display:'flex'}}>
 						
 
-						<Route exact path= '/message' component = {ConversationColumn} />
+						<Route exact path= '/message' component = {Messages} />
 						<Route path= '/recipient/:recipientId' component = {ChatWindowTest}/>
 						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>
 					</div>
