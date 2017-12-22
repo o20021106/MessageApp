@@ -102,7 +102,7 @@ class ConversationColumn extends React.Component{
 								displayTime = createdTime.getHours >= 12 ? displayTime+'pm' : displayTime+'am';
 							}
 							else if(1000*60*60*24*7 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
-								displayTime = dayMap(createdTime.getDay());
+								displayTime = dayMap[createdTime.getDay()];
 							}
 							else if( createdTime.getFullYear() == now.getFullYear()){
 								displayTime = monthMap[createdTime.getMonth()]+' '+createdTime.getDate();

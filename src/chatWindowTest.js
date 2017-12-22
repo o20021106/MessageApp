@@ -155,7 +155,9 @@ class ChatWindowTest extends React.Component{
 			return (
 					<div key ={message._id} style = {messageStyle}>
 						<div style = {outerBoxStyle}>
-							<div style = {innderBoxStyle}>
+							<div style = {innderBoxStyle}>								
+							<img src = {message.author.avatarURL} width = '50px'></img>
+
 								name: {message.author.name}  message:{message.body}
 							</div>
 						</div>

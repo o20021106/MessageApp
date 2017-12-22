@@ -9213,6 +9213,7 @@ var ChatWindowTest = function (_React$Component) {
 							_react2.default.createElement(
 								'div',
 								{ style: innderBoxStyle },
+								_react2.default.createElement('img', { src: message.author.avatarURL, width: '50px' }),
 								'name: ',
 								message.author.name,
 								'  message:',
@@ -17873,7 +17874,7 @@ var ConversationColumn = function (_React$Component) {
 								displayTime = createdTime.getHours() + ':' + minute;
 								displayTime = createdTime.getHours >= 12 ? displayTime + 'pm' : displayTime + 'am';
 							} else if (1000 * 60 * 60 * 24 * 7 >= now - createdTime && createdTime.getDay() === createdTime.getDay()) {
-								displayTime = dayMap(createdTime.getDay());
+								displayTime = dayMap[createdTime.getDay()];
 							} else if (createdTime.getFullYear() == now.getFullYear()) {
 								displayTime = monthMap[createdTime.getMonth()] + ' ' + createdTime.getDate();
 							} else {
