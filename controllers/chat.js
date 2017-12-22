@@ -197,7 +197,7 @@ exports.getConversationsSocket = function(user){
 			Message.find({conversationId: conversation._id})
 			.sort('createdAt')
 			.limit(1)
-			.populate('author', 'name')
+			.populate('author', 'name _id avatarURL')
 			.exec(function(err, message){
 				if (err){
 					return {err:err};
@@ -219,7 +219,7 @@ var getConversation1 = function(conversationId){
 		console.log(' in getConversation');
 		Message.find({conversationId: conversationId})
 		.sort({ createdAt : 1})
-		.populate('author', 'name')
+		.populate('author', 'name _id avatarURL')
 		.exec(function(err, messages){
 			if(err){
 				return reject( {error:err})
@@ -236,7 +236,7 @@ exports.getConversation = function(req,res,next){
 	console.log('here in get conversation')
 	Message.find({conversationId: req.params.conversationId})
 	.sort({ createdAt : 1})
-	.populate('author', 'name')
+	.populate('author', 'name _id avatarURL')
 	.exec(function(err, messages){
   
 		if(err){

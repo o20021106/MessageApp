@@ -32,14 +32,18 @@ class ConversationColumn extends React.Component{
 				display: 'flex',
 				height: 64, 
 				width : '100%',				
-				textDecoration: 'none'
+				textDecoration: 'none',
+				fontSize:'16px',
+				color: 'white',
+				fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif'
 
 			}
 			const listStyle = {
 				padding:0,
 				margin:0,
 				listStyleType: 'none',
-				width : '100%'
+				width : '100%',
+
 			}
 			const avatarStyle = {
 				borderRadius: '50%',
@@ -78,13 +82,34 @@ class ConversationColumn extends React.Component{
 				marginRight: 12
 			}
 
-
-
+			const dayMap= {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thr',5:'Fri',6:'Sat'}
+			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 			return (
 				<div>
 					<ul style = {listStyle}>{
 						this.props.conversations.map(function(conversation){
 							var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
+							var now = new Date();
+							var createdTime = new Date(conversation.message[0].createdAt);
+							var displayTime ='';
+							console.log('time!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+							console.log(now-createdTime );
+							console.log(now);
+							console.log(createdTime);
+							if (1000*60*60*24 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
+								var minute = ('0'+createdTime.getMinutes()).slice(-2); 
+								displayTime = createdTime.getHours()+':'+minute;
+								displayTime = createdTime.getHours >= 12 ? displayTime+'pm' : displayTime+'am';
+							}
+							else if(1000*60*60*24*7 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
+								displayTime = dayMap(createdTime.getDay());
+							}
+							else if( createdTime.getFullYear() == now.getFullYear()){
+								displayTime = monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
+							}
+							else{
+								displayTime = getFullYear()+monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
+							}
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
 									<NavLink style = {navLinkStyle}  to = {`/recipient/${participant[0]._id}`} >
@@ -95,11 +120,11 @@ class ConversationColumn extends React.Component{
 										<div style = {conversationInfoStyle}>
 											<div style={nameTimeStyle}>
 												<span style = {nameStyle}>{participant[0].name}</span>
-												<span>{conversation.message[0].createdAt}</span>
+												<span>{displayTime}</span>
 											</div> 
 											<div style = {messageStyle}>
 												{conversation.message[0].author._id === JSON.parse(localStorage.getItem('user'))._id ? 
-													'You' : conversation.message[0].author.name}:{conversation.message[0].body}
+													'You' : conversation.message[0].author.name}: {conversation.message[0].body}
 											</div>
 										</div>
 									</NavLink>
@@ -161,7 +186,7 @@ class ConversationColumn extends React.Component{
 		const linkStyle = {
 			color:'white',
 			textDecoration: 'none',
-			fontSize: '14px',
+			fontSize: '16px',
 			fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif'
 		}
 

@@ -18,8 +18,6 @@ class ChatFrame extends React.Component{
     				return socket.on('newMessage',function(data){
     					console.log('inside callback function for on');
     					next({type:'RECIEVE_NEW_MESSAGE', message: data.message, chosenId:data.chosenId, conversationType:data.conversationType,});
-
-    		//{composedMessage:composedMessage, conversationId:conversationId}
     				});
     			}
 			}); 
@@ -33,10 +31,7 @@ class ChatFrame extends React.Component{
     					console.log('ireceived a new conversation!!!!!!!!!!!!!!!!!!!!!!');
     					console.log(data);
     					next({type:'NEW_CONVERSATION', ...data});
- 
 
-
-    		//{composedMessage:composedMessage, conversationId:conversationId}
     				});
     			}
 			});
@@ -49,9 +44,7 @@ class ChatFrame extends React.Component{
     				return socket.on('REDIRECT',function(destination){
     					console.log('Redirect to!!!!!!!!!!!!!!!!!!!!!!');
     					window.history.pushState('data to be passed', 'Title of the page', '/conversation/aaaa');
-						//window.location.href = destination;
 
-    		//{composedMessage:composedMessage, conversationId:conversationId}
     				});
     			}
 			});

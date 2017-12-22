@@ -9,6 +9,7 @@ import {  BrowserRouter as Router,
 import { Redirect } from 'react-router';
 import SearchUser from './searchUser';
 import ConversationList from './conversationList';
+import ConversationColumn from './conversationColumn';
 
 
 
@@ -114,17 +115,53 @@ class ChatWindowTest extends React.Component{
 		console.log(this.props.match.params.recipientId);
 		console.log(this.props.conversationData.conversationType);
 
+
+		const messageStyle = {
+			width : '100%',
+			border:2,
+			overflow:'auto',
+			zoom:1
+		}
+		const rightOuterBoxStyle = {marginLeft: 36,overflow:'auto',zoom:1}
+		const leftOuterBoxStyle = {marginRight: 36,overflow:'auto',zoom:1}
+
+		const rightStyle= {
+			float : 'right',
+			clear: 'right',
+			maxWidth : '95%',
+			wordWrap:'break-word',
+			backgroundColor : 'red'
+		}
+
+		const leftStyle = {
+			float : 'left',
+			clear: 'left',
+			maxWidth : '95%',
+			wordWrap:'break-word',
+			backgroundColor : 'green'
+
+		}
 		var messages = this.props.conversationData.messages;
 		if(messages.length !==0 &
 		this.props.conversationData.chosenId === this.props.match.params.recipientId & 
 		this.props.conversationData.conversationType === 'RECIPIENT'){
 			console.log('in if');
 			console.log(messages);
-			return messages.map(message=>(
-				<div key ={message._id}>
-					name: {message.author.name}  message:{message.body}
-				</div>
-			));
+			
+			
+			return messages.map(message=>{
+				const outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
+				const innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
+			return (
+					<div key ={message._id} style = {messageStyle}>
+						<div style = {outerBoxStyle}>
+							<div style = {innderBoxStyle}>
+								name: {message.author.name}  message:{message.body}
+							</div>
+						</div>
+					</div>
+					)
+			});
 		}
 		else{
 			console.log(this.props.conversationData);
@@ -152,23 +189,52 @@ class ChatWindowTest extends React.Component{
 	}   
 
 	render(){
-		console.log('in chat window test render');
-		console.log(this.props.conversationData.chosenId);
-		console.log(this.props.recipientConversationId[this.props.match.params.recipientId]);
-		console.log(this.props.conversationData.messages);
-			return (
-				<div>
-					{this.props.chosenConversation}<br/>
-					{this.props.match.params.conversationId}
-					<SearchUser/>
-					<ConversationList/>
-					{this.conversationDisplay()}
-			 		<form onSubmit = {(e) => this.newMessage(e)}>
-					 	<input type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
-						<input type = 'submit' value="Submit" ></input>
 
-				 	</form>
-				 	{this.state.messageBuffer}
+			const messageWindowStyle = {
+				display: 'flex',
+				flex:1,
+				minWidth:0
+			}
+
+			const conversationColumnStyle = window.innerWidth >= 960 ?{
+				maxWidth:240,
+			} : {
+				display: 'none'
+			}
+
+			const conversationWindowStyle = {
+				flex:1, 
+				minWidth:0,
+				display: 'flex',
+				flexDirection : 'column' 
+			}
+			const conversationsStyle = {
+				flex:1, 
+				minWidth:0,
+				overflowY: 'scroll',
+			}
+			const inputBoxStyle = {
+				width : '100%',
+				wordWrap: 'breakWord',
+				height : 64,
+				overflowY:scroll
+			}
+			return (
+				<div style = {messageWindowStyle}>
+					<div style = {conversationColumnStyle}>
+						<ConversationColumn/>
+					</div>
+					<div style ={conversationWindowStyle}>
+						<div style = {conversationsStyle}>
+							{this.conversationDisplay()}
+					 	</div>
+					 	<div >
+					 		<form onSubmit = {(e) => this.newMessage(e)}>
+							 	<input style = {inputBoxStyle} type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
+								<input type = 'submit' value="Submit" ></input>
+						 	</form>
+						 </div>
+					 </div>
 				 </div>
 			)	
 		

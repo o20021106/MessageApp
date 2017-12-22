@@ -82,7 +82,7 @@ exports.newMessage = function(user, conversationId, composedMessage){
 	     	}
 	     	console.log('in message');
 	     	Message.find({_id : newMessage.id})
-	     	.populate('author','name')
+	     	.populate('author','name _id avatarURL')
 	     	.exec(function(err, rMessage){
 	     		if (err) {
 	    		console.log('new message save err');

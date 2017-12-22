@@ -45,6 +45,15 @@ export default function(state = initial, action){
 			return {...state, recipients : action.recipients, recipientConversationId:recipientConversationId};
 			break;
 		case LOAD_CONVERSATIONS:
+			action.conversations.sort(function(a,b){
+				if (a.message[0].createdAt > b.message[0].createdAt){
+					return -1
+				}
+				if (a.message[0].createdAt < b.message[0].createdAt){
+					return 1
+				}
+				return 0
+			})
 			console.log('load conversations');
 			console.log(action.conversations);  
 			return {...state, conversations : action.conversations};
@@ -86,10 +95,10 @@ export default function(state = initial, action){
 			})
 
 			conversations.sort(function(a,b){
-				if (a.message[0].createdAt < b.message[0].createdAt){
+				if (a.message[0].createdAt > b.message[0].createdAt){
 					return -1
 				}
-				if (a.message[0].createdAt > b.message[0].createdAt){
+				if (a.message[0].createdAt < b.message[0].createdAt){
 					return 1
 				}
 				return 0
@@ -126,7 +135,7 @@ export default function(state = initial, action){
 			var recipientConversationId = Object.assign({}, state.recipientConversationId);
 			var userId = action.chosenId.filter(id => id!= JSON.parse(localStorage.getItem("user"))._id)[0];
 			recipientConversationId[userId]=action.payload.conversation._id;
-			conversations.push({message: [action.payload.message],conversation:action.payload.conversation});
+			conversations.unshift({message: [action.payload.message],conversation:action.payload.conversation});
 
 			if (conversations.length === 0){
 				console.log('in new conversation if 1');
@@ -179,9 +188,7 @@ export default function(state = initial, action){
 						console.log('in first if');
 						recipientConversationId[action.chosenId] = action.conversationId;
 				}	
-				if(action.conversationId){
-					console.log('conversationId exist');
-					
+				if(action.conversationId){	
 					if(state.conversationData.chosenId === action.chosenId){
 						console.log('second');
 						console.log(action.payload);
@@ -205,7 +212,7 @@ export default function(state = initial, action){
 					console.log(exist);
 					if(!exist){
 						console.log('not exist');
-						conversations.push(conversationNew);
+						conversations.unshift(conversationNew);
 					}
 					console.log(conversations);
 
