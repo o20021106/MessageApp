@@ -27,6 +27,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^3.0.0",
     "promise": "^8.0.1",
+    "radium": "^0.19.6",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
     "react-redux": "^5.0.6",

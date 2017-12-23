@@ -10,6 +10,8 @@ import {  BrowserRouter as Router,
   Link
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import Radium from 'radium';
+
 
 
 
@@ -51,12 +53,12 @@ class Chat extends React.Component{
 
     
 	render(){
+		var ChatWindow = Radium(ChatWindowTest);
 		return (
 				//{JSON.parse(localStorage.getItem("user")).name}
 				<Router>
 					<div style = {{height:'100vh', display:'flex'}}>
 						
-
 						<Route exact path= '/message' component = {Messages} />
 						<Route path= '/recipient/:recipientId' component = {ChatWindowTest}/>
 						<Route path= '/conversation/:conversationId'component = {ChatWindowTest}/>

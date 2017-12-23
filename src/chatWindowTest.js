@@ -10,6 +10,8 @@ import { Redirect } from 'react-router';
 import SearchUser from './searchUser';
 import ConversationList from './conversationList';
 import ConversationColumn from './conversationColumn';
+import Radium from 'radium';
+import {StyleRoot} from 'radium';
 
 
 
@@ -155,7 +157,9 @@ class ChatWindowTest extends React.Component{
 			return (
 					<div key ={message._id} style = {messageStyle}>
 						<div style = {outerBoxStyle}>
-							<div style = {innderBoxStyle}>
+							<div style = {innderBoxStyle}>								
+							<img src = {message.author.avatarURL} width = '50px'></img>
+
 								name: {message.author.name}  message:{message.body}
 							</div>
 						</div>
@@ -196,15 +200,28 @@ class ChatWindowTest extends React.Component{
 				minWidth:0
 			}
 
-			const conversationColumnStyle = window.innerWidth >= 960 ?{
+			const conversationColumnStyle = {
+				display : 'none',
+				':hover':{
+					backgroundColor:'black'
+				},
+				'@media (min-width: 360px)':{
+					display : 'block',
+					maxWidth:240,
+					backgroundColor: 'green'
+				}
+			}
+
+			/*window.innerWidth >= 960 ?{
 				maxWidth:240,
 			} : {
 				display: 'none'
-			}
+			}*/
 
 			const conversationWindowStyle = {
 				flex:1, 
 				minWidth:0,
+
 				display: 'flex',
 				flexDirection : 'column' 
 			}
@@ -219,11 +236,18 @@ class ChatWindowTest extends React.Component{
 				height : 64,
 				overflowY:scroll
 			}
+
+			const hoverTtst = {
+				height: 50,
+				':hover':{
+					backgroundColor: 'blue'
+				}
+			}
 			return (
 				<div style = {messageWindowStyle}>
-					<div style = {conversationColumnStyle}>
-						<ConversationColumn/>
-					</div>
+						<div style = {conversationColumnStyle}>
+							<ConversationColumn/>
+						</div>
 					<div style ={conversationWindowStyle}>
 						<div style = {conversationsStyle}>
 							{this.conversationDisplay()}
@@ -244,6 +268,11 @@ class ChatWindowTest extends React.Component{
 
 
 
+
+
+
+
+
 function mapStateToProps(state) {
     return { chosenConversation: state.chosenConversation, 
     	currentConversation: state.currentConversation, 
@@ -254,6 +283,25 @@ function mapStateToProps(state) {
     	conversations: state.conversations}
 }
 	
-export default connect(mapStateToProps, actions)(ChatWindowTest);
+export default connect(mapStateToProps, actions)(Radium(ChatWindowTest));
  
 
+var styles = {
+  base: {
+    color: '#fff',
+
+    // Adding interactive state couldn't be easier! Add a special key to your
+    // style object (:hover, :focus, :active, or @media) with the additional rules.
+    ':hover': {
+      background: 'black'
+    }
+  },
+
+  primary: {
+    background: '#0074D9'
+  },
+
+  warning: {
+    background: '#FF4136'
+  }
+};

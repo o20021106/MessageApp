@@ -11,6 +11,8 @@ import rootReducer from './src/reducers/chatReducer2';
 import configureStore from './src/configureStore';
 import socketMiddleware from './src/socketMiddleware';
 import {LOAD_CONVERSATIONS} from './src/actions/type';
+import {StyleRoot} from 'radium';
+
 
 const socket = new socketClient();
 socket.connect();
@@ -31,7 +33,9 @@ class Chatroom extends React.Component{
 	render(){
 		return (
 			<Provider store = {store}>
-				<ChatFrame />
+				<StyleRoot>
+					<ChatFrame />
+				</StyleRoot>
 			</Provider>
 		)
 	}
