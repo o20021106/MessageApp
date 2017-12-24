@@ -185,13 +185,13 @@ export function loadConversations(){
 			dispatch({type: LOAD_CONVERSATIONS , conversations: json.conversations});
 			return json;
 		})
-		.then(function(json){
+/*		.then(function(json){
 			//console.log(json.conversations[0].conversation._id);
 			//console.log('load conversatjion id')
 			dispatch({type:CHOSEN_CONVERSATION, chosenConversation: json.conversations[0].conversation._id});
-			getCurrentConversation(json.conversations[0].conversation._id, dispatch);
+			//getCurrentConversation(json.conversations[0].conversation._id, dispatch);
 
-		})
+		})*/
 		.catch(err=>{
 			console.log(err);
 		});

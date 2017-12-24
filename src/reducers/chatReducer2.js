@@ -199,11 +199,16 @@ export default function(state = initial, action){
 					console.log(conversations);
 					console.log(action.conversationId);
 					var conversationNew = Object.assign({},action.payload);
+					console.log('here in conversation by recipientId');
+					console.log(conversationNew);
 					conversationNew.message = [conversationNew.message[0]];
+					console.log(conversationNew);
+
 					if(conversations.length !== 0){
 						conversations = conversations.map(conversation=>{
+							console.log('here in conversation map');
 							if(conversation.conversation._id === action.conversationId){
-								conversation.message = conversationNew;
+								conversation = conversationNew;
 								exist = true;
 							}
 							console.log(conversation);

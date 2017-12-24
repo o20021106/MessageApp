@@ -10,6 +10,8 @@ import {  BrowserRouter as Router,
   NavLink
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
+import * as getTime from './getTimeDisplay';
+
 
 class ConversationColumn extends React.Component{	
 
@@ -90,26 +92,9 @@ class ConversationColumn extends React.Component{
 						this.props.conversations.map(function(conversation){
 							var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
 							var now = new Date();
+							console.log(conversation);
 							var createdTime = new Date(conversation.message[0].createdAt);
-							var displayTime ='';
-							console.log('time!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-							console.log(now-createdTime );
-							console.log(now);
-							console.log(createdTime);
-							if (1000*60*60*24 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
-								var minute = ('0'+createdTime.getMinutes()).slice(-2); 
-								displayTime = createdTime.getHours()+':'+minute;
-								displayTime = createdTime.getHours >= 12 ? displayTime+'pm' : displayTime+'am';
-							}
-							else if(1000*60*60*24*7 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
-								displayTime = dayMap[createdTime.getDay()];
-							}
-							else if( createdTime.getFullYear() == now.getFullYear()){
-								displayTime = monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
-							}
-							else{
-								displayTime = getFullYear()+monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
-							}
+							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
 									<NavLink style = {navLinkStyle}  to = {`/recipient/${participant[0]._id}`} >
@@ -247,8 +232,9 @@ class ConversationColumn extends React.Component{
 				<div style = {{flex:1, backgroundColor:'blue',overflowY:'scroll'}}>
 					<div style = {searchedUsersListStyle}>
 						{this.searchedUsersList()}
-						hi<br></br>
-						hi<br></br>
+						{JSON.parse(localStorage.getItem("user"))._id}
+						{JSON.parse(localStorage.getItem("user")).name}
+						
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
@@ -300,6 +286,9 @@ class ConversationColumn extends React.Component{
 					</div>
 					<div style = {conversationListStyle}>
 						{this.conversationList()}
+						
+						{JSON.parse(localStorage.getItem("user"))._id}
+						{JSON.parse(localStorage.getItem("user")).name}
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>

@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
+
 import { connect } from 'react-redux';
 import fetch from 'isomorphic-fetch';
 import * as actions from './actions/index';
@@ -12,6 +14,7 @@ import ConversationList from './conversationList';
 import ConversationColumn from './conversationColumn';
 import Radium from 'radium';
 import {StyleRoot} from 'radium';
+import * as getTime from './getTimeDisplay';
 
 
 
@@ -19,10 +22,13 @@ class ChatWindowTest extends React.Component{
 
 	constructor(props){
 		super(props);	
-	    this.state = {messageBuffer:'asdfadsfasdf'};
+	    this.state = {messageBuffer:'asdfadsfasdf',scrollHeight:0,scrollTOp:0,clientHeight:0};
+	    this.scrollToBottom = this.scrollToBottom.bind(this);
+	    this.scrollToBottom2 = this.scrollToBottom2.bind(this);
 
 	}
 	componentDidMount(){
+		this.scrollToBottom2();
 		console.log('componeneDidMount!!!!!!!!!!!!!!!!!');
 		console.log(Object.keys(this.props.recipientConversationId).length);
 		//if(Object.keys(this.props.recipientConversationId).length !== 0){
@@ -51,6 +57,7 @@ class ChatWindowTest extends React.Component{
 
 	}
 	componentWillReceiveProps(nextProps){
+
 		console.log(nextProps);
 		
 		console.log(Object.keys(this.props.recipientConversationId).length);
@@ -80,7 +87,61 @@ class ChatWindowTest extends React.Component{
 					this.props.setChosenRecipient(nextProps.match.params.recipientId, null, notLoaded);				
 			}
 		}
-	}		
+	}	
+	componentWillUpdate(){
+		this.setState({scrollHeght:this.conversationWindowEl.scrollHeight, 
+			scrollTop: this.conversationWindowEl.scrollTop,
+			clientHeight:this.conversationWindowEl.clientHeight});
+	}
+	componentDidUpdate(prevProps,prevState){
+		console.log('in update!!!!!!!!!!!!!!!');
+
+		console.log(prevProps);
+		console.log('conversationData' in prevProps);
+		console.log('in if');
+		var preMessages = prevProps.conversationData.messages;
+		var thisMessages = this.props.conversationData.messages;
+		var bottomLine = this.state.scrollHeight - this.state.clientHeight;
+
+		if(thisMessages.length!==0){
+			console.log('this.message');
+			console.log(thisMessages);
+			if(preMessages.length===0){
+				this.scrollToBottom2();
+			}
+			else if(preMessages[preMessages.length-1]._id !== thisMessages[thisMessages.length-1]._id && this.state.scrollTop >= bottomLine){
+					scrollToBottom2();
+					console.log('in scroll');
+			}
+			else{
+
+				console.log('in alert!!!!!!!!!!!!!!!!');
+				console.log(preMessages[preMessages.length-1]._id);
+				console.log(thisMessages[thisMessages.length-1]._id);
+				console.log(this.state.scrollTop);
+				console.log(this.state.clientHeight);
+				console.log(bottomLine);
+			}
+		}
+
+
+		console.log('componeneDidMount');
+		//this.scrollToBottom2();
+
+		console.log('componeneDidMount2')
+	}	
+
+	scrollToBottom2() {
+		console.log('scro22222222222222222222222222222222');
+		console.log(this.conversationWindowEl.scrollHeight);
+		console.log(this.conversationWindowEl.scrollTop);
+
+		this.conversationWindowEl.scrollTop = this.conversationWindowEl.scrollHeight;  	
+	}
+	scrollToBottom() {
+		console.log('scrolllllllllllllllllllllllllllllllllll');
+    	this.el.scrollIntoView({ behaviour: 'smooth' });
+  	}
 
 	conversationList(){
 		console.log('in conversation');
@@ -121,11 +182,13 @@ class ChatWindowTest extends React.Component{
 		const messageStyle = {
 			width : '100%',
 			border:2,
-			overflow:'auto',
-			zoom:1
+			minWidth:0,
+			marginTop:2,
+			marginBottom:2,
+			display:'flex'
 		}
-		const rightOuterBoxStyle = {marginLeft: 36,overflow:'auto',zoom:1}
-		const leftOuterBoxStyle = {marginRight: 36,overflow:'auto',zoom:1}
+		const rightOuterBoxStyle = {flex:1, marginLeft: 36,marginRight:12, minWidth:0,zoom:1,display:'flex'}
+		const leftOuterBoxStyle = {flex:1,marginRight: 36,marginLeft:12, minWidth:0,zoom:1, display:'flex'}
 
 		const rightStyle= {
 			float : 'right',
@@ -143,6 +206,14 @@ class ChatWindowTest extends React.Component{
 			backgroundColor : 'green'
 
 		}
+		const avatarStyle = {
+				float:'left',
+				borderRadius: '50%',
+				width: '30px',
+				height:'30px',
+				objectFit: 'cover',
+				display: 'inline-block'
+			}
 		var messages = this.props.conversationData.messages;
 		if(messages.length !==0 &
 		this.props.conversationData.chosenId === this.props.match.params.recipientId & 
@@ -150,17 +221,48 @@ class ChatWindowTest extends React.Component{
 			console.log('in if');
 			console.log(messages);
 			
-			
-			return messages.map(message=>{
+			var dateLast = 0;
+			var yearLast = 0;
+			var dateDisplayStyle;
+			return messages.map((message)=>{
 				const outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
 				const innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
-			return (
-					<div key ={message._id} style = {messageStyle}>
-						<div style = {outerBoxStyle}>
-							<div style = {innderBoxStyle}>								
-							<img src = {message.author.avatarURL} width = '50px'></img>
+				const timeStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? {float: 'right'} : {float :'left'};
 
-								name: {message.author.name}  message:{message.body}
+				const avatarDisplayStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ?{display:'none'}: avatarStyle
+				const displayTime = getTime.getMessageTime(message.createdAt);
+				
+				var createdTime = new Date(message.createdAt);
+				if (createdTime.getFullYear()!==yearLast ||dateLast!== createdTime.getDate()){
+
+
+					yearLast = createdTime.getFullYear();
+					dateLast = createdTime.getDate();
+
+					dateDisplayStyle = {display:'block'}
+				}
+				else{
+					dateDisplayStyle = {display:'none'}
+				}
+
+				return (
+					<div style ={{width : '100%'}} key ={message._id}>
+						<div style = {[dateDisplayStyle,{width:'100%', textAlign:'center'}]} >
+							{displayTime.date}
+						</div>
+						<div  style = {messageStyle}>
+							<div style = {outerBoxStyle}>
+								<div style = {{display:'flex',alignItems:'start'}}>
+									<img src = {message.author.avatarURL} style ={avatarDisplayStyle}></img>
+								</div>
+								<div style = {{display:'inline-block',flex:1, minWidth:0,paddingLeft:10,paddingRight:10}}>
+									<div style = {timeStyle}>
+										{displayTime.time}
+									</div>
+									<div style = {[innderBoxStyle,{display:'inline-block', alignItems:'center',padding:'12px 16px', borderRadius:'6px'}]}>								
+										{message.body}
+									</div>
+								</div>
 							</div>
 						</div>
 					</div>
@@ -202,13 +304,10 @@ class ChatWindowTest extends React.Component{
 
 			const conversationColumnStyle = {
 				display : 'none',
-				':hover':{
-					backgroundColor:'black'
-				},
-				'@media (min-width: 360px)':{
+				
+				'@media (min-width: 480px)':{
 					display : 'block',
 					maxWidth:240,
-					backgroundColor: 'green'
 				}
 			}
 
@@ -229,11 +328,12 @@ class ChatWindowTest extends React.Component{
 				flex:1, 
 				minWidth:0,
 				overflowY: 'scroll',
+				marginBottom: 20
 			}
 			const inputBoxStyle = {
 				width : '100%',
 				wordWrap: 'breakWord',
-				height : 64,
+				height :32,
 				overflowY:scroll
 			}
 
@@ -245,11 +345,12 @@ class ChatWindowTest extends React.Component{
 			}
 			return (
 				<div style = {messageWindowStyle}>
+
 						<div style = {conversationColumnStyle}>
 							<ConversationColumn/>
 						</div>
 					<div style ={conversationWindowStyle}>
-						<div style = {conversationsStyle}>
+						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
 							{this.conversationDisplay()}
 					 	</div>
 					 	<div >
@@ -259,6 +360,7 @@ class ChatWindowTest extends React.Component{
 						 	</form>
 						 </div>
 					 </div>
+					 <div ref = {(el)=>{this.el=el}}></div>
 				 </div>
 			)	
 		
