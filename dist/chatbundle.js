@@ -9121,9 +9121,9 @@ var ChatWindowTest = function (_React$Component) {
 
 		var _this = _possibleConstructorReturn(this, (ChatWindowTest.__proto__ || Object.getPrototypeOf(ChatWindowTest)).call(this, props));
 
-		_this.state = { messageBuffer: 'asdfadsfasdf', scrollHeight: 0, scrollTOp: 0, clientHeight: 0 };
+		_this.state = { messageBuffer: 'asdfadsfasdf', atBottom: false, displayNoti: false };
 		_this.scrollToBottom = _this.scrollToBottom.bind(_this);
-		_this.scrollToBottom2 = _this.scrollToBottom2.bind(_this);
+		_this.handelConversationScroll = _this.handelConversationScroll.bind(_this);
 
 		return _this;
 	}
@@ -9131,7 +9131,8 @@ var ChatWindowTest = function (_React$Component) {
 	_createClass(ChatWindowTest, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			this.scrollToBottom2();
+			this.conversationWindowEl.addEventListener('scroll', this.handelConversationScroll);
+			this.scrollToBottom();
 			console.log('componeneDidMount!!!!!!!!!!!!!!!!!');
 			console.log(Object.keys(this.props.recipientConversationId).length);
 			//if(Object.keys(this.props.recipientConversationId).length !== 0){
@@ -9159,9 +9160,10 @@ var ChatWindowTest = function (_React$Component) {
 		key: 'componentWillReceiveProps',
 		value: function componentWillReceiveProps(nextProps) {
 
-			console.log(nextProps);
+			var bottomLine = this.conversationWindowEl.scrollHeight - this.conversationWindowEl.clientHeight;
+			var atBottom = this.conversationWindowEl.scrollTop >= bottomLine ? true : false;
+			this.setState({ atBottom: atBottom });
 
-			console.log(Object.keys(this.props.recipientConversationId).length);
 			if (this.props.match.params.recipientId !== nextProps.match.params.recipientId) {
 				console.log('transition');
 				var convExist = 'CON_EXIST';
@@ -9178,7 +9180,6 @@ var ChatWindowTest = function (_React$Component) {
 						this.props.setChosenRecipient(nextProps.match.params.recipientId, null, conNExist);
 					}
 				} else {
-					//
 					console.log('no loaded yet prop');
 
 					this.props.setChosenRecipient(nextProps.match.params.recipientId, null, notLoaded);
@@ -9186,62 +9187,41 @@ var ChatWindowTest = function (_React$Component) {
 			}
 		}
 	}, {
-		key: 'componentWillUpdate',
-		value: function componentWillUpdate() {
-			this.setState({ scrollHeght: this.conversationWindowEl.scrollHeight,
-				scrollTop: this.conversationWindowEl.scrollTop,
-				clientHeight: this.conversationWindowEl.clientHeight });
-		}
-	}, {
 		key: 'componentDidUpdate',
 		value: function componentDidUpdate(prevProps, prevState) {
-			console.log('in update!!!!!!!!!!!!!!!');
 
-			console.log(prevProps);
-			console.log('conversationData' in prevProps);
-			console.log('in if');
 			var preMessages = prevProps.conversationData.messages;
 			var thisMessages = this.props.conversationData.messages;
 			var bottomLine = this.state.scrollHeight - this.state.clientHeight;
+			if (this.props.match.params.recipientId !== prevProps.match.params.recipientId) {
+				this.scrollToBottom();
+			} else if (thisMessages.length !== 0) {
 
-			if (thisMessages.length !== 0) {
-				console.log('this.message');
-				console.log(thisMessages);
 				if (preMessages.length === 0) {
-					this.scrollToBottom2();
-				} else if (preMessages[preMessages.length - 1]._id !== thisMessages[thisMessages.length - 1]._id && this.state.scrollTop >= bottomLine) {
-					scrollToBottom2();
-					console.log('in scroll');
-				} else {
-
-					console.log('in alert!!!!!!!!!!!!!!!!');
-					console.log(preMessages[preMessages.length - 1]._id);
-					console.log(thisMessages[thisMessages.length - 1]._id);
-					console.log(this.state.scrollTop);
-					console.log(this.state.clientHeight);
-					console.log(bottomLine);
+					this.scrollToBottom();
+				} else if (preMessages[preMessages.length - 1]._id !== thisMessages[thisMessages.length - 1]._id) {
+					console.log('new message');
+					if (thisMessages[thisMessages.length - 1].author._id === JSON.parse(localStorage.getItem("user"))._id || this.state.atBottom) {
+						this.scrollToBottom();
+					} else {
+						this.conversationNoti.style.display = 'block';
+					}
 				}
 			}
-
-			console.log('componeneDidMount');
-			//this.scrollToBottom2();
-
-			console.log('componeneDidMount2');
 		}
 	}, {
-		key: 'scrollToBottom2',
-		value: function scrollToBottom2() {
-			console.log('scro22222222222222222222222222222222');
-			console.log(this.conversationWindowEl.scrollHeight);
-			console.log(this.conversationWindowEl.scrollTop);
-
-			this.conversationWindowEl.scrollTop = this.conversationWindowEl.scrollHeight;
+		key: 'handelConversationScroll',
+		value: function handelConversationScroll() {
+			var bottomLine = this.conversationWindowEl.scrollHeight - this.conversationWindowEl.clientHeight;
+			var atBottom = this.conversationWindowEl.scrollTop >= bottomLine ? true : false;
+			if (atBottom) {
+				this.conversationNoti.style.display = 'none';
+			}
 		}
 	}, {
 		key: 'scrollToBottom',
 		value: function scrollToBottom() {
-			console.log('scrolllllllllllllllllllllllllllllllllll');
-			this.el.scrollIntoView({ behaviour: 'smooth' });
+			this.conversationWindowEl.scrollTop = this.conversationWindowEl.scrollHeight;
 		}
 	}, {
 		key: 'conversationList',
@@ -9334,7 +9314,7 @@ var ChatWindowTest = function (_React$Component) {
 				var dateLast = 0;
 				var yearLast = 0;
 				var dateDisplayStyle;
-				return messages.map(function (message) {
+				return messages.map(function (message, index, array) {
 					var outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
 					var innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
 					var timeStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? { float: 'right' } : { float: 'left' };
@@ -9353,6 +9333,15 @@ var ChatWindowTest = function (_React$Component) {
 						dateDisplayStyle = { display: 'none' };
 					}
 
+					var space20 = false;
+
+					if (index === array.length - 1 || array[index + 1].author._id !== message.author._id) {
+						space20 = true;
+					}
+					var space20Style = {
+						height: 20,
+						display: space20 ? 'block' : 'none'
+					};
 					return _react2.default.createElement(
 						'div',
 						{ style: { width: '100%' }, key: message._id },
@@ -9387,7 +9376,8 @@ var ChatWindowTest = function (_React$Component) {
 									)
 								)
 							)
-						)
+						),
+						_react2.default.createElement('div', { style: space20Style })
 					);
 				});
 			} else {
@@ -9408,6 +9398,7 @@ var ChatWindowTest = function (_React$Component) {
 	}, {
 		key: 'newMessage',
 		value: function newMessage(e) {
+
 			e.preventDefault();
 			e.target.querySelector('#composedMessage').value = '';
 
@@ -9453,8 +9444,7 @@ var ChatWindowTest = function (_React$Component) {
 			var conversationsStyle = {
 				flex: 1,
 				minWidth: 0,
-				overflowY: 'scroll',
-				marginBottom: 20
+				overflowY: 'scroll'
 			};
 			var inputBoxStyle = {
 				width: '100%',
@@ -9463,11 +9453,12 @@ var ChatWindowTest = function (_React$Component) {
 				overflowY: scroll
 			};
 
-			var hoverTtst = {
-				height: 50,
-				':hover': {
-					backgroundColor: 'blue'
-				}
+			var newMessageNoti = {
+				position: 'fixed',
+				top: 0,
+				width: '100%',
+				backgroundColor: 'yellow',
+				display: 'none'
 			};
 			return _react2.default.createElement(
 				'div',
@@ -9480,6 +9471,13 @@ var ChatWindowTest = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ style: conversationWindowStyle },
+					_react2.default.createElement(
+						'div',
+						{ style: newMessageNoti, ref: function ref(el) {
+								_this2.conversationNoti = el;
+							} },
+						'new Message'
+					),
 					_react2.default.createElement(
 						'div',
 						{ style: conversationsStyle, ref: function ref(el) {
@@ -9523,27 +9521,6 @@ function mapStateToProps(state) {
 }
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)((0, _radium2.default)(ChatWindowTest));
-
-
-var styles = {
-	base: {
-		color: '#fff',
-
-		// Adding interactive state couldn't be easier! Add a special key to your
-		// style object (:hover, :focus, :active, or @media) with the additional rules.
-		':hover': {
-			background: 'black'
-		}
-	},
-
-	primary: {
-		background: '#0074D9'
-	},
-
-	warning: {
-		background: '#FF4136'
-	}
-};
 
 /***/ }),
 /* 78 */
@@ -18267,6 +18244,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(4);
@@ -18322,6 +18301,7 @@ var ConversationColumn = function (_React$Component) {
 		_this.state = { timeoutId: null, showConversations: true, keyWord: '' };
 		_this.keyUpHnadler = _this.keyUpHnadler.bind(_this);
 		_this.insertKeyWord = _this.insertKeyWord.bind(_this);
+		_this.conversationList = _this.conversationList.bind(_this);
 		return _this;
 	}
 
@@ -18380,7 +18360,8 @@ var ConversationColumn = function (_React$Component) {
 					alignItems: 'center',
 					marginRight: 12
 				};
-
+				var chosenConversationId = null;
+				chosenConversationId = this.props.recipientConversationId ? this.props.recipientConversationId[this.props.conversationData.chosenId] : null;
 				var dayMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thr', 5: 'Fri', 6: 'Sat' };
 				var monthMap = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'May', 5: 'Jun', 6: 'Jul', 7: 'Aug', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dec' };
 				return _react2.default.createElement(
@@ -18390,11 +18371,11 @@ var ConversationColumn = function (_React$Component) {
 						'ul',
 						{ style: listStyle },
 						this.props.conversations.map(function (conversation) {
+							var navLinkDisplayStyle = window.innerWidth >= 480 && chosenConversationId && conversation.conversation._id === chosenConversationId ? _extends({}, navLinkStyle, { backgroundColor: 'black' }) : navLinkStyle;
 							var participant = conversation.conversation.participants.filter(function (participant) {
 								return participant._id != JSON.parse(localStorage.getItem("user"))._id;
 							});
 							var now = new Date();
-							console.log(conversation);
 							var createdTime = new Date(conversation.message[0].createdAt);
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return _react2.default.createElement(
@@ -18402,7 +18383,7 @@ var ConversationColumn = function (_React$Component) {
 								{ style: { width: '100%' }, key: conversation.conversation._id },
 								_react2.default.createElement(
 									_reactRouterDom.NavLink,
-									{ style: navLinkStyle, to: '/recipient/' + participant[0]._id },
+									{ style: navLinkDisplayStyle, to: '/recipient/' + participant[0]._id },
 									_react2.default.createElement(
 										'div',
 										{ style: imageWrapperStyle },
@@ -18778,7 +18759,11 @@ var ConversationColumn = function (_React$Component) {
 }(_react2.default.Component);
 
 function mapStateToProps(state) {
-	return { recipients: state.recipients, conversations: state.conversations, searchedUsers: state.searchedUsers };
+	return { recipients: state.recipients,
+		conversations: state.conversations,
+		conversationData: state.conversationData,
+		searchedUsers: state.searchedUsers,
+		recipientConversationId: state.recipientConversationId };
 }
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)(ConversationColumn);

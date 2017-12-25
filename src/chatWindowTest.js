@@ -22,13 +22,14 @@ class ChatWindowTest extends React.Component{
 
 	constructor(props){
 		super(props);	
-	    this.state = {messageBuffer:'asdfadsfasdf',scrollHeight:0,scrollTOp:0,clientHeight:0};
-	    this.scrollToBottom = this.scrollToBottom.bind(this);
-	    this.scrollToBottom2 = this.scrollToBottom2.bind(this);
+	    this.state = {messageBuffer:'asdfadsfasdf', atBottom:false, displayNoti:false};
+		this.scrollToBottom = this.scrollToBottom.bind(this);
+		this.handelConversationScroll = this.handelConversationScroll.bind(this);
 
 	}
 	componentDidMount(){
-		this.scrollToBottom2();
+		this.conversationWindowEl.addEventListener('scroll', this.handelConversationScroll);
+		this.scrollToBottom();
 		console.log('componeneDidMount!!!!!!!!!!!!!!!!!');
 		console.log(Object.keys(this.props.recipientConversationId).length);
 		//if(Object.keys(this.props.recipientConversationId).length !== 0){
@@ -58,9 +59,11 @@ class ChatWindowTest extends React.Component{
 	}
 	componentWillReceiveProps(nextProps){
 
-		console.log(nextProps);
 		
-		console.log(Object.keys(this.props.recipientConversationId).length);
+		var bottomLine = this.conversationWindowEl.scrollHeight - this.conversationWindowEl.clientHeight;
+		var atBottom = this.conversationWindowEl.scrollTop >= bottomLine ? true: false;
+		this.setState({atBottom:atBottom});
+
 		if(this.props.match.params.recipientId !== nextProps.match.params.recipientId){
 			console.log('transition');
 			var convExist = 'CON_EXIST';
@@ -81,67 +84,51 @@ class ChatWindowTest extends React.Component{
 
 				}
 			}
-			else{   //
+			else{   
 									console.log('no loaded yet prop');					
 
 					this.props.setChosenRecipient(nextProps.match.params.recipientId, null, notLoaded);				
 			}
 		}
 	}	
-	componentWillUpdate(){
-		this.setState({scrollHeght:this.conversationWindowEl.scrollHeight, 
-			scrollTop: this.conversationWindowEl.scrollTop,
-			clientHeight:this.conversationWindowEl.clientHeight});
-	}
-	componentDidUpdate(prevProps,prevState){
-		console.log('in update!!!!!!!!!!!!!!!');
 
-		console.log(prevProps);
-		console.log('conversationData' in prevProps);
-		console.log('in if');
+	componentDidUpdate(prevProps,prevState){
+
 		var preMessages = prevProps.conversationData.messages;
 		var thisMessages = this.props.conversationData.messages;
 		var bottomLine = this.state.scrollHeight - this.state.clientHeight;
+		if(this.props.match.params.recipientId !== prevProps.match.params.recipientId){
+			this.scrollToBottom();
+		}
+		else if(thisMessages.length!==0){
 
-		if(thisMessages.length!==0){
-			console.log('this.message');
-			console.log(thisMessages);
 			if(preMessages.length===0){
-				this.scrollToBottom2();
+				this.scrollToBottom();
 			}
-			else if(preMessages[preMessages.length-1]._id !== thisMessages[thisMessages.length-1]._id && this.state.scrollTop >= bottomLine){
-					scrollToBottom2();
-					console.log('in scroll');
-			}
-			else{
-
-				console.log('in alert!!!!!!!!!!!!!!!!');
-				console.log(preMessages[preMessages.length-1]._id);
-				console.log(thisMessages[thisMessages.length-1]._id);
-				console.log(this.state.scrollTop);
-				console.log(this.state.clientHeight);
-				console.log(bottomLine);
+			else if(preMessages[preMessages.length-1]._id !== thisMessages[thisMessages.length-1]._id){
+				console.log('new message');
+				if(thisMessages[thisMessages.length-1].author._id === JSON.parse(localStorage.getItem("user"))._id || 
+					this.state.atBottom){
+					this.scrollToBottom();
+				}
+				else{
+					this.conversationNoti.style.display = 'block';
+				}
 			}
 		}
 
-
-		console.log('componeneDidMount');
-		//this.scrollToBottom2();
-
-		console.log('componeneDidMount2')
 	}	
-
-	scrollToBottom2() {
-		console.log('scro22222222222222222222222222222222');
-		console.log(this.conversationWindowEl.scrollHeight);
-		console.log(this.conversationWindowEl.scrollTop);
-
-		this.conversationWindowEl.scrollTop = this.conversationWindowEl.scrollHeight;  	
+	handelConversationScroll(){
+		var bottomLine = this.conversationWindowEl.scrollHeight - this.conversationWindowEl.clientHeight;
+		var atBottom = this.conversationWindowEl.scrollTop >= bottomLine ? true: false;
+		if(atBottom){
+			this.conversationNoti.style.display = 'none';
+		}
 	}
 	scrollToBottom() {
-		console.log('scrolllllllllllllllllllllllllllllllllll');
-    	this.el.scrollIntoView({ behaviour: 'smooth' });
-  	}
+		this.conversationWindowEl.scrollTop = this.conversationWindowEl.scrollHeight;  	
+	}
+
 
 	conversationList(){
 		console.log('in conversation');
@@ -224,7 +211,7 @@ class ChatWindowTest extends React.Component{
 			var dateLast = 0;
 			var yearLast = 0;
 			var dateDisplayStyle;
-			return messages.map((message)=>{
+			return messages.map((message,index, array)=>{
 				const outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
 				const innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
 				const timeStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? {float: 'right'} : {float :'left'};
@@ -245,6 +232,15 @@ class ChatWindowTest extends React.Component{
 					dateDisplayStyle = {display:'none'}
 				}
 
+				var space20 =false;
+
+				if(index === array.length-1 || array[index+1].author._id !== message.author._id){
+					space20=true;
+				}
+				const space20Style = {
+					height:20,
+					display: space20? 'block':'none' 
+				}
 				return (
 					<div style ={{width : '100%'}} key ={message._id}>
 						<div style = {[dateDisplayStyle,{width:'100%', textAlign:'center'}]} >
@@ -264,6 +260,9 @@ class ChatWindowTest extends React.Component{
 									</div>
 								</div>
 							</div>
+
+						</div>
+						<div style = {space20Style}>
 						</div>
 					</div>
 					)
@@ -281,8 +280,10 @@ class ChatWindowTest extends React.Component{
 	}
 
 	newMessage(e){
+
 		e.preventDefault();
 		e.target.querySelector('#composedMessage').value = '';
+
 
 		if(!this.props.recipientConversationId[this.props.match.params.recipientId]){
 			this.props.newConversationSocket('RECIPIENT', this.state.messageBuffer, this.props.match.params.recipientId);
@@ -328,7 +329,6 @@ class ChatWindowTest extends React.Component{
 				flex:1, 
 				minWidth:0,
 				overflowY: 'scroll',
-				marginBottom: 20
 			}
 			const inputBoxStyle = {
 				width : '100%',
@@ -337,11 +337,12 @@ class ChatWindowTest extends React.Component{
 				overflowY:scroll
 			}
 
-			const hoverTtst = {
-				height: 50,
-				':hover':{
-					backgroundColor: 'blue'
-				}
+			const newMessageNoti = {
+				position:'fixed', 
+				top:0,
+				width:'100%',
+				backgroundColor:'yellow',
+				display: 'none'
 			}
 			return (
 				<div style = {messageWindowStyle}>
@@ -350,7 +351,10 @@ class ChatWindowTest extends React.Component{
 							<ConversationColumn/>
 						</div>
 					<div style ={conversationWindowStyle}>
-						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
+						<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
+							new Message
+						</div>
+ 						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
 							{this.conversationDisplay()}
 					 	</div>
 					 	<div >
@@ -387,23 +391,3 @@ function mapStateToProps(state) {
 	
 export default connect(mapStateToProps, actions)(Radium(ChatWindowTest));
  
-
-var styles = {
-  base: {
-    color: '#fff',
-
-    // Adding interactive state couldn't be easier! Add a special key to your
-    // style object (:hover, :focus, :active, or @media) with the additional rules.
-    ':hover': {
-      background: 'black'
-    }
-  },
-
-  primary: {
-    background: '#0074D9'
-  },
-
-  warning: {
-    background: '#FF4136'
-  }
-};

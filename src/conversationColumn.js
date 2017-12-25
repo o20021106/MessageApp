@@ -20,6 +20,7 @@ class ConversationColumn extends React.Component{
 		this.state = {timeoutId: null, showConversations: true, keyWord:''};
 		this.keyUpHnadler = this.keyUpHnadler.bind(this);
 		this.insertKeyWord = this.insertKeyWord.bind(this);
+		this.conversationList = this.conversationList.bind(this);
 	}
 
 
@@ -83,21 +84,22 @@ class ConversationColumn extends React.Component{
 				alignItems: 'center',
 				marginRight: 12
 			}
-
+			var chosenConversationId = null;
+			chosenConversationId = this.props.recipientConversationId ? this.props.recipientConversationId[this.props.conversationData.chosenId]:null;
 			const dayMap= {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thr',5:'Fri',6:'Sat'}
 			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 			return (
 				<div>
-					<ul style = {listStyle}>{
-						this.props.conversations.map(function(conversation){
+ 					<ul style = {listStyle}>{
+ 						this.props.conversations.map(function(conversation){
+							var navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'black'}:navLinkStyle;
 							var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
 							var now = new Date();
-							console.log(conversation);
 							var createdTime = new Date(conversation.message[0].createdAt);
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
-									<NavLink style = {navLinkStyle}  to = {`/recipient/${participant[0]._id}`} >
+									<NavLink style = {navLinkDisplayStyle}  to = {`/recipient/${participant[0]._id}`} >
 										
 										<div style = {imageWrapperStyle}>
 											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
@@ -350,7 +352,11 @@ class ConversationColumn extends React.Component{
 	}
 }
 function mapStateToProps(state) {  
-    return { recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers };
+    return { recipients: state.recipients, 
+    	conversations: state.conversations, 
+    	conversationData:state.conversationData,
+    	searchedUsers:state.searchedUsers,
+    	recipientConversationId:state.recipientConversationId,  };
 }
 	
 export default connect(mapStateToProps, actions)(ConversationColumn);

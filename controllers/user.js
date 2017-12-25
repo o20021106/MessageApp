@@ -11,8 +11,38 @@ var path = require('path');
 
 exports.register = {
 	post: function(req,res,next){
-        
-		
+		req.assert('email','Please provide a valid email address').isEmail();
+		req.check('password', 'Please enter a password longer than 6 characters').len({min:6});
+		console.log(req.body.email);
+		console.log(req.body.password);
+		var errors = req.validationErrors();
+
+		if (errors){
+			return res.json({message: errors});
+		}
+
+		var user = new User({
+			email : req.body.email,
+			password: req.body.password,
+			name : req.body.name,
+			avatarURL: config.avatarDefault
+		});
+		User.findOne({email:req.body.email}, function(err,existingUser){
+			if(existingUser){
+				return res.json({error:'exist'});
+			}
+			user.save(function(err, newUser){
+				if(err){
+					return res.json({error:'failed'});
+				}
+				else{
+					return res.redirect({url: '/login'});
+				}
+			});
+		});
+
+
+/*		
 
 		const storage = multer.diskStorage({
   			destination: 'images',
@@ -29,7 +59,11 @@ exports.register = {
 		       console.log('err');
 		    }
 		    else if (!req.file) { 
+		    	req.assert('email','Please provide a valid email address').isEmail();
+				req.check('password', 'Please enter a password longer than 6 characters').len({min:6});
+
 		    	console.log("No file received");
+		    	console.log(req.body.email);
      		    var avatarURL= config.avatarDefault;
 
 		      	var user = new User({
@@ -45,6 +79,7 @@ exports.register = {
 					}
 					user.save(function(err, newUser){
 						if(err){
+							console.log(err);
 							return res.json({message:'creating new user failed'});
 						}
 						else{
@@ -111,7 +146,7 @@ exports.register = {
 			
 			}
 
-		})
+		})*/
 	}
 }
 
