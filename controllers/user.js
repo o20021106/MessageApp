@@ -36,7 +36,12 @@ exports.register = {
 					return res.json({error:'failed'});
 				}
 				else{
-					return res.redirect({url: '/login'});
+					var token = jwt.sign({id : newUser._id}, config.secret, {
+			            expiresIn: 86400 // in seconds
+	 	          	});
+		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
+		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : newUser }, url: 'http://localhost:8000/editProfile'});
+
 				}
 			});
 		});
@@ -218,4 +223,106 @@ exports.login = {
 		    }
 		  });
 		}
+}
+
+exports.editProfile = {
+	post: function(req,res,next){
+
+		const storage = multer.diskStorage({
+  			destination: 'images',
+  			filename: function (req, file, callback) {
+	    		crypto.pseudoRandomBytes(16, function(err, raw) {
+		  			if (err) return callback(err);
+		 			callback(null, raw.toString('hex') + path.extname(file.originalname));
+				});
+  			}
+		});
+		var upload = multer({ storage: storage }).single('avatar');
+  		upload(req, res, function (err) {
+		    if (err) {
+		       console.log('err');
+		    }
+		    else if (!req.file) { 
+		    	
+		    	console.log("No picture received");
+		    	console.log(req.body.email);
+     		    var avatarURL= config.avatarDefault;
+
+/*
+				User.findOne({email:req.user.email}, function(err,existingUser){
+					if(existingUser){
+						return res.json({message:'an user with a same email adress already exists.'});
+					}
+					user.save(function(err, newUser){
+						if(err){
+							console.log(err);
+							return res.json({message:'creating new user failed'});
+						}
+						else{
+							return res.redirect("/login");
+						}
+					});
+				})
+				*/
+		    } 
+		    else {
+			    
+
+			    const host = req.hostname;
+	  		    const filePath = req.protocol + "://" + host + '/' + req.file.path;
+			    console.log('file received');
+			    cloudinary.config(config.cloudinary);
+
+			      //cloudinary.v2.uploader.upload_stream( (result) => console.log(result) ).end( req.file.buffer ); 
+
+			    var avatarURL= config.avatarDefault;
+
+			    cloudinary.v2.uploader.upload(req.file.path, function (err, response) {
+			    	if (err) {
+				        console.log('failed to send to cloud')
+				        console.log(err);
+			    	} 
+			    	else {
+			    		avatarURL = response.url;
+				        console.log('success sending to cloud');
+				        console.log(response);
+				    }
+				
+					User.findOne({email:req.user.email}, function(err,user){
+						if(err){
+							return res.json({error:err});
+						}
+						console.log('find user');
+						console.log(req.body.height);
+						
+
+
+						var profileItems = ['name','birthday','aboutMe','height','weight','role'];
+						profileItems.forEach(function(profileItem){
+							if(req.body[profileItem]){
+								user[profileItem] = req.body[profileItem];
+							}
+						});
+
+
+/*
+						user.save(function(err, newUser){
+							if(err){
+								return res.json({message:'creating new user failed'});
+							}
+							else{
+								return res.redirect("/login");
+							}
+
+						});
+						
+						*/
+					});
+			    });
+			      
+			
+			}
+
+		})
+	}
 }

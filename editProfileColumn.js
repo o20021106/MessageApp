@@ -1,15 +1,14 @@
 import fetch from 'isomorphic-fetch';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import {StyleRoot} from 'radium';
 
 
-class Register extends React.Component{ 
+export default class EditProfileColumn extends React.Component{ 
 	constructor(props){
 		super(props);
 		this.previewAvatar =this.previewAvatar.bind(this);
 		this.chooseFile =this.chooseFile.bind(this);
-		this.createAccount =this.createAccount.bind(this);
+		this.EditProfile =this.EditProfile.bind(this);
 	}
 
 	previewAvatar() {
@@ -31,7 +30,7 @@ class Register extends React.Component{
 		this.imgInput.click();
 	}
 
-	createAccount(e){
+	EditProfile(e){
 		e.preventDefault();
 		var registerData = new FormData(this.form);
 		console.log({ password: registerData.get('password'), email : registerData.get('email'), name:registerData.get('name')});
@@ -67,7 +66,7 @@ class Register extends React.Component{
 			    return response.json();
 			})
 			.then(json=>{
-				if(json.hasOwnProperty('message')){
+				if('message' in json){
 					json.message.forEach(function(mess){
 						if(mess.param === 'email'){
 							checker[mess.param].innerHTML = 'invalid email';
@@ -79,29 +78,20 @@ class Register extends React.Component{
 						}
 					})
 				}
-				else if (json.hasOwnProperty('error')){
+				else if ('error' in json){
 					if(json['error'] === 'exist'){
 						console.log('exist')
 						checker['userCheck'].innerHTML = 'user already exists';
 						checker['userCheck'].style.visibility = 'visible';
 					}
-					else if(json.hasOwnProperty('failed')){
+					else if(json['error']==='failed'){
 						console.log('failed');
 						checker['userCheck'].innerHTML = 'creating account failed';
 						checker['userCheck'].style.visibility = 'visible';
 
 					}
 				}
-				else if(json.hasOwnProperty('url')){
-					if (typeof(Storage) !== "undefined") {
-						localStorage.setItem('token', json.data.token);
-						localStorage.setItem('user', JSON.stringify(json.data.user)); 
-						window.location.href = json.url;
-						console.log('here');
- 					} else { 
-			    // Sorry! No Web Storage support..
-					}
-					console.log(json.url);
+				else if('url' in json){
 					window.location.href = json.url;
 				}
 
@@ -112,29 +102,33 @@ class Register extends React.Component{
 			});
 		}
 	}
+	roleOptions(){
+		var roles = ['top','bottom','vers'];
+		return roles.map(role=>{
+			if (JSON.parse(localStorage.getItem("user")).role === role){
+				return <option key={role} value ={role} select = 'selected'>{role}</option>
+			}
+			else{
+				return <option key={role} value ={role}>{role}</option>
 
+			}
+		})
+	}
 	render(){
 		console.log("YOU");
 
 		
-		const outerBoxStyle = {	
-			display:'flex',
-			width :'100%',
-			justifyContent: 'center',
-			alignItems:'center', 
-			height:'100%'}
-		const registerBoxStyle = {
+
+		const outerBoxStyle = {
 			margin:0,
-			boxSizing:'border-box',
 			padding:'30px 30px 30px 30px',
 			backgroundColor: 'green',
 			width:'100%', 
 			height:'100%',
-			'@media (min-width : 480px)':{
-				maxWidth:480, 
-				height:'80%'}
-			}
-		const inputItemBoxStyle = {display:'flex', alignItems:'center'}
+			boxSizing: 'border-box',
+			overflowY: 'scroll'
+		}
+		const inputItemBoxStyle = {display:'flex', alignItems:'center', width:'100%'}
 		const inputBoxStyle = {
 			flex:1, minWidth:0,  
 			borderBottom: '1px solid white',
@@ -144,48 +138,64 @@ class Register extends React.Component{
 			backgroundColor:'green', 
 			padding:10, 
 			marginLeft:20};
-		return(
 
-			<StyleRoot style = {{height:'100%'}}>
-				<div style = {outerBoxStyle}>
-					<form ref = {(el)=>{this.form = el}} style = {registerBoxStyle} onSubmit = {(e)=>this.createAccount(e)}>
+		return(
+				<div style = {outerBoxStyle} >
+					<form encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action='editProfile'>
+						<div>
+							<input type = 'file' accept='image/*' name = 'avatar' style = {{display:'none'}} ref = {(el)=>{this.imgInput =el}}></input>
+							<img ref = {(el)=>{this.avatar = el}} onClick= {this.chooseFile} src = {JSON.parse(localStorage.getItem("user")).avatarURL} style ={{width:100}}></img>
+							<button onClick = {this.chooseFile}><i className = 'fa fa-camera'></i></button>
+						</div>
 						<div style = {{marginTop:18}}>
 							<div style = {inputItemBoxStyle}>
-								<i className="fa fa-user fa-fw"></i>
-								<input placeholder ='USERNAME' name = "name" type = "text" style = {inputBoxStyle}></input>
-							</div>
-							<div ref = {(el)=>{this.nameCheck = el}} style = {{visibility: 'hidden'}}>
-								invalid name
+								<span>NAME</span>
+								<input defaultValue = {JSON.parse(localStorage.getItem("user")).name} name = "name" type = "text" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
-								<i className="fa fa-envelope fa-fw"></i>
-								<input placeholder = 'EMAIL' name = "email" type = "text" style = {inputBoxStyle}></input>
-							</div>
-							<div ref = {(el)=>{this.emailCheck = el}} style = {{visibility: 'hidden'}}>
-								email has already been taken
+								<span>ABOUT ME</span>
+								<input defaultValue = {JSON.parse(localStorage.getItem("user")).aboutMe} name = "aboutme" type = "text" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
-								<i className="fa fa-lock fa-fw"></i>
-								<input placeholder = 'PASSWORD' name = "password" type = "password" style = {inputBoxStyle}></input>
-							</div>
-							<div ref = {(el)=>{this.passwordCheck = el}} style = {{visibility: 'hidden'}}>
-								password must be at leat 6 characters long
+								<span>BIRTHDAY</span>
+								<input defaultValue = {JSON.parse(localStorage.getItem("user")).birthDay} name = "birthday" type = "date" style = {inputBoxStyle}></input>
 							</div>
 						</div>
-						<input type='submit' value = 'CREATE ACCOUNT' onClick = {(e)=> this.createAccount(e)}style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
+						<div style = {{marginTop:48}}>
+							<div style = {inputItemBoxStyle}>
+								<span>HEIGHT</span>
+								<input defaultValue = {JSON.parse(localStorage.getItem("user")).height} name = "height" type = "text" style = {inputBoxStyle}></input>
+							</div>
+						</div>
+						<div style = {{marginTop:48}}>
+							<div style = {inputItemBoxStyle}>
+								<span>WEIGHT</span>
+								<input defaultValue = {JSON.parse(localStorage.getItem("user")).weight} name = "weight" type = "text" style = {inputBoxStyle}></input>
+							</div>
+						</div>
+						<div style = {{marginTop:48}}>
+							<div style = {inputItemBoxStyle}>
+								<span>ROLE</span>
+								<select name = "role" style = {inputBoxStyle}>
+									{this.roleOptions()}
+								</select>
+							</div>
+						</div>
+
+						<input type='submit' value = 'SAVE' onClick = {(e)=> this.createAccount(e)}style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
 							
 						</input>
 						<div ref ={(el)=>{this.userCheck = el}} style = {{visibility:'hidden'}}>user already exists</div>
 
 					</form>
-				</div>	
-			</StyleRoot>);
+					<div><br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi<br></br>hi</div>
+				</div>
+			)
 	}
 
 }
 
-ReactDOM.render(<Register />,document.getElementById('root'));

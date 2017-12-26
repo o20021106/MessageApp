@@ -87,11 +87,16 @@ router.get('/message', function(req,res){
     res.sendFile(path.join(__dirname, '/../index.html'));
 
 })
+router.get('/editProfile', passport.authenticate('jwt', { session: false }), function(req,res){
+    res.sendFile(path.join(__dirname, '/../editProfile.html'));
+
+});
 router.get('/', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.redirect('/message')
 })
 router.post('/register',userController.register.post);
+router.post('/editProfile', passport.authenticate('jwt', { session: false }), userController.editProfile.post);
 
 router.post('/login',userController.login.post);
 router.post('/newMessage',passport.authenticate('jwt', { session: false }), chatController.newConversation);
