@@ -238,32 +238,42 @@ exports.editProfile = {
   			}
 		});
 		var upload = multer({ storage: storage }).single('avatar');
+
+
   		upload(req, res, function (err) {
 		    if (err) {
-		       console.log('err');
+		    	console.log('error upload');
+		       console.log(err);
 		    }
 		    else if (!req.file) { 
 		    	
 		    	console.log("No picture received");
-		    	console.log(req.body.email);
-     		    var avatarURL= config.avatarDefault;
+		    	console.log(req.body.name);
+		    	console.log('name');
 
-/*
-				User.findOne({email:req.user.email}, function(err,existingUser){
-					if(existingUser){
-						return res.json({message:'an user with a same email adress already exists.'});
+				User.findOne({email:req.user.email}, function(err,user){
+					if(err){
+						return res.json({error:err});
 					}
-					user.save(function(err, newUser){
+					var profileItems = ['name','birthday','aboutMe','height','weight','role'];
+					profileItems.forEach(function(profileItem){
+						console.log(req.body[profileItem]);
+						if(req.body[profileItem]){
+							var data = profileItem === 'birthday'? new Date(req.body[profileItem]): req.body[profileItem]
+							user[profileItem] = data;
+								
+						}
+					});
+					user.save(function(err, updatedUser){
 						if(err){
-							console.log(err);
-							return res.json({message:'creating new user failed'});
+							return res.json({error:err});
 						}
 						else{
-							return res.redirect("/login");
+							return res.json({user: updatedUser, url:'http://localhost:8000/message'})
 						}
 					});
 				})
-				*/
+				
 		    } 
 		    else {
 			    
@@ -292,31 +302,32 @@ exports.editProfile = {
 						if(err){
 							return res.json({error:err});
 						}
-						console.log('find user');
-						console.log(req.body.height);
-						
+						user.avatarURL = avatarURL;
 
 
 						var profileItems = ['name','birthday','aboutMe','height','weight','role'];
 						profileItems.forEach(function(profileItem){
+							console.log(req.body[profileItem]);
 							if(req.body[profileItem]){
-								user[profileItem] = req.body[profileItem];
+								var data = profileItem === 'birthday'? new Date(req.body[profileItem]): req.body[profileItem]
+								user[profileItem] = data;
+								
 							}
 						});
 
 
-/*
-						user.save(function(err, newUser){
+
+						user.save(function(err, updatedUser){
 							if(err){
-								return res.json({message:'creating new user failed'});
+								return res.json({error:err});
 							}
 							else{
-								return res.redirect("/login");
+								return res.json({user: updatedUser, url:'http://localhost:8000/message'});
 							}
 
 						});
 						
-						*/
+
 					});
 			    });
 			      

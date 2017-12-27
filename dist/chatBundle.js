@@ -9059,8 +9059,6 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(4);
@@ -9126,8 +9124,6 @@ var ChatWindowTest = function (_React$Component) {
 		_this.state = { messageBuffer: 'asdfadsfasdf', atBottom: false, displayNoti: false };
 		_this.scrollToBottom = _this.scrollToBottom.bind(_this);
 		_this.handelConversationScroll = _this.handelConversationScroll.bind(_this);
-		_this.inputBoxKeyPress = _this.inputBoxKeyPress.bind(_this);
-		_this.messageComponent = _this.messageComponent.bind(_this);
 
 		return _this;
 	}
@@ -9135,7 +9131,6 @@ var ChatWindowTest = function (_React$Component) {
 	_createClass(ChatWindowTest, [{
 		key: 'componentDidMount',
 		value: function componentDidMount() {
-			this.inputBox.focus();
 			this.conversationWindowEl.addEventListener('scroll', this.handelConversationScroll);
 			this.scrollToBottom();
 			console.log('componeneDidMount!!!!!!!!!!!!!!!!!');
@@ -9192,16 +9187,6 @@ var ChatWindowTest = function (_React$Component) {
 			}
 		}
 	}, {
-		key: 'createMarkup',
-		value: function createMarkup(string) {
-			return { __html: string };
-		}
-	}, {
-		key: 'messageComponent',
-		value: function messageComponent(string) {
-			return _react2.default.createElement('div', { dangerouslySetInnerHTML: this.createMarkup(string) });
-		}
-	}, {
 		key: 'componentDidUpdate',
 		value: function componentDidUpdate(prevProps, prevState) {
 
@@ -9209,7 +9194,6 @@ var ChatWindowTest = function (_React$Component) {
 			var thisMessages = this.props.conversationData.messages;
 			var bottomLine = this.state.scrollHeight - this.state.clientHeight;
 			if (this.props.match.params.recipientId !== prevProps.match.params.recipientId) {
-				this.inputBox.focus();
 				this.scrollToBottom();
 			} else if (thisMessages.length !== 0) {
 
@@ -9282,8 +9266,6 @@ var ChatWindowTest = function (_React$Component) {
 	}, {
 		key: 'conversationDisplay',
 		value: function conversationDisplay() {
-			var _this2 = this;
-
 			console.log('indisplay');
 			console.log(this.props.conversationData.chosenId);
 			console.log(this.props.match.params.recipientId);
@@ -9335,7 +9317,7 @@ var ChatWindowTest = function (_React$Component) {
 				return messages.map(function (message, index, array) {
 					console.log('message author!!!!!!!!!!!');
 					console.log(JSON.parse(localStorage.getItem("user"))._id);
-					console.log(message.author._id);
+					console.log(mssage.author._id);
 					var outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
 					var innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
 					var timeStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? { float: 'right' } : { float: 'left' };
@@ -9363,9 +9345,6 @@ var ChatWindowTest = function (_React$Component) {
 						height: 20,
 						display: space20 ? 'block' : 'none'
 					};
-
-					console.log('string!!!!!!!!!!!!!!!!!');
-					console.log(_typeof(message.body));
 					return _react2.default.createElement(
 						'div',
 						{ style: { width: '100%' }, key: message._id },
@@ -9396,7 +9375,7 @@ var ChatWindowTest = function (_React$Component) {
 									_react2.default.createElement(
 										'div',
 										{ style: [innderBoxStyle, { display: 'inline-block', alignItems: 'center', padding: '12px 16px', borderRadius: '6px' }] },
-										_this2.messageComponent(message.body)
+										message.body
 									)
 								)
 							)
@@ -9434,32 +9413,9 @@ var ChatWindowTest = function (_React$Component) {
 			}
 		}
 	}, {
-		key: 'newMessageFromBox',
-		value: function newMessageFromBox(e) {
-			e.preventDefault();
-			this.inputBox.innerHTML = '';
-
-			if (!this.props.recipientConversationId[this.props.match.params.recipientId]) {
-				this.props.newConversationSocket('RECIPIENT', this.state.messageBuffer, this.props.match.params.recipientId);
-			} else {
-				console.log('in new message ChatWindowTest');
-				this.props.newMessageSocket('RECIPIENT', this.props.match.params.recipientId, this.state.messageBuffer, this.props.recipientConversationId[this.props.match.params.recipientId]);
-			}
-		}
-	}, {
-		key: 'inputBoxKeyPress',
-		value: function inputBoxKeyPress(e) {
-			if (e.which === 13 && e.shiftKey != 1) {
-				e.preventDefault();
-				this.newMessageFromBox(e);
-			} else {
-				this.setState({ messageBuffer: e.target.innerHTML });
-			}
-		}
-	}, {
 		key: 'render',
 		value: function render() {
-			var _this3 = this;
+			var _this2 = this;
 
 			var messageWindowStyle = {
 				display: 'flex',
@@ -9521,14 +9477,14 @@ var ChatWindowTest = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ style: newMessageNoti, ref: function ref(el) {
-								_this3.conversationNoti = el;
+								_this2.conversationNoti = el;
 							} },
 						'new Message'
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: conversationsStyle, ref: function ref(el) {
-								_this3.conversationWindowEl = el;
+								_this2.conversationWindowEl = el;
 							} },
 						this.conversationDisplay()
 					),
@@ -9538,19 +9494,17 @@ var ChatWindowTest = function (_React$Component) {
 						_react2.default.createElement(
 							'form',
 							{ onSubmit: function onSubmit(e) {
-									return _this3.newMessageFromBox(e);
+									return _this2.newMessage(e);
 								} },
-							_react2.default.createElement('div', { ref: function ref(el) {
-									_this3.inputBox = el;
-								}, suppressContentEditableWarning: 'true', contentEditable: 'true', style: { height: 50, overflowY: 'scroll', border: '1px solid black' }, onKeyPress: function onKeyPress(e) {
-									return _this3.inputBoxKeyPress(e);
+							_react2.default.createElement('input', { style: inputBoxStyle, type: 'text', id: 'composedMessage', onChange: function onChange(e) {
+									return _this2.insertText(e);
 								} }),
 							_react2.default.createElement('input', { type: 'submit', value: 'Submit' })
 						)
 					)
 				),
 				_react2.default.createElement('div', { ref: function ref(el) {
-						_this3.el = el;
+						_this2.el = el;
 					} })
 			);
 		}
@@ -9558,9 +9512,6 @@ var ChatWindowTest = function (_React$Component) {
 
 	return ChatWindowTest;
 }(_react2.default.Component);
-
-// 	<input style = {inputBoxStyle} type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
-
 
 function mapStateToProps(state) {
 	return { chosenConversation: state.chosenConversation,
@@ -18358,37 +18309,6 @@ var ConversationColumn = function (_React$Component) {
 	}
 
 	_createClass(ConversationColumn, [{
-		key: 'decoder',
-		value: function decoder(encoded) {
-			console.log('decodin g1 !!!!!!!!!!!!');
-			console.log(encoded);
-			var decoded = encoded.replace(/<br>/g, '');
-			console.log(decoded);
-			decoded = decoded.replace(/&amp;/g, '&');
-			console.log(decoded);
-			decoded = decoded.replace(/&lt;/g, '<');
-			console.log(decoded);
-
-			decoded = decoded.replace(/&gt;/g, '>');
-			console.log(decoded);
-
-			console.log(encoded);
-			console.log(decoded);
-			return decoded;
-		}
-	}, {
-		key: 'decoder2',
-		value: function decoder2(encoded) {
-			var elem = document.createElement('textarea');
-			elem.insertAdjacentHTML('afterbegin', encoded);
-
-			var decoded = elem.value;
-			var decoded2 = elem.textContent;
-			console.log('decoding!!!!!!!!!!!!!!!!');
-			console.log(decoded);
-			console.log(decoded2);
-		}
-	}, {
 		key: 'conversationList',
 		value: function conversationList() {
 			console.log('in conversation');
@@ -18447,7 +18367,6 @@ var ConversationColumn = function (_React$Component) {
 				chosenConversationId = this.props.recipientConversationId ? this.props.recipientConversationId[this.props.conversationData.chosenId] : null;
 				var dayMap = { 0: 'Sun', 1: 'Mon', 2: 'Tue', 3: 'Wed', 4: 'Thr', 5: 'Fri', 6: 'Sat' };
 				var monthMap = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'May', 5: 'Jun', 6: 'Jul', 7: 'Aug', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dec' };
-				var decoder = this.decoder;
 				return _react2.default.createElement(
 					'div',
 					null,
@@ -18495,7 +18414,7 @@ var ConversationColumn = function (_React$Component) {
 											{ style: messageStyle },
 											conversation.message[0].author._id === JSON.parse(localStorage.getItem('user'))._id ? 'You' : conversation.message[0].author.name,
 											': ',
-											decoder(conversation.message[0].body)
+											conversation.message[0].body
 										)
 									)
 								)
@@ -43609,15 +43528,10 @@ exports.default = function () {
 					console.log('before c-b-r conversation');
 					console.log(conversations);
 					console.log(action.conversationId);
-					/*var conversationNew2 = new Object()
-     conversationNew2.conversation = action.payload.conversation;
-     conversationNew2.message = [conversation.]
-     */
-
 					var conversationNew = Object.assign({}, action.payload);
 					console.log('here in conversation by recipientId');
 					console.log(conversationNew);
-					conversationNew.message = [conversationNew.message[conversationNew.message.length - 1]];
+					conversationNew.message = [conversationNew.message[0]];
 					console.log(conversationNew);
 
 					if (conversations.length !== 0) {
@@ -43695,4 +43609,4 @@ function configureStore(socketClient) {
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=chatbundle.js.map
+//# sourceMappingURL=chatBundle.js.map

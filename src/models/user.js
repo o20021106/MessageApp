@@ -11,9 +11,13 @@ var userSchema = new mongoose.Schema({
 	email: { type: String, unique:true,required:true},
 	password: {type: String,required:true},
 	name: {type: String, required: true},
-	avatarURL: {type: String}
+	avatarURL: {type: String},
+	birthday: {type: Date},
+	aboutMe:{type:String},
+	height:{type:String},
+	weight:{type:String},
+	role:{type:String}
 });
-
 
 /*
 userSchema.pre('save', function(next) {

@@ -25,9 +25,12 @@ class ChatWindowTest extends React.Component{
 	    this.state = {messageBuffer:'asdfadsfasdf', atBottom:false, displayNoti:false};
 		this.scrollToBottom = this.scrollToBottom.bind(this);
 		this.handelConversationScroll = this.handelConversationScroll.bind(this);
+		this.inputBoxKeyPress = this.inputBoxKeyPress.bind(this);
+		this.messageComponent = this.messageComponent.bind(this);
 
 	}
 	componentDidMount(){
+		this.inputBox.focus();
 		this.conversationWindowEl.addEventListener('scroll', this.handelConversationScroll);
 		this.scrollToBottom();
 		console.log('componeneDidMount!!!!!!!!!!!!!!!!!');
@@ -91,6 +94,13 @@ class ChatWindowTest extends React.Component{
 			}
 		}
 	}	
+	createMarkup(string) {
+  		return {__html: string};
+	}
+
+	messageComponent(string) {
+  		return <div dangerouslySetInnerHTML={this.createMarkup(string)} />;
+	}
 
 	componentDidUpdate(prevProps,prevState){
 
@@ -98,6 +108,7 @@ class ChatWindowTest extends React.Component{
 		var thisMessages = this.props.conversationData.messages;
 		var bottomLine = this.state.scrollHeight - this.state.clientHeight;
 		if(this.props.match.params.recipientId !== prevProps.match.params.recipientId){
+			this.inputBox.focus();
 			this.scrollToBottom();
 		}
 		else if(thisMessages.length!==0){
@@ -205,13 +216,16 @@ class ChatWindowTest extends React.Component{
 		if(messages.length !==0 &
 		this.props.conversationData.chosenId === this.props.match.params.recipientId & 
 		this.props.conversationData.conversationType === 'RECIPIENT'){
-			console.log('in if');
+			console.log('in if messages not empty');
 			console.log(messages);
 			
 			var dateLast = 0;
 			var yearLast = 0;
 			var dateDisplayStyle;
 			return messages.map((message,index, array)=>{
+				console.log('message author!!!!!!!!!!!');
+				console.log(JSON.parse(localStorage.getItem("user"))._id);
+				console.log(message.author._id)
 				const outerBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightOuterBoxStyle : leftOuterBoxStyle;
 				const innderBoxStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? rightStyle : leftStyle;
 				const timeStyle = message.author._id === JSON.parse(localStorage.getItem("user"))._id ? {float: 'right'} : {float :'left'};
@@ -241,6 +255,9 @@ class ChatWindowTest extends React.Component{
 					height:20,
 					display: space20? 'block':'none' 
 				}
+
+				console.log('string!!!!!!!!!!!!!!!!!');
+				console.log(typeof(message.body));
 				return (
 					<div style ={{width : '100%'}} key ={message._id}>
 						<div style = {[dateDisplayStyle,{width:'100%', textAlign:'center'}]} >
@@ -256,7 +273,7 @@ class ChatWindowTest extends React.Component{
 										{displayTime.time}
 									</div>
 									<div style = {[innderBoxStyle,{display:'inline-block', alignItems:'center',padding:'12px 16px', borderRadius:'6px'}]}>								
-										{message.body}
+										{this.messageComponent(message.body)}
 									</div>
 								</div>
 							</div>
@@ -294,6 +311,34 @@ class ChatWindowTest extends React.Component{
 				this.state.messageBuffer, this.props.recipientConversationId[this.props.match.params.recipientId]);
 		}
 	}   
+
+	newMessageFromBox(e){
+		e.preventDefault();
+		this.inputBox.innerHTML='';
+
+		if(!this.props.recipientConversationId[this.props.match.params.recipientId]){
+			this.props.newConversationSocket('RECIPIENT', this.state.messageBuffer, this.props.match.params.recipientId);
+		}
+		else{
+			console.log('in new message ChatWindowTest');
+			this.props.newMessageSocket('RECIPIENT', this.props.match.params.recipientId,
+				this.state.messageBuffer, this.props.recipientConversationId[this.props.match.params.recipientId]);
+		}
+	}
+
+
+	inputBoxKeyPress(e){
+		if (e.which === 13 && e.shiftKey != 1){
+			e.preventDefault();
+			this.newMessageFromBox(e);
+
+		}
+		else{
+			this.setState({messageBuffer:e.target.innerHTML});
+
+		}
+
+	}
 
 	render(){
 
@@ -347,9 +392,10 @@ class ChatWindowTest extends React.Component{
 			return (
 				<div style = {messageWindowStyle}>
 
-						<div style = {conversationColumnStyle}>
-							<ConversationColumn/>
-						</div>
+					<div style = {conversationColumnStyle}>
+						<ConversationColumn/>
+					</div>
+
 					<div style ={conversationWindowStyle}>
 						<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
 							new Message
@@ -358,8 +404,8 @@ class ChatWindowTest extends React.Component{
 							{this.conversationDisplay()}
 					 	</div>
 					 	<div >
-					 		<form onSubmit = {(e) => this.newMessage(e)}>
-							 	<input style = {inputBoxStyle} type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
+					 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
+					 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
 								<input type = 'submit' value="Submit" ></input>
 						 	</form>
 						 </div>
@@ -375,7 +421,8 @@ class ChatWindowTest extends React.Component{
 
 
 
-
+// 	<input style = {inputBoxStyle} type = 'text'id = 'composedMessage' onChange = {(e)=> this.insertText(e)}></input>
+							
 
 
 

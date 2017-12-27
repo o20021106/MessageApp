@@ -7,7 +7,7 @@ exports.getTimeConversationList = function(timeStamp){
 	var displayTime ='';
 
 	if (1000*60*60*24 >= (now-createdTime) && createdTime.getDay() === createdTime.getDay()){
-		var minute = ('0'+createdTime.getMinutes()).slice(-2); 
+		var minute = ('00'+createdTime.getMinutes()).slice(-2); 
 		displayTime = createdTime.getHours()+':'+minute;
 		displayTime = createdTime.getHours >= 12 ? displayTime+'pm' : displayTime+'am';
 	}
@@ -29,7 +29,7 @@ exports.getMessageTime = function(timeStamp){
 	const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 	var now = new Date();
 	var createdTime = new Date(timeStamp);
-	var minute = ('0'+createdTime.getMinutes()).slice(-2); 
+	var minute = ('00'+createdTime.getMinutes()).slice(-2); 
 	var displayTime = createdTime.getHours()+':'+minute;
 	displayTime = createdTime.getHours >= 12 ? displayTime+'pm' : displayTime+'am';
 

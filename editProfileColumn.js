@@ -9,14 +9,24 @@ export default class EditProfileColumn extends React.Component{
 		this.previewAvatar =this.previewAvatar.bind(this);
 		this.chooseFile =this.chooseFile.bind(this);
 		this.EditProfile =this.EditProfile.bind(this);
+
+	}
+	componentDidMount(){
+		const user = JSON.parse(localStorage.getItem("user"));
+		if(user.hasOwnProperty('aboutMe')){
+			console.log(user.aboutMe);
+			this.aboutmeBox.insertAdjacentHTML('afterbegin', user.aboutMe)
+		}
 	}
 
 	previewAvatar() {
+	  console.log('in preview');
 	  var preview = this.avatar;
 	  var file    = this.imgInput.files[0];
 	  var reader  = new FileReader();
 
 	  reader.addEventListener("load", function () {
+	  	console.log('load');
 	    preview.src = reader.result;
 	  }, false);
 
@@ -32,6 +42,45 @@ export default class EditProfileColumn extends React.Component{
 
 	EditProfile(e){
 		e.preventDefault();
+		var registerData = new FormData(this.form);
+		registerData.set('aboutMe', this.aboutmeBox.innerHTML);
+		console.log(registerData.get('aboutMe'));
+		this.test.innerHTML = registerData.get('aboutMe');
+		console.log(typeof(registerData.get('aboutMe')));
+		fetch('/editProfile',
+			{
+			    headers: {
+			    	'Accept': 'application/json'
+			    },
+			    credentials: 'same-origin',
+			    method: "POST",
+			    body: registerData
+			})
+			.then(function(response) {
+				console.log('i am a response '+response);
+			    return response.json();
+			})
+			.then(json=>{
+				console.log(json);
+				if(json.hasOwnProperty('error')){
+					console.log('an error occured');
+				}
+				else if(json.hasOwnProperty('user')){
+					if (typeof(Storage) !== "undefined") {
+						localStorage.setItem('user', JSON.stringify(json.user)); 
+						if(json.hasOwnProperty('url')){
+							window.location.href = json.url;
+						}
+					} 
+ 					else{
+ 						//localstroage not supported
+ 					}
+ 				}
+			})
+			.catch(err=>{
+				console.log(err);
+			});
+		/*e.preventDefault();
 		var registerData = new FormData(this.form);
 		console.log({ password: registerData.get('password'), email : registerData.get('email'), name:registerData.get('name')});
 		this.emailCheck.style.visibility = 'hidden';
@@ -100,18 +149,21 @@ export default class EditProfileColumn extends React.Component{
 			.catch(err=>{
 				console.log(err);
 			});
-		}
+		}*/
 	}
 	roleOptions(){
 		var roles = ['top','bottom','vers'];
 		return roles.map(role=>{
+			
+			return <option key={role} value ={role}>{role}</option>
+			/*
 			if (JSON.parse(localStorage.getItem("user")).role === role){
-				return <option key={role} value ={role} select = 'selected'>{role}</option>
+				return <option key={role} value ={role} selected = 'selected'>{role}</option>
 			}
 			else{
 				return <option key={role} value ={role}>{role}</option>
 
-			}
+			}*/
 		})
 	}
 	render(){
@@ -132,18 +184,33 @@ export default class EditProfileColumn extends React.Component{
 		const inputBoxStyle = {
 			flex:1, minWidth:0,  
 			borderBottom: '1px solid white',
-			borderTop:0, 
-			borderLeft:0, 
+			borderTop:0,
 			borderRight:0,
+			borderLeft:0,
 			backgroundColor:'green', 
 			padding:10, 
 			marginLeft:20};
-
+		const user = JSON.parse(localStorage.getItem("user"))
+		var birthday ='';
+		if(user.hasOwnProperty('birthday')){
+			console.log(user.birthday);
+			console.log(typeof(user.birthday));
+			const birthdayObject = new Date(user.birthday);
+			const birthYear = birthdayObject.getFullYear();
+			var birthMonth = birthdayObject.getMonth()+1;
+			birthMonth = ('00'+birthMonth).slice(-2); 
+			var birthDate = birthdayObject.getDate();
+			birthDate = ('00'+birthDate).slice(-2); 
+			birthday = birthYear+'-'+birthMonth+'-'+birthDate
+		}
 		return(
 				<div style = {outerBoxStyle} >
-					<form encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action='editProfile'>
+					<div ref = {(el)=>{this.test = el}}>
+
+					</div>
+					<form onSubmit = {(e)=>this.EditProfile(e)} encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action='editProfile'>
 						<div>
-							<input type = 'file' accept='image/*' name = 'avatar' style = {{display:'none'}} ref = {(el)=>{this.imgInput =el}}></input>
+							<input type = 'file' accept='image/*' onChange ={this.previewAvatar} name = 'avatar' style = {{display:'none'}} ref = {(el)=>{this.imgInput =el}}></input>
 							<img ref = {(el)=>{this.avatar = el}} onClick= {this.chooseFile} src = {JSON.parse(localStorage.getItem("user")).avatarURL} style ={{width:100}}></img>
 							<button onClick = {this.chooseFile}><i className = 'fa fa-camera'></i></button>
 						</div>
@@ -156,13 +223,16 @@ export default class EditProfileColumn extends React.Component{
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>ABOUT ME</span>
-								<input defaultValue = {JSON.parse(localStorage.getItem("user")).aboutMe} name = "aboutme" type = "text" style = {inputBoxStyle}></input>
+								<div style = {[{height:100,overflowY:'scroll',},inputBoxStyle]}>
+									<div>I am ...</div>
+									<div style = {{minWidth:'100%'}}suppressContentEditableWarning={true} contentEditable ='true'  name = "aboutMe" ref = {(el)=> {this.aboutmeBox = el}}></div>
+								</div>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>BIRTHDAY</span>
-								<input defaultValue = {JSON.parse(localStorage.getItem("user")).birthDay} name = "birthday" type = "date" style = {inputBoxStyle}></input>
+								<input defaultValue = {birthday} name = "birthday" type = "date" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
@@ -180,13 +250,14 @@ export default class EditProfileColumn extends React.Component{
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>ROLE</span>
-								<select name = "role" style = {inputBoxStyle}>
+								<select name = "role" style = {inputBoxStyle} defaultValue = {JSON.parse(localStorage.getItem("user")).role ===''?'':JSON.parse(localStorage.getItem("user")).role}>
+									<option value =''></option>
 									{this.roleOptions()}
 								</select>
 							</div>
 						</div>
 
-						<input type='submit' value = 'SAVE' onClick = {(e)=> this.createAccount(e)}style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
+						<input type='submit' value = 'SAVE' onClick = {(e)=> this.EditProfile(e)}style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
 							
 						</input>
 						<div ref ={(el)=>{this.userCheck = el}} style = {{visibility:'hidden'}}>user already exists</div>

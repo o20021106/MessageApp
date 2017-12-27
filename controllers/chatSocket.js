@@ -133,9 +133,20 @@ exports.newConversation = function(user, recipientId, composedMessage,){
 	    			return reject({error:err})
 	     		}
 	     		Conversation.populate(newConversation, {path:'participants',select:'name _id'}, function(err, newConversation){
-	     			return resolve({
-	     				message :newMessage,
-	     				conversation:newConversation
+	     			
+	     			if(err){
+	     				console.log(err);
+	     			}
+	     			Message.populate(newMessage,{path:'author', select:'name _id'},function(err,newPopulatedMessage){
+	     				if(err){
+	     					console.log(err);
+	     				}
+	     				return resolve({
+	     					message :newPopulatedMessage,
+	     					conversation:newConversation
+	     				})
+
+
 	     			})
 	     		})
 	    	});

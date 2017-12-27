@@ -22,7 +22,34 @@ class ConversationColumn extends React.Component{
 		this.insertKeyWord = this.insertKeyWord.bind(this);
 		this.conversationList = this.conversationList.bind(this);
 	}
+	decoder(encoded){
+		console.log('decodin g1 !!!!!!!!!!!!');
+		console.log(encoded);
+		var decoded = encoded.replace(/<br>/g,'');
+		console.log(decoded);
+		decoded = decoded.replace(/&amp;/g,'&');
+		console.log(decoded);
+		decoded = decoded.replace(/&lt;/g,'<');
+		console.log(decoded);
 
+		decoded = decoded.replace(/&gt;/g,'>');
+				console.log(decoded);
+
+		console.log(encoded);
+		console.log(decoded);
+		return decoded;
+	}
+
+	decoder2(encoded){
+		var elem = document.createElement('textarea');
+		elem.insertAdjacentHTML('afterbegin', encoded)
+
+		var decoded = elem.value;
+		var decoded2 = elem.textContent;
+		console.log('decoding!!!!!!!!!!!!!!!!');
+		console.log(decoded);
+		console.log(decoded2);
+	}
 
 	conversationList(){
 		console.log('in conversation');
@@ -88,6 +115,7 @@ class ConversationColumn extends React.Component{
 			chosenConversationId = this.props.recipientConversationId ? this.props.recipientConversationId[this.props.conversationData.chosenId]:null;
 			const dayMap= {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thr',5:'Fri',6:'Sat'}
 			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
+			const decoder = this.decoder;
 			return (
 				<div>
  					<ul style = {listStyle}>{
@@ -111,7 +139,7 @@ class ConversationColumn extends React.Component{
 											</div> 
 											<div style = {messageStyle}>
 												{conversation.message[0].author._id === JSON.parse(localStorage.getItem('user'))._id ? 
-													'You' : conversation.message[0].author.name}: {conversation.message[0].body}
+													'You' : conversation.message[0].author.name}: {decoder(conversation.message[0].body)}
 											</div>
 										</div>
 									</NavLink>

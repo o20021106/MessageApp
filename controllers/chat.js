@@ -128,11 +128,20 @@ exports.getConversationByRecipientId = function(req,res,next){
 		}
 		console.log([req.user._id, req.params.recipientId])
 		console.log(conversation);
-		var messages = getConversation1(conversation._id);
-		messages.then(response=>{
-			return res.status(200).json({'message': response.messages, 'conversation': conversation})
+		Conversation.populate(conversation,{path:'participants',select:'name _id avatarURL'}, function(err, populatedConversation){
+			
+			if (err){
+				console.log(err);
+				return json({error:err});
+			}
+			var messages = getConversation1(conversation._id);
+			messages.then(response=>{
+			return res.status(200).json({'message': response.messages, 'conversation': populatedConversation})
 			//return res.status(200).json({conversationId: conversation._id, conversation:response.conversation})
-		}) 
+		})
+		});
+
+		 
 
 		
 	})

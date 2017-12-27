@@ -198,10 +198,16 @@ export default function(state = initial, action){
 					console.log('before c-b-r conversation');
 					console.log(conversations);
 					console.log(action.conversationId);
+					/*var conversationNew2 = new Object()
+					conversationNew2.conversation = action.payload.conversation;
+					conversationNew2.message = [conversation.]
+*/
+
+
 					var conversationNew = Object.assign({},action.payload);
 					console.log('here in conversation by recipientId');
 					console.log(conversationNew);
-					conversationNew.message = [conversationNew.message[0]];
+					conversationNew.message = [conversationNew.message[conversationNew.message.length-1]];
 					console.log(conversationNew);
 
 					if(conversations.length !== 0){

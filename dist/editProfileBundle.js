@@ -26732,9 +26732,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	};
 
 	if (true) {
-		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return ExecutionEnvironment;
-		}.call(exports, __webpack_require__, exports, module),
+		}).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = ExecutionEnvironment;
@@ -27088,6 +27088,8 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _isomorphicFetch = __webpack_require__(59);
@@ -27121,17 +27123,29 @@ var EditProfileColumn = function (_React$Component) {
 		_this.previewAvatar = _this.previewAvatar.bind(_this);
 		_this.chooseFile = _this.chooseFile.bind(_this);
 		_this.EditProfile = _this.EditProfile.bind(_this);
+
 		return _this;
 	}
 
 	_createClass(EditProfileColumn, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			var user = JSON.parse(localStorage.getItem("user"));
+			if (user.hasOwnProperty('aboutMe')) {
+				console.log(user.aboutMe);
+				this.aboutmeBox.insertAdjacentHTML('afterbegin', user.aboutMe);
+			}
+		}
+	}, {
 		key: 'previewAvatar',
 		value: function previewAvatar() {
+			console.log('in preview');
 			var preview = this.avatar;
 			var file = this.imgInput.files[0];
 			var reader = new FileReader();
 
 			reader.addEventListener("load", function () {
+				console.log('load');
 				preview.src = reader.result;
 			}, false);
 
@@ -27151,102 +27165,122 @@ var EditProfileColumn = function (_React$Component) {
 		value: function EditProfile(e) {
 			e.preventDefault();
 			var registerData = new FormData(this.form);
-			console.log({ password: registerData.get('password'), email: registerData.get('email'), name: registerData.get('name') });
-			this.emailCheck.style.visibility = 'hidden';
-			this.passwordCheck.style.visibility = 'hidden';
-			this.userCheck.style.visibility = 'hidden';
-			this.nameCheck.style.visibility = 'hidden';
-
-			var checker = { name: this.nameCheck, email: this.emailCheck, password: this.passwordCheck, userCheck: this.userCheck };
-			if (registerData.get('password') === '' || registerData.get('email') === '' || registerData.get('name') === '') {
-				var _iteratorNormalCompletion = true;
-				var _didIteratorError = false;
-				var _iteratorError = undefined;
-
-				try {
-					for (var _iterator = registerData.keys()[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-						var key = _step.value;
-
-						if (registerData.get(key) === '') {
-							console.log(key);
-							console.log(registerData.get(key));
-							checker[key].innerHTML = key + ' required';
-							checker[key].style.visibility = 'visible';
+			registerData.set('aboutMe', this.aboutmeBox.innerHTML);
+			console.log(registerData.get('aboutMe'));
+			this.test.innerHTML = registerData.get('aboutMe');
+			console.log(_typeof(registerData.get('aboutMe')));
+			(0, _isomorphicFetch2.default)('/editProfile', {
+				headers: {
+					'Accept': 'application/json'
+				},
+				credentials: 'same-origin',
+				method: "POST",
+				body: registerData
+			}).then(function (response) {
+				console.log('i am a response ' + response);
+				return response.json();
+			}).then(function (json) {
+				console.log(json);
+				if (json.hasOwnProperty('error')) {
+					console.log('an error occured');
+				} else if (json.hasOwnProperty('user')) {
+					if (typeof Storage !== "undefined") {
+						localStorage.setItem('user', JSON.stringify(json.user));
+						if (json.hasOwnProperty('url')) {
+							window.location.href = json.url;
 						}
-					}
-				} catch (err) {
-					_didIteratorError = true;
-					_iteratorError = err;
-				} finally {
-					try {
-						if (!_iteratorNormalCompletion && _iterator.return) {
-							_iterator.return();
-						}
-					} finally {
-						if (_didIteratorError) {
-							throw _iteratorError;
-						}
+					} else {
+						//localstroage not supported
 					}
 				}
-			} else {
-				(0, _isomorphicFetch2.default)('/register', {
-					headers: {
-						'Accept': 'application/json',
-						'Content-Type': 'application/json'
-					},
-					credentials: 'same-origin',
-					method: "POST",
-					body: JSON.stringify({ password: registerData.get('password'), email: registerData.get('email'), name: registerData.get('name') })
-				}).then(function (response) {
-					console.log('i am a response ' + response);
-					return response.json();
-				}).then(function (json) {
-					if ('message' in json) {
-						json.message.forEach(function (mess) {
-							if (mess.param === 'email') {
-								checker[mess.param].innerHTML = 'invalid email';
-								checker[mess.param].style.visibility = 'visible';
-							} else if (mess.param === 'password') {
-								checker[mess.param].innerHTML = 'password must be at leat 6 characters long';
-								checker[mess.param].style.visibility = 'visible';
-							}
-						});
-					} else if ('error' in json) {
-						if (json['error'] === 'exist') {
-							console.log('exist');
-							checker['userCheck'].innerHTML = 'user already exists';
-							checker['userCheck'].style.visibility = 'visible';
-						} else if (json['error'] === 'failed') {
-							console.log('failed');
-							checker['userCheck'].innerHTML = 'creating account failed';
-							checker['userCheck'].style.visibility = 'visible';
-						}
-					} else if ('url' in json) {
-						window.location.href = json.url;
-					}
-				}).catch(function (err) {
-					console.log(err);
-				});
-			}
+			}).catch(function (err) {
+				console.log(err);
+			});
+			/*e.preventDefault();
+   var registerData = new FormData(this.form);
+   console.log({ password: registerData.get('password'), email : registerData.get('email'), name:registerData.get('name')});
+   this.emailCheck.style.visibility = 'hidden';
+   this.passwordCheck.style.visibility = 'hidden';
+   this.userCheck.style.visibility = 'hidden';
+   this.nameCheck.style.visibility = 'hidden';
+   	const checker = {name: this.nameCheck, email: this.emailCheck, password:this.passwordCheck, userCheck:this.userCheck};
+   if(registerData.get('password') === '' ||registerData.get('email')===''||registerData.get('name')===''){
+   	for(var key of registerData.keys()){
+   		if(registerData.get(key) === ''){
+   			console.log(key);
+   			console.log(registerData.get(key));
+   			checker[key].innerHTML = key+' required';
+   			checker[key].style.visibility = 'visible';
+   		}
+   	}
+   }
+   else{
+   	fetch('/register',
+   	{
+   	    headers: {
+   	      'Accept': 'application/json',
+   	      'Content-Type': 'application/json'
+   	    },
+   	    credentials: 'same-origin',
+   	    method: "POST",
+   	    body: JSON.stringify({ password: registerData.get('password'), email : registerData.get('email'), name:registerData.get('name')})
+   	})
+   	.then(function(response) {
+   		console.log('i am a response '+response);
+   	    return response.json();
+   	})
+   	.then(json=>{
+   		if('message' in json){
+   			json.message.forEach(function(mess){
+   				if(mess.param === 'email'){
+   					checker[mess.param].innerHTML = 'invalid email';
+   					checker[mess.param].style.visibility = 'visible';
+   				}
+   				else if(mess.param === 'password'){
+   					checker[mess.param].innerHTML = 'password must be at leat 6 characters long';
+   					checker[mess.param].style.visibility = 'visible';
+   				}
+   			})
+   		}
+   		else if ('error' in json){
+   			if(json['error'] === 'exist'){
+   				console.log('exist')
+   				checker['userCheck'].innerHTML = 'user already exists';
+   				checker['userCheck'].style.visibility = 'visible';
+   			}
+   			else if(json['error']==='failed'){
+   				console.log('failed');
+   				checker['userCheck'].innerHTML = 'creating account failed';
+   				checker['userCheck'].style.visibility = 'visible';
+   				}
+   		}
+   		else if('url' in json){
+   			window.location.href = json.url;
+   		}
+   			})
+   	.catch(err=>{
+   		console.log(err);
+   	});
+   }*/
 		}
 	}, {
 		key: 'roleOptions',
 		value: function roleOptions() {
 			var roles = ['top', 'bottom', 'vers'];
 			return roles.map(function (role) {
-				if (JSON.parse(localStorage.getItem("user")).role === role) {
-					return _react2.default.createElement(
-						'option',
-						{ key: role, value: role, select: 'selected' },
-						role
-					);
-				} else {
-					return _react2.default.createElement(
-						'option',
-						{ key: role, value: role },
-						role
-					);
-				}
+
+				return _react2.default.createElement(
+					'option',
+					{ key: role, value: role },
+					role
+				);
+				/*
+    if (JSON.parse(localStorage.getItem("user")).role === role){
+    	return <option key={role} value ={role} selected = 'selected'>{role}</option>
+    }
+    else{
+    	return <option key={role} value ={role}>{role}</option>
+    	}*/
 			});
 		}
 	}, {
@@ -27270,24 +27304,41 @@ var EditProfileColumn = function (_React$Component) {
 				flex: 1, minWidth: 0,
 				borderBottom: '1px solid white',
 				borderTop: 0,
-				borderLeft: 0,
 				borderRight: 0,
+				borderLeft: 0,
 				backgroundColor: 'green',
 				padding: 10,
 				marginLeft: 20 };
-
+			var user = JSON.parse(localStorage.getItem("user"));
+			var birthday = '';
+			if (user.hasOwnProperty('birthday')) {
+				console.log(user.birthday);
+				console.log(_typeof(user.birthday));
+				var birthdayObject = new Date(user.birthday);
+				var birthYear = birthdayObject.getFullYear();
+				var birthMonth = birthdayObject.getMonth() + 1;
+				birthMonth = ('00' + birthMonth).slice(-2);
+				var birthDate = birthdayObject.getDate();
+				birthDate = ('00' + birthDate).slice(-2);
+				birthday = birthYear + '-' + birthMonth + '-' + birthDate;
+			}
 			return _react2.default.createElement(
 				'div',
 				{ style: outerBoxStyle },
+				_react2.default.createElement('div', { ref: function ref(el) {
+						_this2.test = el;
+					} }),
 				_react2.default.createElement(
 					'form',
-					{ encType: 'multipart/form-data', ref: function ref(el) {
+					{ onSubmit: function onSubmit(e) {
+							return _this2.EditProfile(e);
+						}, encType: 'multipart/form-data', ref: function ref(el) {
 							_this2.form = el;
 						}, style: { width: '100%' }, method: 'post', action: 'editProfile' },
 					_react2.default.createElement(
 						'div',
 						null,
-						_react2.default.createElement('input', { type: 'file', accept: 'image/*', name: 'avatar', style: { display: 'none' }, ref: function ref(el) {
+						_react2.default.createElement('input', { type: 'file', accept: 'image/*', onChange: this.previewAvatar, name: 'avatar', style: { display: 'none' }, ref: function ref(el) {
 								_this2.imgInput = el;
 							} }),
 						_react2.default.createElement('img', { ref: function ref(el) {
@@ -27324,7 +27375,18 @@ var EditProfileColumn = function (_React$Component) {
 								null,
 								'ABOUT ME'
 							),
-							_react2.default.createElement('input', { defaultValue: JSON.parse(localStorage.getItem("user")).aboutMe, name: 'aboutme', type: 'text', style: inputBoxStyle })
+							_react2.default.createElement(
+								'div',
+								{ style: [{ height: 100, overflowY: 'scroll' }, inputBoxStyle] },
+								_react2.default.createElement(
+									'div',
+									null,
+									'I am ...'
+								),
+								_react2.default.createElement('div', { style: { minWidth: '100%' }, suppressContentEditableWarning: true, contentEditable: 'true', name: 'aboutMe', ref: function ref(el) {
+										_this2.aboutmeBox = el;
+									} })
+							)
 						)
 					),
 					_react2.default.createElement(
@@ -27338,7 +27400,7 @@ var EditProfileColumn = function (_React$Component) {
 								null,
 								'BIRTHDAY'
 							),
-							_react2.default.createElement('input', { defaultValue: JSON.parse(localStorage.getItem("user")).birthDay, name: 'birthday', type: 'date', style: inputBoxStyle })
+							_react2.default.createElement('input', { defaultValue: birthday, name: 'birthday', type: 'date', style: inputBoxStyle })
 						)
 					),
 					_react2.default.createElement(
@@ -27382,13 +27444,14 @@ var EditProfileColumn = function (_React$Component) {
 							),
 							_react2.default.createElement(
 								'select',
-								{ name: 'role', style: inputBoxStyle },
+								{ name: 'role', style: inputBoxStyle, defaultValue: JSON.parse(localStorage.getItem("user")).role === '' ? '' : JSON.parse(localStorage.getItem("user")).role },
+								_react2.default.createElement('option', { value: '' }),
 								this.roleOptions()
 							)
 						)
 					),
 					_react2.default.createElement('input', { type: 'submit', value: 'SAVE', onClick: function onClick(e) {
-							return _this2.createAccount(e);
+							return _this2.EditProfile(e);
 						}, style: { textAlign: 'center', marginTop: 48, backgroundColor: 'white', padding: 10, width: '100%', borderStyle: 'none' } }),
 					_react2.default.createElement(
 						'div',
