@@ -10,12 +10,15 @@ var validator = require('express-validator');
 var config = require("./config/main.js")
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-
-//var upload = multer({ dest: 'uploads/' })
+var redis   = require("redis");
+var session = require('express-session');
+var redisStore = require('connect-redis')(session);
+var redisClient  = redis.createClient();
 var morgan = require('morgan');  
 var passport = require('passport');  
 var jwt = require('jsonwebtoken');  
 var cookieParser = require('cookie-parser');
+var config = require("./config/main");
 var Datauri = require('datauri');
 
 
@@ -29,21 +32,48 @@ db.once('open', function() {
   console.log('starting');
 });
 
+app.use(session({
+    secret: config.sessionSecret,
+    // create new redis store.
+    store: new redisStore({ host: 'localhost', port: 6379, client: redisClient,ttl :  260}),
+    saveUninitialized: false,
+    resave: false
+}));
+
+
+app.get('/testingAccess',function(req,res){  
+    // create new session object.
+    if(req.session.key) {
+        // if email key is sent redirect.
+        console.log('key found');
+        res.json({ms:req.session.key});
+    } else {
+        // else go to home page.
+        res.json({ms:'nokey'});
+    }
+});
+
+app.get('/testLogin',function(req,res){
+    // when user login set the key to redis.
+    req.session.key={ms:'this is me testing'};
+    res.json({ms:'sucess login'});
+});
+
+app.get('/testLogout',function(req,res){
+    req.session.destroy(function(err){
+        if(err){
+            console.log(err);
+        } else {
+            res.json({ms:'logout'});
+        }
+    });
+});
+
+
+
 app.use(cookieParser());
-app.get('/cookie', function(req,res){
-	res.cookie('love', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU5Y2ZhYWExNGIxZDc1NWIzZTI0Nzg1MCIsImlhdCI6MTUxMzYwMDYxMiwiZXhwIjoxNTEzNjg3MDEyfQ.1M6Uu1D_jmT7f5rc1TIUtJTpu2zVZpk86D2WjrAX2LI').send('hey got cookie');
-
-})
-
-
-
 app.use(passport.initialize());  
 require('./config/passport')(passport);  
-
-
-
-
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -61,7 +91,6 @@ server.listen(8000,function(){
 
 
 
-var config = require("./config/main");
 var socketioJwt = require('socketio-jwt');
 var User = require('./src/models/user');  
 var Conversation = require('./src/models/conversation');  

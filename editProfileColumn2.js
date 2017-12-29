@@ -12,7 +12,8 @@ export default class EditProfileColumn extends React.Component{
 
 	}
 	componentDidMount(){
-		const user = JSON.parse(localStorage.getItem("user"));
+		//const user = JSON.parse(localStorage.getItem("user"));
+		const user = this.props.user;
 		if(user.hasOwnProperty('aboutMe')){
 			console.log(user.aboutMe);
 			this.aboutmeBox.insertAdjacentHTML('afterbegin', user.aboutMe)
@@ -66,7 +67,9 @@ export default class EditProfileColumn extends React.Component{
 					console.log('an error occured');
 				}
 				else if(json.hasOwnProperty('user')){
-					if (typeof(Storage) !== "undefined") {
+					window.location.href = json.url;
+
+					/*if (typeof(Storage) !== "undefined") {
 						localStorage.setItem('user', JSON.stringify(json.user)); 
 						if(json.hasOwnProperty('url')){
 							window.location.href = json.url;
@@ -74,7 +77,7 @@ export default class EditProfileColumn extends React.Component{
 					} 
  					else{
  						//localstroage not supported
- 					}
+ 					}*/
  				}
 			})
 			.catch(err=>{
@@ -156,14 +159,7 @@ export default class EditProfileColumn extends React.Component{
 		return roles.map(role=>{
 			
 			return <option key={role} value ={role}>{role}</option>
-			/*
-			if (JSON.parse(localStorage.getItem("user")).role === role){
-				return <option key={role} value ={role} selected = 'selected'>{role}</option>
-			}
-			else{
-				return <option key={role} value ={role}>{role}</option>
 
-			}*/
 		})
 	}
 	render(){
@@ -190,7 +186,7 @@ export default class EditProfileColumn extends React.Component{
 			backgroundColor:'green', 
 			padding:10, 
 			marginLeft:20};
-		const user = JSON.parse(localStorage.getItem("user"))
+		const user = this.props.user;
 		var birthday ='';
 		if(user.hasOwnProperty('birthday')){
 			console.log(user.birthday);
@@ -211,13 +207,13 @@ export default class EditProfileColumn extends React.Component{
 					<form onSubmit = {(e)=>this.EditProfile(e)} encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action='editProfile'>
 						<div>
 							<input type = 'file' accept='image/*' onChange ={this.previewAvatar} name = 'avatar' style = {{display:'none'}} ref = {(el)=>{this.imgInput =el}}></input>
-							<img ref = {(el)=>{this.avatar = el}} onClick= {this.chooseFile} src = {JSON.parse(localStorage.getItem("user")).avatarURL} style ={{width:100}}></img>
+							<img ref = {(el)=>{this.avatar = el}} onClick= {this.chooseFile} src = {this.props.user.avatarURL} style ={{width:100}}></img>
 							<button onClick = {this.chooseFile}><i className = 'fa fa-camera'></i></button>
 						</div>
 						<div style = {{marginTop:18}}>
 							<div style = {inputItemBoxStyle}>
 								<span>NAME</span>
-								<input defaultValue = {JSON.parse(localStorage.getItem("user")).name} name = "name" type = "text" style = {inputBoxStyle}></input>
+								<input defaultValue = {this.props.user.name} name = "name" type = "text" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
@@ -238,19 +234,19 @@ export default class EditProfileColumn extends React.Component{
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>HEIGHT</span>
-								<input defaultValue = {JSON.parse(localStorage.getItem("user")).height} name = "height" type = "text" style = {inputBoxStyle}></input>
+								<input defaultValue = {this.props.user.height} name = "height" type = "text" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>WEIGHT</span>
-								<input defaultValue = {JSON.parse(localStorage.getItem("user")).weight} name = "weight" type = "text" style = {inputBoxStyle}></input>
+								<input defaultValue = {this.props.user.weight} name = "weight" type = "text" style = {inputBoxStyle}></input>
 							</div>
 						</div>
 						<div style = {{marginTop:48}}>
 							<div style = {inputItemBoxStyle}>
 								<span>ROLE</span>
-								<select name = "role" style = {inputBoxStyle} defaultValue = {JSON.parse(localStorage.getItem("user")).role ===''?'':JSON.parse(localStorage.getItem("user")).role}>
+								<select name = "role" style = {inputBoxStyle} defaultValue = {this.props.user.role ===''?'':this.props.user.role}>
 									<option value =''></option>
 									{this.roleOptions()}
 								</select>

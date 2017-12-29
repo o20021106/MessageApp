@@ -69,7 +69,7 @@ router.get("/secrete", passport.authenticate('jwt', { session: false }), functio
   res.json("Success! You can not see this without a token");
 });
 
-router.get('/searchUser', passport.authenticate('jwt', { session: false }), searchController.searchUser.get);
+router.get('/searchUser', passport.authenticate('jwt', {session: false }), searchController.searchUser.get);
 router.get('/getRecipients', passport.authenticate('jwt', { session: false }), chatController.getRecipients);
 router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
 router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
@@ -82,16 +82,18 @@ router.get('/recipient/:recipientId', function(req,res){
 
 })
 */
-router.get('/message', function(req,res){
+router.get('/message', passport.authenticate('jwt', {failureRedirect:'/login',session: false }),function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../index.html'));
 
 })
-router.get('/editProfile', passport.authenticate('jwt', { session: false }), function(req,res){
+/*router.get('/editProfile', passport.authenticate('jwt', { session: false }), function(req,res){
     res.sendFile(path.join(__dirname, '/../editProfile.html'));
 
-});
-router.get('/', function(req,res){
+});*/
+router.get('/editProfile', passport.authenticate('jwt', { session: false }), userController.editProfileTesting.get);
+
+router.get('/', passport.authenticate('jwt', {failureRedirect:'/login',session: false }),function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.redirect('/message')
 })

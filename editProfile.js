@@ -4,10 +4,10 @@ import ReactDOM from 'react-dom';
 import {StyleRoot} from 'radium';
 import Radium from 'radium';
 
-import EditProfileColumn from './editProfileColumn';
+import EditProfileColumn from './editProfileColumn2';
 
 
-class EditProfile extends React.Component{ 
+export default class EditProfile extends React.Component{ 
 
 	render(){
 		var EditProfileColumnRadium = Radium(EditProfileColumn);
@@ -32,11 +32,12 @@ class EditProfile extends React.Component{
 
 			<StyleRoot style = {outerBoxStyle}>
 				<div style = {editProfileColumnBoxStyle}>
-					<EditProfileColumnRadium/>
+					<EditProfileColumnRadium user= {this.props.user}/>
 				</div>
 			</StyleRoot>);
 	}
 
 }
 
-ReactDOM.render(<EditProfile />,document.getElementById('root'));
+//ReactDOM.render(<EditProfile />,document.getElementById('root'));
+//radiumConfig={{userAgent: req.headers['user-agent']}}

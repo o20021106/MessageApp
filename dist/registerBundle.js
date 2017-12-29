@@ -11501,7 +11501,7 @@ var Register = function (_React$Component) {
 					} else if (json.hasOwnProperty('url')) {
 						if (typeof Storage !== "undefined") {
 							localStorage.setItem('token', json.data.token);
-							localStorage.setItem('user', JSON.stringify(json.data.user));
+							//localStorage.setItem('user', JSON.stringify(json.data.user)); 
 							window.location.href = json.url;
 							console.log('here');
 						} else {
@@ -26926,9 +26926,9 @@ var __WEBPACK_AMD_DEFINE_RESULT__;/*!
 	};
 
 	if (true) {
-		!(__WEBPACK_AMD_DEFINE_RESULT__ = function () {
+		!(__WEBPACK_AMD_DEFINE_RESULT__ = (function () {
 			return ExecutionEnvironment;
-		}.call(exports, __webpack_require__, exports, module),
+		}).call(exports, __webpack_require__, exports, module),
 				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	} else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = ExecutionEnvironment;

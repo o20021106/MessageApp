@@ -7,6 +7,14 @@ var multer  = require('multer');
 var crypto = require('crypto');
 var cloudinary = require('cloudinary');
 var path = require('path');
+import EditProfile from '../editProfile';
+import Testing from '../testing';
+import template from '../template';
+import { renderToString } from 'react-dom/server';
+import React from 'react';
+
+
+
 
 
 exports.register = {
@@ -39,6 +47,7 @@ exports.register = {
 					var token = jwt.sign({id : newUser._id}, config.secret, {
 			            expiresIn: 86400 // in seconds
 	 	          	});
+	 	          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : newUser }, url: 'http://localhost:8000/editProfile'});
 
@@ -269,6 +278,7 @@ exports.editProfile = {
 							return res.json({error:err});
 						}
 						else{
+							req.session.user = updatedUser;
 							return res.json({user: updatedUser, url:'http://localhost:8000/message'})
 						}
 					});
@@ -322,6 +332,7 @@ exports.editProfile = {
 								return res.json({error:err});
 							}
 							else{
+								req.session.user = updatedUser;
 								return res.json({user: updatedUser, url:'http://localhost:8000/message'});
 							}
 
@@ -335,5 +346,22 @@ exports.editProfile = {
 			}
 
 		})
+	}
+}
+
+
+exports.editProfileTesting = {
+	get: function(req,res){
+		const user = req.session.user;
+		console.log('edit user');
+  		var initialState = { user };
+  		initialState = {...initialState, radiumConfig:{userAgent: req.headers['user-agent']}}
+		const appString = renderToString(<EditProfile {...initialState}/>);
+		
+  		res.send(template({
+    		body: appString,
+    		title: 'Hello World from the server!',
+   			initialState: initialState
+  		}));
 	}
 }
