@@ -10,27 +10,22 @@ var Promise = require ('promise');
 exports.chatLoad = function(req,res,next){
 	User.findOne({_id:req.params.recipientId})
 	.exec(function(err,recipient){
-		console.log('after exec');
+		console.log('chatload');
 		if(err){
-			console.log('err');
-			console.log(req.user);
+			console.log('chatload err');
+			console.log(err);
 			Conversation.findOne({$and: [{participants: {$in:[req.user._id]}}, {participants: {$size :2} }]})
 			.sort({ createdAt : -1})
 			.limit(1)
 			.exec(function(err, conversation){
 				if(err){
-					console.log('err2');
 					return res.json({error: err})
 				}
 
 				if(conversation){
-					console.log('existing conversation');
-
 					var recipient = conversation.participants.filter(function(participant){
-
 						return String(participant) !== String(req.user._id)}
 						);
-					console.log(recipient);
 					return res.redirect('/recipient/'+recipient);
 				}
 				else{
@@ -40,13 +35,10 @@ exports.chatLoad = function(req,res,next){
 		}else{
 			if(recipient){
 				console.log('recipient found');
-				console.log(path.join(__dirname, '/../index.html'));
-				return res.status(200).sendFile(path.join(__dirname, '/../index.html'));
+				return next();
 			}
 			else{
 				console.log('recipient not found');
-
-				
 				Conversation.findOne({$and: [{participants: {$in:req.user._id}}, {participants: {$size :2} }]})
 				.sort({ createdAt : -1})
 				.limit(1)
@@ -84,7 +76,7 @@ exports.getRecipients = function(req, res, next){
 			res.json({err:err});
 			return next(err);
 		}
-		userConversations = []
+		var userConversations = []
 		users.forEach(function(user){
 			console.log('in recipient user');
 			Conversation.findOne({$and: [{participants: {$all:[req.user._id, user._id]}}, {participants: {$size :2} }]})
@@ -114,20 +106,13 @@ exports.getRecipients = function(req, res, next){
 
 exports.getConversationByRecipientId = function(req,res,next){
 	console.log(' in getConversationByRecipeintId');
-//	options= {upsert: true, new: true};
-//$or: [{a: 1}, {b: 1}]
-//db.shapes.find({'shape.id':{$all:[1,2]},shape:{$size:2}}); 
-
 	Conversation.findOne({$and: [{participants: {$all:[req.user._id, req.params.recipientId]}}, {participants: {$size :2} }]},function(err,conversation){
-//	Conversation.findOne({participants: [req.user._id, req.params.recipientId]},function(err,conversation){
 		if(err){
 			return res.json({error:err})
 		}
 		if(!conversation){
 			return res.status(200).json({status: 'noConversation'})
 		}
-		console.log([req.user._id, req.params.recipientId])
-		console.log(conversation);
 		Conversation.populate(conversation,{path:'participants',select:'name _id avatarURL'}, function(err, populatedConversation){
 			
 			if (err){
@@ -137,13 +122,8 @@ exports.getConversationByRecipientId = function(req,res,next){
 			var messages = getConversation1(conversation._id);
 			messages.then(response=>{
 			return res.status(200).json({'message': response.messages, 'conversation': populatedConversation})
-			//return res.status(200).json({conversationId: conversation._id, conversation:response.conversation})
 		})
 		});
-
-		 
-
-		
 	})
 
 }
@@ -161,7 +141,6 @@ exports.getConversations = function(req, res, next){
 			return next(err);
 		}
 		else if (conversations.length === 0) {
-			console.log('in here')
 		    return res.status(200).json({ conversations: [] });
 		}
 		let allConversations = [];
@@ -178,10 +157,6 @@ exports.getConversations = function(req, res, next){
 					return next(err);
 				}
 				allConversations.push({'message': message, 'conversation': conversation});
-				console.log('length');
-				console.log(allConversations.length);
-				console.log(conversations.length);
-
 				if(allConversations.length === conversations.length) {
               		return res.status(200).json({ conversations: allConversations });
             	}
@@ -293,3 +268,36 @@ exports.newConversation = function(req, res, next){
   	console.log(3)
 }
 
+import { hydrate } from 'react-dom';
+import { Provider } from 'react-redux';
+import thunkMiddleware from 'redux-thunk'
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import ChatFrame from '../src/chatFrame';
+import socketClient from '../src/socketClient';
+import rootReducer from '../src/reducers/chatReducer';
+import configureStore from '../src/configureStore';
+import socketMiddleware from '../src/socketMiddleware';
+import {LOAD_CONVERSATIONS} from '../src/actions/type';
+import {StyleRoot} from 'radium';
+import templateChat from '../templateChat';
+import Testing from '../testing';
+import template from '../template';
+import { renderToString } from 'react-dom/server';
+import React from 'react';
+
+
+
+
+exports.message = {
+	get: function(req,res){
+		const user = req.user;
+  		let radiumProp = { radiumConfig:{userAgent: req.headers['user-agent']}};
+		let preloadedState = { user }
+		const createStoreWithMiddleWare = applyMiddleware(thunkMiddleware)(createStore);
+		const store = createStoreWithMiddleWare(rootReducer);
+		const html = renderToString(<Provider store={store} {...radiumProp}><StyleRoot></StyleRoot></Provider>);
+		var finalState = store.getState()
+		finalState = {...finalState,...preloadedState}
+		res.send(templateChat(html, 'chatting',finalState, radiumProp))
+	}
+}

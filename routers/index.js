@@ -1,4 +1,3 @@
-var blogPostModel = require('../src/models/blogPostModel');
 var express = require('express');
 var path = require('path');
 var router = express.Router();
@@ -13,10 +12,15 @@ router.get('/register', function(req,res){
     res.sendFile(path.join(__dirname, '/../register.html'));
 
 })
+/*
 router.get('/login', function(req,res){
     //res.sendFile(path.join(__dirname, '/../index.html'));
     res.sendFile(path.join(__dirname, '/../login.html'));
 
+})
+*/
+router.get('/login', function(req,res){
+    res.sendFile(path.join(__dirname, '/../login.html'));
 })
 
 router.get('/authenticate', function(req,res){
@@ -25,83 +29,40 @@ router.get('/authenticate', function(req,res){
 
 })
 
-/*
-router.post('/authenticate', function(req, res) {  
-  User.findOne({
-    email: req.body.email
-  }, function(err, user) {
-    if (err) throw err;
-    if (!user) {
-      res.send({ success: false, message: 'Authentication failed. User not found.' });
-    } else {
-      // Check if password matches
-      user.comparePassword(req.body.password, function(err, isMatch) {
-        if (isMatch && !err) {
-        	console.log("match!");
-          // Create token if the password matched and no error was thrown
-          var token = jwt.sign(user.toObject(), config.secret, {
-            expiresIn: 10080 // in seconds
-          });
-          res.json({ success: true, token: 'JWT ' + token });
-        } else {
-          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
-        }
-      });
-    }
-  });
-});
-*/
 var passport = require('passport');  
-/*router.get("/secrete",function(req,res){
-	console.log(req.headers.authorization); 
-	res.json({token: "here"});
-});
-*/
 
 
-router.get('/testing', passport.authenticate('jwt', { session: false }), function(req, res){
+router.get('/testing', passport.authenticate('jwt', { session: false,failureRedirect:'/login' }), function(req, res){
   console.log(req.user.email);
   res.json("Success! You can not see this without a token");
 });
-router.get("/secrete", passport.authenticate('jwt', { session: false }), function(req, res){
+router.get("/secrete", passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), function(req, res){
 
 	console.log(req.user.email);
   res.json("Success! You can not see this without a token");
 });
 
-router.get('/searchUser', passport.authenticate('jwt', {session: false }), searchController.searchUser.get);
-router.get('/getRecipients', passport.authenticate('jwt', { session: false }), chatController.getRecipients);
-router.get('/getConversations', passport.authenticate('jwt', { session: false }), chatController.getConversations);
-router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false }), chatController.getConversation);
-router.get('/getConversationByRecipientId/:recipientId', passport.authenticate('jwt', { session: false }), chatController.getConversationByRecipientId);
-router.get('/recipient/:recipientId', passport.authenticate('jwt', { session: false }),chatController.chatLoad);
-/*
-router.get('/recipient/:recipientId', function(req,res){
-    //res.sendFile(path.join(__dirname, '/../index.html'));
-    res.sendFile(path.join(__dirname, '/../index.html'));
+router.get('/searchUser', passport.authenticate('jwt', {session: false ,failureRedirect:'/login'}), searchController.searchUser.get);
+router.get('/getRecipients', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.getRecipients);
+router.get('/getConversations', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.getConversations);
+router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.getConversation);
+router.get('/getConversationByRecipientId/:recipientId', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.getConversationByRecipientId);
 
-})
-*/
-router.get('/message', passport.authenticate('jwt', {failureRedirect:'/login',session: false }),function(req,res){
-    //res.sendFile(path.join(__dirname, '/../index.html'));
-    res.sendFile(path.join(__dirname, '/../index.html'));
+router.get('/recipient/:recipientId', passport.authenticate('jwt', { session: false , failureRedirect:'/login'}),chatController.chatLoad, chatController.message.get);
 
-})
-/*router.get('/editProfile', passport.authenticate('jwt', { session: false }), function(req,res){
-    res.sendFile(path.join(__dirname, '/../editProfile.html'));
+router.get('/message', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.message.get);
 
-});*/
-router.get('/editProfile', passport.authenticate('jwt', { session: false }), userController.editProfileTesting.get);
+
+router.get('/editProfile', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), userController.editProfileTesting.get);
 
 router.get('/', passport.authenticate('jwt', {failureRedirect:'/login',session: false }),function(req,res){
-    //res.sendFile(path.join(__dirname, '/../index.html'));
     res.redirect('/message')
 })
 router.post('/register',userController.register.post);
-router.post('/editProfile', passport.authenticate('jwt', { session: false }), userController.editProfile.post);
+router.post('/editProfile', passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), userController.editProfile.post);
 
 router.post('/login',userController.login.post);
-router.post('/newMessage',passport.authenticate('jwt', { session: false }), chatController.newConversation);
+router.post('/newMessage',passport.authenticate('jwt', { session: false ,failureRedirect:'/login'}), chatController.newConversation);
 //router.post('/authenticate',userController.authenticate.post);
 
 module.exports = router;

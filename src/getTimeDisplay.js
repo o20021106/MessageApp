@@ -18,7 +18,7 @@ exports.getTimeConversationList = function(timeStamp){
 		displayTime = monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
 	}
 	else{
-		displayTime = createdTime.getFullYear()+monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
+		displayTime = createdTime.getFullYear()+' '+monthMap[createdTime.getMonth()]+' '+createdTime.getDate();
 	}
 
 	return displayTime

@@ -204,27 +204,26 @@ exports.login = {
 		  }
 		
 
-		  User.findOne({
-		    email: req.body.email
-		  }, function(err, user) {
-		    if (err) throw err;
+		  User.findOne({email: req.body.email}, function(err, user) {
+		  	if (err) throw err;
 		    if (!user) {
 		      res.send({ success: false, message: 'Authentication failed. User not found.' });
 		    } else {
 		      // Check if password matches
 		      user.comparePassword(req.body.password, function(err, isMatch) {
 		        if (isMatch && !err) {
+		        	req.session.user = user;
 		        	console.log("match!");
-		          // Create token if the password matched and no error was thrown
-		          var token = jwt.sign({id : user._id}, config.secret, {
+		          	// Create token if the password matched and no error was thrown
+		          	var token = jwt.sign({id : user._id}, config.secret, {
 
-		          //var token = jwt.sign({email : user.email}, config.secret, {
-		            expiresIn: 86400 // in seconds
-		          });
-		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http://localhost:8000/'});
+		          		//var token = jwt.sign({email : user.email}, config.secret, {
+		            	expiresIn: 86400 // in seconds
+		          	});
+		          	//res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
+		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http://localhost:8000/'});
 
-		          //res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
+		          	//res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
 		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
 		        }
@@ -352,7 +351,7 @@ exports.editProfile = {
 
 exports.editProfileTesting = {
 	get: function(req,res){
-		const user = req.session.user;
+		const user = req.user;
 		console.log('edit user');
   		var initialState = { user };
   		initialState = {...initialState, radiumConfig:{userAgent: req.headers['user-agent']}}

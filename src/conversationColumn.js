@@ -1,9 +1,6 @@
 import React from 'react';
-import { connect, Provider } from 'react-redux';
-import fetch from 'isomorphic-fetch';
+import { connect } from 'react-redux';
 import * as actions from './actions/index';
-import ChatWindowTest from './chatWindowTest';
-import io from 'socket.io-client';
 import {  BrowserRouter as Router,
   Route,
   Link,
@@ -18,41 +15,23 @@ class ConversationColumn extends React.Component{
 	constructor(props){
 		super(props);
 		this.state = {timeoutId: null, showConversations: true, keyWord:''};
-		this.keyUpHnadler = this.keyUpHnadler.bind(this);
+		this.keyUpHandler = this.keyUpHandler.bind(this);
 		this.insertKeyWord = this.insertKeyWord.bind(this);
 		this.conversationList = this.conversationList.bind(this);
+		this.clickSearchUser = this.clickSearchUser.bind(this);
 	}
+
 	decoder(encoded){
-		console.log('decodin g1 !!!!!!!!!!!!');
-		console.log(encoded);
-		var decoded = encoded.replace(/<br>/g,'');
-		console.log(decoded);
+		var decoded = encoded.split('<br>')[0];
 		decoded = decoded.replace(/&amp;/g,'&');
-		console.log(decoded);
 		decoded = decoded.replace(/&lt;/g,'<');
-		console.log(decoded);
-
 		decoded = decoded.replace(/&gt;/g,'>');
-				console.log(decoded);
-
-		console.log(encoded);
-		console.log(decoded);
 		return decoded;
 	}
 
-	decoder2(encoded){
-		var elem = document.createElement('textarea');
-		elem.insertAdjacentHTML('afterbegin', encoded)
-
-		var decoded = elem.value;
-		var decoded2 = elem.textContent;
-		console.log('decoding!!!!!!!!!!!!!!!!');
-		console.log(decoded);
-		console.log(decoded2);
-	}
-
 	conversationList(){
-		console.log('in conversation');
+		console.log('in conversation list');
+		console.log(this.props.conversations);
 		if(!(this.props.conversations.length === 0)){
 
 			const navLinkStyle = {
@@ -116,12 +95,13 @@ class ConversationColumn extends React.Component{
 			const dayMap= {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thr',5:'Fri',6:'Sat'}
 			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 			const decoder = this.decoder;
+			const user = this.props.user;
 			return (
 				<div>
  					<ul style = {listStyle}>{
  						this.props.conversations.map(function(conversation){
 							var navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'black'}:navLinkStyle;
-							var participant = conversation.conversation.participants.filter(participant => participant._id!=JSON.parse(localStorage.getItem("user"))._id);
+							var participant = conversation.conversation.participants.filter(participant => participant._id!=user._id);
 							var now = new Date();
 							var createdTime = new Date(conversation.message[0].createdAt);
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
@@ -138,7 +118,7 @@ class ConversationColumn extends React.Component{
 												<span>{displayTime}</span>
 											</div> 
 											<div style = {messageStyle}>
-												{conversation.message[0].author._id === JSON.parse(localStorage.getItem('user'))._id ? 
+												{conversation.message[0].author._id === user._id ? 
 													'You' : conversation.message[0].author.name}: {decoder(conversation.message[0].body)}
 											</div>
 										</div>
@@ -153,7 +133,7 @@ class ConversationColumn extends React.Component{
 		}
 	}
 
-	keyUpHnadler(e){
+	keyUpHandler(e){
 		e.preventDefault();
 		var keyWord = e.currentTarget.value;
 		console.log(keyWord);
@@ -171,12 +151,16 @@ class ConversationColumn extends React.Component{
 		this.setState({keyWord:e.target.value});
 	}
 
+	clickSearchUser(){
+		this.props.clearSearch();
+		this.setState({keyWord:''});
+		console.log('click searchBoxStyle');
+		console.log(this.input);
+		this.input.value ='';
+	}
 
 
 	searchedUsersList(){
-		console.log('here in searched user');
-		console.log(this.props.searchedUsers);
-		
 
 
 		const avatarStyle = {
@@ -188,35 +172,64 @@ class ConversationColumn extends React.Component{
 		}
 
 		const listItemStyle = {
-			padding : '12px 12px',
 			display : 'flex',
 			alignItems:'center'
 		}
 
-		const userInfromationStyle = {
+		const nameStyle ={
+			textOverflow : 'ellipsis',
 			flex: 1,
-			paddingLeft: '12px'
+			whiteSpace: 'nowrap',
+			overflow:'hidden'
+
+		}
+		const nameTimeStyle = {
+			display: 'flex',
+		}
+		const conversationInfoStyle = {
+			display: 'flex',
+			flexDirection: 'column',
+			justifyContent: 'center',
+			flex:1,
+			paddingRight:12,
+			minWidth: 0,
+		}
+		const imageWrapperStyle = {
+			display:'flex',
+			alignItems: 'center',
+			marginRight: 12
 		}
 
-		const linkStyle = {
-			color:'white',
+		const navLinkStyle = {
+			boxSizing: 'border-box',
+			display:'block',
+			paddingLeft : 12,
+			display: 'flex',
+			height: 64, 
+			width : '100%',				
 			textDecoration: 'none',
-			fontSize: '16px',
+			fontSize:'16px',
+			color: 'white',
 			fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif'
+
 		}
 
-
+		const userName= {}
 
 		if(this.props.searchedUsers.length !==0){
 			return this.props.searchedUsers.map(user=>{
 				return (
 					<div style = {listItemStyle} key = {user._id}>
-						<img src = {user.avatarURL} style = {avatarStyle}></img>
-						<div style = {userInfromationStyle}>	
-							<NavLink style = {linkStyle} to = {`/recipient/${user._id}`} onClick = {this.props.clearSearch} >
-								{user.name}
+							<NavLink style = {navLinkStyle} to = {`/recipient/${user._id}`} onClick = {this.clickSearchUser} >
+								<div style = {imageWrapperStyle}>
+									<img src = {user.avatarURL} style = {avatarStyle}></img>
+								</div>
+								<div style = {conversationInfoStyle}>
+									<div style={nameTimeStyle}>
+										<span style = {nameStyle}>{user.name}</span>
+									</div> 
+								</div>
 							</NavLink>
-						</div>
 					</div>
 					)
 			}) 
@@ -248,22 +261,18 @@ class ConversationColumn extends React.Component{
 			width : '100%'
 		}
 
-
-		
-
 		return(
 			<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100vh', width:'100%'}}>
 						
 				<div style = {searchBoxStyle}>
-					<input style ={searchBarStyle} type = 'search'  onChange = {(e)=>{this.insertKeyWord(e)}} onKeyUp = {(e) =>this.keyUpHnadler(e)}></input>				
+					<input ref = {(el)=>{this.input = el}} style ={searchBarStyle} type = 'search'  onChange = {(e)=>{this.insertKeyWord(e)}} onKeyUp = {(e) =>this.keyUpHandler(e)}></input>				
 				</div>
-							
-						
+											
 				<div style = {{flex:1, backgroundColor:'blue',overflowY:'scroll'}}>
 					<div style = {searchedUsersListStyle}>
 						{this.searchedUsersList()}
-						{JSON.parse(localStorage.getItem("user"))._id}
-						{JSON.parse(localStorage.getItem("user")).name}
+						{this.props.user._id}
+						{this.props.user.name}
 						
 						hi<br></br>
 						hi<br></br>
@@ -281,7 +290,7 @@ class ConversationColumn extends React.Component{
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
-						hi<br></br>						hi<br></br>
+						hi<br></br>						
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
@@ -296,7 +305,6 @@ class ConversationColumn extends React.Component{
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
-						hi<br></br>						hi<br></br>
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
@@ -317,13 +325,7 @@ class ConversationColumn extends React.Component{
 					<div style = {conversationListStyle}>
 						{this.conversationList()}
 						
-						{JSON.parse(localStorage.getItem("user"))._id}
-						{JSON.parse(localStorage.getItem("user")).name}
-						hi<br></br>
-						hi<br></br>
-						hi<br></br>
-						hi<br></br>
-												hi<br></br>
+						{this.props.user.name}
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
@@ -339,7 +341,9 @@ class ConversationColumn extends React.Component{
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
-												hi<br></br>
+						hi<br></br>
+						hi<br></br>
+						hi<br></br>
 						hi<br></br>
 						hi<br></br>
 						hi<br></br>
@@ -380,11 +384,12 @@ class ConversationColumn extends React.Component{
 	}
 }
 function mapStateToProps(state) {  
-    return { recipients: state.recipients, 
+    return { 
     	conversations: state.conversations, 
     	conversationData:state.conversationData,
     	searchedUsers:state.searchedUsers,
-    	recipientConversationId:state.recipientConversationId,  };
+    	recipientConversationId: state.recipientConversationId,  
+    	user: state.user};
 }
 	
 export default connect(mapStateToProps, actions)(ConversationColumn);

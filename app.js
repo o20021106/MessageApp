@@ -1,6 +1,5 @@
 var express = require ('express');
 var index = require('./routers/index.js');
-var api = require('./routers/api.js');
 var app = express();
 var path = require('path');
 var DIST_DIR = path.join(__dirname,'dist/');
@@ -21,8 +20,6 @@ var cookieParser = require('cookie-parser');
 var config = require("./config/main");
 var Datauri = require('datauri');
 
-
-//const dbUrl = "mongodb://ipingou:mlab800203@ds153123.mlab.com:53123/ipingou";
 const dbUrl = config.database;
 mongoose.connect(dbUrl);
 var db = mongoose.connection;
@@ -34,30 +31,11 @@ db.once('open', function() {
 
 app.use(session({
     secret: config.sessionSecret,
-    // create new redis store.
-    store: new redisStore({ host: 'localhost', port: 6379, client: redisClient,ttl :  260}),
+    store: new redisStore({ host: 'localhost', port: 6379, client: redisClient,ttl :  1000}),
     saveUninitialized: false,
     resave: false
 }));
 
-
-app.get('/testingAccess',function(req,res){  
-    // create new session object.
-    if(req.session.key) {
-        // if email key is sent redirect.
-        console.log('key found');
-        res.json({ms:req.session.key});
-    } else {
-        // else go to home page.
-        res.json({ms:'nokey'});
-    }
-});
-
-app.get('/testLogin',function(req,res){
-    // when user login set the key to redis.
-    req.session.key={ms:'this is me testing'};
-    res.json({ms:'sucess login'});
-});
 
 app.get('/testLogout',function(req,res){
     req.session.destroy(function(err){
@@ -76,13 +54,10 @@ app.use(passport.initialize());
 require('./config/passport')(passport);  
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use(morgan('dev'));  
-
 app.use(validator());
 app.use(express.static(DIST_DIR));
 app.use(express.static(path.join(__dirname,'fontawesome-free-5.0.2/')));
-app.use('/api',api);
 app.use('/',index);
 
 server.listen(8000,function(){
@@ -112,7 +87,7 @@ io.on('connection', function(client){
     		console.log('error')
 			return console.log(err);
 		} 
-
+		console.log(user.name);
         clients[user._id] = client.id;
 
 
@@ -128,56 +103,32 @@ io.on('connection', function(client){
 
 
 	    client.on('sendMessage', function(data,fn){
-	    	console.log('in sendMessage');
-	    	console.log(user);
-	    	console.log(data);
 	    	chatControllerSocket.newMessage(user,data.recipient, data.composedMessage)
 	    	.then(response => {
-	    		console.log('in sendMessage response');
-	    		console.log(response);
 	    		fn(response);
 	    	});
 	    }); 
 
 	    client.on('newMessage', function(data,fn){
-	    	console.log('in newMessage');
-	    	console.log(user);
-	    	console.log(data);
 	    	chatControllerSocket.newMessage(user,data.conversationId, data.composedMessage)
 	    	.then(response => {
-	    		console.log('in newMessage response');
-	    		console.log(response);
 	    		io.to(data.conversationId).emit('newMessage', {message: response.message, chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
 	    		fn(response.status);
 	    	});
 	    });
 
 	    client.on('newConversation', function(data,fn){
-	    	console.log('in newConversation');
-	    	console.log(data);
 	    	chatControllerSocket.newConversation(user, data.recipientId, data.composedMessage)
 	    	.then(response =>{
-	    		console.log('in newConversation response');
-	    		console.log(response);
 	    		client.join(response.conversation._id);
- 
 	    		if(data.recipientId in clients){
-	    			console.log('new conversation with someone online');
-		    		console.log(io.sockets.connected[clients[data.recipientId]]);
-
 	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
 	    			io.to(response.conversation._id).emit('NEW_CONVERSATION', 
 	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
-	    			//io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
 	    		}
 	    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
 	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
-	    			//io.to(clients[data.recipientId]).emit('NEW_CONVERSATION_APPROACH', {payload: response,latestRecipient: data.recipientId} );
-
 	    		fn({type: 'NOTHING'});
-	    		//fn({type: 'NEW_CONVERSATION', payload: response, latestRecipient: data.recipientId, userId: user._id});
-	    		//console.log('before redirectI!NG!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-	    		//io.to(client.id).emit('REDIRECT', 'whererugoing');
 	    	}); 
 
 	    }); 
@@ -192,8 +143,3 @@ io.on('connection', function(client){
   		});
   	}) 
 });
-/*
-app.listen(8000,function(){
-	console.log('server is up');
-})
-*/ 

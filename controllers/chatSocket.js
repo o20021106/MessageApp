@@ -132,12 +132,12 @@ exports.newConversation = function(user, recipientId, composedMessage,){
 	    		if (err) {
 	    			return reject({error:err})
 	     		}
-	     		Conversation.populate(newConversation, {path:'participants',select:'name _id'}, function(err, newConversation){
+	     		Conversation.populate(newConversation, {path:'participants',select:'name _id avatarURL'}, function(err, newConversation){
 	     			
 	     			if(err){
 	     				console.log(err);
 	     			}
-	     			Message.populate(newMessage,{path:'author', select:'name _id'},function(err,newPopulatedMessage){
+	     			Message.populate(newMessage,{path:'author', select:'name _id avatarURL'},function(err,newPopulatedMessage){
 	     				if(err){
 	     					console.log(err);
 	     				}
