@@ -8,7 +8,7 @@ export default class socketAPI {
 
   connect() {
 
-    this.socket = io({query: 'token='+localStorage.getItem("token").slice(7)}).connect();
+    this.socket = io({query: 'token='+window.localStorage.getItem("token").slice(7)}).connect();
     return new Promise((resolve, reject) => {
       this.socket.on('connect', () => resolve());
       this.socket.on('connect_error', (error) => reject(error));
