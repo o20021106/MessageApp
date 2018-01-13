@@ -19,7 +19,7 @@ var jwt = require('jsonwebtoken');
 var cookieParser = require('cookie-parser');
 var config = require("./config/main");
 var Datauri = require('datauri');
-const PORT = process.env.PORT || 8000;
+const PORT = process.env.PORT || 6000;
 
 const dbUrl = config.database;
 mongoose.connect(dbUrl);
