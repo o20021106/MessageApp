@@ -47,7 +47,7 @@ exports.register = {
 					var token = jwt.sign({id : newUser._id}, config.secret, {
 			            expiresIn: 86400 // in seconds
 	 	          	});
-	 	          	req.session.user = newUser;
+	 	//          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: 'http://localhost:8000/editProfile'});
 
@@ -212,7 +212,7 @@ exports.login = {
 		      // Check if password matches
 		      user.comparePassword(req.body.password, function(err, isMatch) {
 		        if (isMatch && !err) {
-		        	req.session.user = user;
+		        	//req.session.user = user;
 		        	console.log("match!");
 		          	// Create token if the password matched and no error was thrown
 		          	var token = jwt.sign({id : user._id}, config.secret, {
