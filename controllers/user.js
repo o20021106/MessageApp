@@ -277,7 +277,7 @@ exports.editProfile = {
 							return res.json({error:err});
 						}
 						else{
-							req.session.user = updatedUser;
+							//req.session.user = updatedUser;
 							return res.json({user: updatedUser, url:'http://localhost:8000/message'})
 						}
 					});
@@ -331,7 +331,7 @@ exports.editProfile = {
 								return res.json({error:err});
 							}
 							else{
-								req.session.user = updatedUser;
+								//req.session.user = updatedUser;
 								return res.json({user: updatedUser, url:'http://localhost:8000/message'});
 							}
 

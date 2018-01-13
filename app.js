@@ -9,10 +9,10 @@ var validator = require('express-validator');
 var config = require("./config/main.js")
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
-var redis   = require("redis");
-var session = require('express-session');
-var redisStore = require('connect-redis')(session);
-var redisClient  = redis.createClient();
+//var redis   = require("redis");
+//var session = require('express-session');
+//var redisStore = require('connect-redis')(session);
+//var redisClient  = redis.createClient();
 var morgan = require('morgan');  
 var passport = require('passport');  
 var jwt = require('jsonwebtoken');  
@@ -30,6 +30,7 @@ db.once('open', function() {
   console.log('starting');
 });
 
+/*
 app.use(session({
     secret: config.sessionSecret,
     store: new redisStore({ host: 'localhost', port: 6379, client: redisClient,ttl :  1000}),
@@ -47,7 +48,7 @@ app.get('/testLogout',function(req,res){
         }
     });
 });
-
+*/
 
 
 app.use(cookieParser());
