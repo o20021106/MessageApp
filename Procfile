@@ -1,1 +1,1 @@
-web: node indexTest.js
+web: npm run startOld
