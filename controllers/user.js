@@ -49,7 +49,7 @@ exports.register = {
 	 	          	});
 	 	          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : newUser }, url: 'http://localhost:8000/editProfile'});
+		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: 'http://localhost:8000/editProfile'});
 
 				}
 			});
