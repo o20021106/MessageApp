@@ -32,6 +32,7 @@ class Login extends React.Component{
 
 			if (typeof(Storage) !== "undefined") {
 				window.localStorage.setItem('token', json.data.token);
+				console.log(json.url);
 				//localStorage.setItem('user', JSON.stringify(json.data.user)); 
 				window.location.href = json.url;
 				console.log('here');

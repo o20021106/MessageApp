@@ -12,7 +12,9 @@ import Testing from '../testing';
 import template from '../template';
 import { renderToString } from 'react-dom/server';
 import React from 'react';
-
+const PORT = process.env.PORT || 6000;
+const hostname = process.env.host || `localhost:${PORT}/`;
+const hostRe = 'http://'+hostname;
 
 
 
@@ -49,7 +51,7 @@ exports.register = {
 	 	          	});
 	 	//          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: 'https://'+process.env.host+'/editProfile' ||'http://localhost:5000/editProfile'});
+		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: hostRe+'editProfile'});
 
 				}
 			});
@@ -221,7 +223,7 @@ exports.login = {
 		            	expiresIn: 86400 // in seconds
 		          	});
 		          	//res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'https://'+process.env.host+'/'||'http://localhost:8000/'});
+		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: hostRe});
 
 		          	//res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
@@ -278,7 +280,7 @@ exports.editProfile = {
 						}
 						else{
 							//req.session.user = updatedUser;
-							return res.json({user: updatedUser, url:'https://'+process.env.host+'/message'||'http://localhost:8000/message'})
+							return res.json({user: updatedUser, url:hostRe+'message'})
 						}
 					});
 				})
@@ -332,7 +334,7 @@ exports.editProfile = {
 							}
 							else{
 								//req.session.user = updatedUser;
-								return res.json({user: updatedUser, url:'https://'+process.env.host+'/message'||'http://localhost:8000/message'});
+								return res.json({user: updatedUser, url:hostRe+'message'});
 							}
 
 						});

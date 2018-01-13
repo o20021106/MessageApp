@@ -11500,7 +11500,7 @@ var Register = function (_React$Component) {
 						}
 					} else if (json.hasOwnProperty('url')) {
 						if (typeof Storage !== "undefined") {
-							localStorage.setItem('token', json.data.token);
+							window.localStorage.setItem('token', json.data.token);
 							//localStorage.setItem('user', JSON.stringify(json.data.user)); 
 							window.location.href = json.url;
 							console.log('here');
