@@ -49,7 +49,7 @@ exports.register = {
 	 	          	});
 	 	//          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: 'http://'+process.env.host+'/editProfile' ||'http://localhost:5000/editProfile'});
+		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: 'https://'+process.env.host+'/editProfile' ||'http://localhost:5000/editProfile'});
 
 				}
 			});
@@ -221,7 +221,7 @@ exports.login = {
 		            	expiresIn: 86400 // in seconds
 		          	});
 		          	//res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http:/'+process.env.host+'/'||'http://localhost:8000/'});
+		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'https://'+process.env.host+'/'||'http://localhost:8000/'});
 
 		          	//res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
@@ -278,7 +278,7 @@ exports.editProfile = {
 						}
 						else{
 							//req.session.user = updatedUser;
-							return res.json({user: updatedUser, url:'http:/'+process.env.host+'/message'||'http://localhost:8000/message'})
+							return res.json({user: updatedUser, url:'https://'+process.env.host+'/message'||'http://localhost:8000/message'})
 						}
 					});
 				})
@@ -332,7 +332,7 @@ exports.editProfile = {
 							}
 							else{
 								//req.session.user = updatedUser;
-								return res.json({user: updatedUser, url:'http:/'+process.env.host+'/message'||'http://localhost:8000/message'});
+								return res.json({user: updatedUser, url:'https://'+process.env.host+'/message'||'http://localhost:8000/message'});
 							}
 
 						});
