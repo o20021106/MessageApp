@@ -19,7 +19,7 @@ var jwt = require('jsonwebtoken');
 var cookieParser = require('cookie-parser');
 var config = require("./config/main");
 var Datauri = require('datauri');
-const PORT = process.env.PORT || 5000;
+//const PORT = process.env.PORT || 5000;
 
 const dbUrl = config.database;
 mongoose.connect(dbUrl);
@@ -61,7 +61,7 @@ app.use(express.static(DIST_DIR));
 app.use(express.static(path.join(__dirname,'fontawesome-free-5.0.2/')));
 app.use('/',index);
 
-server.listen(PORT,function(){
+server.listen(8000,function(){
 	console.log('server is up');
 });
 
