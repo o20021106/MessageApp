@@ -42187,7 +42187,7 @@ var socketAPI = function () {
     value: function connect() {
       var _this = this;
 
-      this.socket = (0, _socket2.default)({ query: 'token=' + window.localStorage.getItem("token").slice(7) }).connect();
+      this.socket = (0, _socket2.default)({ query: 'token=' + localStorage.getItem("token").slice(7) }).connect();
       return new _promise2.default(function (resolve, reject) {
         _this.socket.on('connect', function () {
           return resolve();
