@@ -13,7 +13,8 @@ export default class EditProfile extends React.Component{
 		var EditProfileColumnRadium = Radium(EditProfileColumn);
 		console.log("YOU");
 		const outerBoxStyle = {	
-			display:'flex',
+ 			display: 'flex',     /* NEW - Chrome */
+ 
 			width :'100%',
 			justifyContent: 'center',
 			alignItems:'center', 

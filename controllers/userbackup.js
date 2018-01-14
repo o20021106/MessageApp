@@ -1,5 +1,9 @@
 
 
+
+
+
+
 var User = require("../src/models/user.js");
 var utility = require("../utility/utility.js")
 var User = require('../src/models/user');  
@@ -14,9 +18,7 @@ import Testing from '../testing';
 import template from '../template';
 import { renderToString } from 'react-dom/server';
 import React from 'react';
-const PORT = process.env.PORT || 6000;
-const hostname = process.env.host || `localhost:${PORT}/`;
-const hostRe = 'http://'+hostname;
+
 
 
 
@@ -51,9 +53,9 @@ exports.register = {
 					var token = jwt.sign({id : newUser._id}, config.secret, {
 			            expiresIn: 86400 // in seconds
 	 	          	});
-	 	//          	req.session.user = newUser;
+	 	          	req.session.user = newUser;
 		          //res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token}, url: hostRe+'editProfile'});
+		          	return res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : newUser }, url: 'http://localhost:5000/editProfile'});
 
 				}
 			});
@@ -61,7 +63,6 @@ exports.register = {
 
 
 /*		
-
 		const storage = multer.diskStorage({
   			destination: 'images',
   			filename: function (req, file, callback) {
@@ -79,18 +80,15 @@ exports.register = {
 		    else if (!req.file) { 
 		    	req.assert('email','Please provide a valid email address').isEmail();
 				req.check('password', 'Please enter a password longer than 6 characters').len({min:6});
-
 		    	console.log("No file received");
 		    	console.log(req.body.email);
      		    var avatarURL= config.avatarDefault;
-
 		      	var user = new User({
 					email : req.body.email,
 					password: req.body.password,
 					name : req.body.name,
 					avatarURL: avatarURL
 				})
-
 				User.findOne({email:req.body.email}, function(err,existingUser){
 					if(existingUser){
 						return res.json({message:'an user with a same email adress already exists.'});
@@ -109,23 +107,16 @@ exports.register = {
 		    else {
 			    req.assert('email','Please provide a valid email address').isEmail();
 				req.check('password', 'Please enter a password longer than 6 characters').len({min:6});
-
 				var errors = req.validationErrors();
-
 				if (errors){
 					return res.json({message: errors});
 				}
-
-
 			    const host = req.hostname;
 	  		    const filePath = req.protocol + "://" + host + '/' + req.file.path;
 			    console.log('file received');
 			    cloudinary.config(config.cloudinary);
-
 			      //cloudinary.v2.uploader.upload_stream( (result) => console.log(result) ).end( req.file.buffer ); 
-
 			    var avatarURL= config.avatarDefault;
-
 			    cloudinary.v2.uploader.upload(req.file.path, function (err, response) {
 			    	if (err) {
 				        console.log('failed to send to cloud')
@@ -142,12 +133,10 @@ exports.register = {
 						name : req.body.name,
 						avatarURL: avatarURL
 					})
-
 					User.findOne({email:req.body.email}, function(err,existingUser){
 						if(existingUser){
 							return res.json({message:'an user with a same email adress already exists.'});
 						}
-
 						user.save(function(err, newUser){
 							if(err){
 								return res.json({message:'creating new user failed'});
@@ -155,15 +144,12 @@ exports.register = {
 							else{
 								return res.redirect("/login");
 							}
-
 						});
-
 					});
 			    });
 			      
 			
 			}
-
 		})*/
 	}
 }
@@ -175,26 +161,21 @@ exports.register = {
 				email : req.body.email,
 			password : req.body.password
 		})
-
 		User.findOne({email: user.email}, function(err, existingUser){
 			if(err){
 				return res.json({message:" an err occured"})
 			}
-
 			existingUser.comparePassword(user.password, function(err, isMatch){
 				if(err){
 					return res.json({message:" an err occured"})
 				}
-
 				if (isMatch){
 					return res.redirect('/authenticate')
 				} 
 				else return res.json({message: "wrong password"})
 			})
-
 		})
 	}
-
 }
 */
 exports.login = {
@@ -205,23 +186,18 @@ exports.login = {
 		  var errors = req.validationErrors();
 		  if (errors){
 			return res.json({message: errors});
-		  } 
+		  }
 		
-
+		  console.log(req.body.email);
+		  console.log(req.body.password);
 		  User.findOne({email: req.body.email}, function(err, user) {
 		  	if (err) throw err;
 		    if (!user) {
 		      res.send({ success: false, message: 'Authentication failed. User not found.' });
 		    } else {
-		    	console.log('password');
-		    	console.log(req.body.password);
 		      // Check if password matches
 		      user.comparePassword(req.body.password, function(err, isMatch) {
-		      	if(err){
-		      		console.log(err);
-		      	}
 		        if (isMatch && !err) {
-		        	//req.session.user = user;
 		        	console.log("match!");
 		          	// Create token if the password matched and no error was thrown
 		          	var token = jwt.sign({id : user._id}, config.secret, {
@@ -230,10 +206,12 @@ exports.login = {
 		            	expiresIn: 86400 // in seconds
 		          	});
 		          	//res.json({ success: true, data:{token: 'bearer ' + token, user : user }});
-		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: hostRe});
+		          	res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }, url: 'http://localhost:5000/'});
 
 		          	//res.cookie('token', token).json({ success: true, data:{token: 'bearer ' + token, user : user }});
 		        } else {
+		        	console.log('why!!')
+		        	console.log(err);
 		          res.send({ success: false, message: 'Authentication failed. Passwords did not match.' });
 		        }
 		      });
@@ -286,8 +264,8 @@ exports.editProfile = {
 							return res.json({error:err});
 						}
 						else{
-							//req.session.user = updatedUser;
-							return res.json({user: updatedUser, url:hostRe+'message'})
+							req.session.user = updatedUser;
+							return res.json({user: updatedUser, url:'http://localhost:5000/message'})
 						}
 					});
 				})
@@ -340,8 +318,8 @@ exports.editProfile = {
 								return res.json({error:err});
 							}
 							else{
-								//req.session.user = updatedUser;
-								return res.json({user: updatedUser, url:hostRe+'message'});
+								req.session.user = updatedUser;
+								return res.json({user: updatedUser, url:'http://localhost:5000/message'});
 							}
 
 						});

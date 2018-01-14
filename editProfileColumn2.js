@@ -220,7 +220,7 @@ export default class EditProfileColumn extends React.Component{
 							<div style = {inputItemBoxStyle}>
 								<span>ABOUT ME</span>
 								<div style = {[{height:100,overflowY:'scroll',},inputBoxStyle]}>
-									<div>I am ...</div>
+									<div>I am ! ...</div>
 									<div style = {{minWidth:'100%'}} suppressContentEditableWarning={true} contentEditable ='true'  name = "aboutMe" ref = {(el)=> {this.aboutmeBox = el}}></div>
 								</div>
 							</div>
