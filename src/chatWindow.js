@@ -242,12 +242,12 @@ class ChatWindowTest extends React.Component{
 		e.preventDefault();
 
 		if(!this.props.recipientConversationId[this.props.match.params.recipientId]){
-			this.props.newConversationSocket('RECIPIENT', e.target.innerHTML, this.props.match.params.recipientId);
+			this.props.newConversationSocket('RECIPIENT', this.inputBox.innerHTML, this.props.match.params.recipientId);
 		}
 		else{
 			console.log('in new message ChatWindowTest');
 			this.props.newMessageSocket('RECIPIENT', this.props.match.params.recipientId,
-			e.target.innerHTML, this.props.recipientConversationId[this.props.match.params.recipientId]);
+			this.inputBox.innerHTML, this.props.recipientConversationId[this.props.match.params.recipientId]);
 		}
 		this.inputBox.innerHTML='';
 	}
