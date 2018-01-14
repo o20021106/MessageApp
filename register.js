@@ -94,8 +94,9 @@ class Register extends React.Component{
 				}
 				else if(json.hasOwnProperty('url')){
 					if (typeof(Storage) !== "undefined") {						
-						window.localStorage.setItem('token', json.data.token);
-						//localStorage.setItem('user', JSON.stringify(json.data.user)); 
+						w				localStorage.getItem('token');
+
+				localStorage.setItem('token', json.data.token);
 						window.location.href = json.url;
 						console.log('here');
  					} else { 
