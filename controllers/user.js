@@ -16,7 +16,7 @@ import { renderToString } from 'react-dom/server';
 import React from 'react';
 const PORT = process.env.PORT || 6000;
 const hostname = process.env.host || `localhost:${PORT}/`;
-const hostRe = 'http://'+hostname;
+const hostRe = 'https://'+hostname;
 
 
 
