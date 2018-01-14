@@ -90,7 +90,6 @@ export default class EditProfileColumn extends React.Component{
 		this.passwordCheck.style.visibility = 'hidden';
 		this.userCheck.style.visibility = 'hidden';
 		this.nameCheck.style.visibility = 'hidden';
-
 		const checker = {name: this.nameCheck, email: this.emailCheck, password:this.passwordCheck, userCheck:this.userCheck};
 		if(registerData.get('password') === '' ||registerData.get('email')===''||registerData.get('name')===''){
 			for(var key of registerData.keys()){
@@ -140,14 +139,11 @@ export default class EditProfileColumn extends React.Component{
 						console.log('failed');
 						checker['userCheck'].innerHTML = 'creating account failed';
 						checker['userCheck'].style.visibility = 'visible';
-
 					}
 				}
 				else if('url' in json){
 					window.location.href = json.url;
 				}
-
-
 			})
 			.catch(err=>{
 				console.log(err);
@@ -204,7 +200,7 @@ export default class EditProfileColumn extends React.Component{
 					<div ref = {(el)=>{this.test = el}}>
 
 					</div>
-					<form onSubmit = {(e)=>this.EditProfile(e)} encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action='editProfile'>
+					<form onSubmit = {(e)=>this.EditProfile(e)} encType='multipart/form-data' ref = {(el)=>{this.form = el}} style ={{width :'100%'}} method ='post' action = 'editProfile'>
 						<div>
 							<input type = 'file' accept='image/*' onChange ={this.previewAvatar} name = 'avatar' style = {{display:'none'}} ref = {(el)=>{this.imgInput =el}}></input>
 							<img ref = {(el)=>{this.avatar = el}} onClick= {this.chooseFile} src = {this.props.user.avatarURL} style ={{width:100}}></img>
@@ -220,7 +216,7 @@ export default class EditProfileColumn extends React.Component{
 							<div style = {inputItemBoxStyle}>
 								<span>ABOUT ME</span>
 								<div style = {[{height:100,overflowY:'scroll',},inputBoxStyle]}>
-									<div>I am ! ...</div>
+									<div>I am ...</div>
 									<div style = {{minWidth:'100%'}} suppressContentEditableWarning={true} contentEditable ='true'  name = "aboutMe" ref = {(el)=> {this.aboutmeBox = el}}></div>
 								</div>
 							</div>
@@ -265,4 +261,3 @@ export default class EditProfileColumn extends React.Component{
 	}
 
 }
-
