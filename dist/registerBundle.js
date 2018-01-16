@@ -11500,8 +11500,8 @@ var Register = function (_React$Component) {
 						}
 					} else if (json.hasOwnProperty('url')) {
 						if (typeof Storage !== "undefined") {
-							window.localStorage.setItem('token', json.data.token);
-							//localStorage.setItem('user', JSON.stringify(json.data.user)); 
+							localStorage.getItem('token');
+							localStorage.setItem('token', json.data.token);
 							window.location.href = json.url;
 							console.log('here');
 						} else {
@@ -11524,6 +11524,7 @@ var Register = function (_React$Component) {
 
 			var outerBoxStyle = {
 				display: 'flex',
+				flexDirection: 'column',
 				width: '100%',
 				justifyContent: 'center',
 				alignItems: 'center',
@@ -11533,11 +11534,13 @@ var Register = function (_React$Component) {
 				boxSizing: 'border-box',
 				padding: '30px 30px 30px 30px',
 				backgroundColor: 'green',
+				flex: 1,
+				overflowY: 'scroll',
 				width: '100%',
-				height: '100%',
 				'@media (min-width : 480px)': {
 					maxWidth: 480,
-					height: '80%' }
+					margin: 50,
+					overflowY: 'visible' }
 			};
 			var inputItemBoxStyle = { display: 'flex', alignItems: 'center' };
 			var inputBoxStyle = {

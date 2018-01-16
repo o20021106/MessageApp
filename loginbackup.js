@@ -3,7 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import {StyleRoot} from 'radium';
 
-export default class Login extends React.Component{ 
+class Login extends React.Component{ 
 
 	login(e){
 		console.log(e.currentTarget);
@@ -51,7 +51,6 @@ export default class Login extends React.Component{
 
 	
 	render(){
-		console.log('login');
 		const outerBoxStyle = {	
 			display:'flex',
 			flexDirection:'column',
@@ -84,7 +83,8 @@ export default class Login extends React.Component{
 			marginLeft:20};
 		return(
 
-			<div style = {[outerBoxStyle, this.props.style]}>
+		<StyleRoot style = {{height:'100%'}}>
+			<div style = {outerBoxStyle}>
 			    <form onSubmit = {(e)=>this.login(e)} style = {loginBoxStyle}>
 			    	<div style = {{marginTop:18}}>
 			    		<div style = {inputItemBoxStyle}>
@@ -106,12 +106,10 @@ export default class Login extends React.Component{
 						<input type='submit' value = 'LOGIN' style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}></input>
 					</div>
 				</form>
-				<button onClick = {()=>this.props.selectRL('register')}>register</button>
-
 			</div>
-		);
+		</StyleRoot>);
 	}
 
 }
 
-//ReactDOM.render(<Login />,document.getElementById('root'));
+ReactDOM.render(<Login />,document.getElementById('root'));

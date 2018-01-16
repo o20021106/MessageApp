@@ -63,7 +63,7 @@ app.use(express.static(path.join(__dirname,'fontawesome-free-5.0.2/')));
 app.use('/',index);
 
 server.listen(PORT,function(){
-	console.log('server is up');
+	console.log('server is up, and listening on port '+PORT);
 });
 
 

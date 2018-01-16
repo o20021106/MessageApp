@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import {StyleRoot} from 'radium';
 
 
-class Register extends React.Component{ 
+export default class Register extends React.Component{ 
 	constructor(props){
 		super(props);
 		this.previewAvatar =this.previewAvatar.bind(this);
@@ -94,9 +94,8 @@ class Register extends React.Component{
 				}
 				else if(json.hasOwnProperty('url')){
 					if (typeof(Storage) !== "undefined") {						
-						w				localStorage.getItem('token');
-
-				localStorage.setItem('token', json.data.token);
+						localStorage.getItem('token');
+						localStorage.setItem('token', json.data.token);
 						window.location.href = json.url;
 						console.log('here');
  					} else { 
@@ -120,6 +119,7 @@ class Register extends React.Component{
 		
 		const outerBoxStyle = {	
 			display:'flex',
+			flexDirection:'column',
 			width :'100%',
 			justifyContent: 'center',
 			alignItems:'center', 
@@ -129,11 +129,14 @@ class Register extends React.Component{
 			boxSizing:'border-box',
 			padding:'30px 30px 30px 30px',
 			backgroundColor: 'green',
-			width:'100%', 
-			height:'100%',
+			flex:1,
+			overflowY:'scroll',
+			width:'100%',
 			'@media (min-width : 480px)':{
-				maxWidth:480, 
-				height:'80%'}
+				maxWidth:480,
+				margin:50,
+				overflowY:'visible'
+				}
 			}
 		const inputItemBoxStyle = {display:'flex', alignItems:'center'}
 		const inputBoxStyle = {
@@ -145,10 +148,31 @@ class Register extends React.Component{
 			backgroundColor:'green', 
 			padding:10, 
 			marginLeft:20};
+		const loginIndsideButtonStyle = {
+			display: 'block',		
+			padding : 10,
+			width : '50%',
+			float:'right',
+			clear: 'left',
+			textAlign: 'center',
+			'@media (min-width : 480px)':{
+				display: 'none'
+			}
+		}
+		const loginOutdsideButtonStyle = {
+			marginBottom:50,
+			display: 'none',		
+			'@media (min-width : 480px)':{
+				maxWidth:480,
+				padding:10,
+				textAlign: 'center',
+				display: 'block'
+			}
+		}
+
 		return(
 
-			<StyleRoot style = {{height:'100%'}}>
-				<div style = {outerBoxStyle}>
+				<div style = {[outerBoxStyle, this.props.style]}>
 					<form ref = {(el)=>{this.form = el}} style = {registerBoxStyle} onSubmit = {(e)=>this.createAccount(e)}>
 						<div style = {{marginTop:18}}>
 							<div style = {inputItemBoxStyle}>
@@ -177,16 +201,19 @@ class Register extends React.Component{
 								password must be at leat 6 characters long
 							</div>
 						</div>
-						<input type='submit' value = 'CREATE ACCOUNT' onClick = {(e)=> this.createAccount(e)}style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
+						<input type='submit' value = 'CREATE ACCOUNT' onClick = {(e)=> this.createAccount(e)} style = {{textAlign:'center', marginTop:48, backgroundColor:'white', padding:10, width:'100%',borderStyle:'none'}}>
 							
 						</input>
 						<div ref ={(el)=>{this.userCheck = el}} style = {{visibility:'hidden'}}>user already exists</div>
+						<button style = {loginIndsideButtonStyle} onClick = {()=>this.props.selectRL('login')}>login</button>
 
 					</form>
-				</div>	
-			</StyleRoot>);
+					<button style = {loginOutdsideButtonStyle} onClick = {()=>this.props.selectRL('login')}>login</button>
+				</div>	)
+
+			;
 	}
 
 }
 
-ReactDOM.render(<Register />,document.getElementById('root'));
+//ReactDOM.render(<Register />,document.getElementById('root'));
