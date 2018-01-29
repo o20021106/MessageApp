@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect, Provider } from 'react-redux';
-import * as actions from './actions/index';
+import * as actions from '../actions/index';
 import {BrowserRouter as Router,
   Route,
   Link

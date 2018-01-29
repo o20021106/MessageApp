@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect, Provider } from 'react-redux';
 import fetch from 'isomorphic-fetch';
-import * as actions from './actions/index';
+import * as actions from '../actions/index';
 import ChatWindowTest from './chatWindow';
 import Messages from './messages';
 import io from 'socket.io-client';

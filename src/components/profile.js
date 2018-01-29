@@ -1,12 +1,12 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import * as actions from './actions/index';
+import * as actions from '../actions/index';
 import {  BrowserRouter as Router,
   Route,
   Link
 } from 'react-router-dom';
 import Radium from 'radium';
-import * as getTime from './getTimeDisplay';
+import * as getTime from '../getTimeDisplay';
 
 class Profile extends React.Component{
 
