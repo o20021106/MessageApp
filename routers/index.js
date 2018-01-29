@@ -61,7 +61,7 @@ router.get('/editProfile', passport.authenticate('jwt', { session: false ,failur
 router.get('/registerLogin', function(req,res){
     res.sendFile(path.join(__dirname, '/../registerLogin.html'));
 })
-router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'login',session: false }),function(req,res){
+router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
     res.redirect('https://'+req.headers.host+'/message')
 })
 router.post('/register',userController.register.post);
