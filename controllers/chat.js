@@ -272,7 +272,7 @@ import { hydrate } from 'react-dom';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
-import ChatFrame from '../src/chatFrame';
+import ChatFrame from '../src/components/chatFrame';
 import socketClient from '../src/socketClient';
 import rootReducer from '../src/reducers/chatReducer';
 import configureStore from '../src/configureStore';
