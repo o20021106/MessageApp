@@ -7,7 +7,7 @@ var searchController = require('../controllers/search.js');
 var config = require("../config/main");
 const PORT = process.env.PORT || 6000;
 
-const hostname = process.env.host || `localhost:${PORT}/`;
+const hostname = process.env.host || `localhost:${PORT}`;
 const hostRe = 'https://'+hostname;
 
 
