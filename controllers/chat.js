@@ -167,6 +167,52 @@ exports.getConversations = function(req, res, next){
 	})
 }
 
+
+
+exports.getConversationsPre = function(req, resolve, reject){
+    console.log('in getconversations here');
+	Conversation.find({participants: req.user._id})
+	.select('_id participants')
+	.populate('participants','name avatarURL')
+	.exec(function(err,conversations){
+		if (err){
+			console.log('conv err');
+			console.log(err);
+			res.json({err:err});
+			return next(err);
+		}
+		else if (conversations.length === 0) {
+		    return res.status(200).json({ conversations: [] });
+		}
+		let allConversations = [];
+		conversations.forEach(function(conversation){
+			Message.find({conversationId: conversation._id})
+			.sort('-createdAt')
+			.limit(1)
+			.populate('author', 'name _id')
+			.exec(function(err, message){
+				if (err){
+					console.log('conv2 err');
+					console.log(err);
+					res.json({err:err});
+					return reject(err);
+				}
+				allConversations.push({'message': message, 'conversation': conversation});
+				if(allConversations.length === conversations.length) {
+					return resolve({ conversations: allConversations })
+					}
+            	
+
+			})
+		})
+
+	})
+}
+
+
+
+
+
 exports.getConversationsSocket = function(user){
     console.log('in getconversations');
 	Conversation.find({participants: user._id})

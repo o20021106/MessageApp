@@ -10,6 +10,8 @@ import {LOAD_RECIPIENTS,
 	LOAD_SEARCH_USER,
 	CLEAR_SEARCH} from './type'
 
+
+
 export function loadRecipients(){
 	return function(dispatch){
 		fetch("/getRecipients",

@@ -14,7 +14,7 @@ import {LOAD_RECIPIENTS,
 	CLEAR_SEARCH,
 	LOAD_SEARCH_USER } from '../actions/type.js';
 
-const initial = {
+export const initial = {
 	user:{},
 	recipients:[], 
 	recipientConversationId:{}, 
@@ -31,7 +31,8 @@ const initial = {
 
 export default function(state = initial, action){
 	switch (action.type){
-
+		case 'test':
+			return {...state, recipients:['ha']}
 		case LOAD_CONVERSATIONS:
 
 			action.conversations.sort(function(a,b){

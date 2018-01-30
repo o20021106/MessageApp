@@ -64,9 +64,14 @@ router.get('/editProfile', passport.authenticate('jwt', { session: false ,failur
 router.get('/registerLogin', function(req,res){
     res.sendFile(path.join(__dirname, '/../registerLogin.html'));
 })
+
+var nearbyController = require('../controllers/nearby.js');
+router.get('/nearby/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), nearbyController.getNearby.get);
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
     res.redirect('https://'+req.headers.host+'/message')
 })
+
+
 router.post('/register',userController.register.post);
 router.post('/editProfile', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), userController.editProfile.post);
 
