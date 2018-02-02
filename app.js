@@ -122,11 +122,12 @@ io.on('connection', function(client){
 	    client.on('newConversation', function(data,fn){
 	    	chatControllerSocket.newConversation(user, data.recipientId, data.composedMessage)
 	    	.then(response =>{
+	    		console.log('new conversation!!!!!!!!!!!!!!!!!!')
+	    		console.log(data.recipientId);
+	    		console.log(clients);
 	    		client.join(response.conversation._id);
 	    		if(data.recipientId in clients){
 	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
-	    			io.to(response.conversation._id).emit('NEW_CONVERSATION', 
-	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
 	    		}
 	    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
 	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});

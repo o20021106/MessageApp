@@ -2,7 +2,7 @@ export default (html, finalState, radiumProp) => {
 
   return `
     <!DOCTYPE html>
-    <html style = 'width:100%; margin : 0px'>
+    <html style = 'width:100%; margin : 0px; height: 100vh'>
 		<head>
 			<link rel="stylesheet" href="/web-fonts-with-css/css/fontawesome-all.min.css">	
 			<meta name= 'viewport' content = 'width = device-width, initial-scale=1'>
@@ -10,9 +10,9 @@ export default (html, finalState, radiumProp) => {
 			<script>window.__RADIUM_PROP__ = ${JSON.stringify(radiumProp).replace(/</g, '\\u003c')}</script>
 
 			</head>
-		<body style = 'width:100%; margin : 0px'>
-		<div id = 'root' style = 'width:100%; margin : 0px'>${html}</div>
-			<script src = '/nearbyBundle.js'></script> 
+		<body style = 'width:100%; margin : 0px; height:100%'>
+		<div id = 'root' style = 'width:100%; height:100%; margin : 0px'>${html}</div>
+		<script src = '/chatBundle.js'></script> 
 		</body>
 	</html>
 	`;

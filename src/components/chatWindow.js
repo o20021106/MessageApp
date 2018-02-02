@@ -294,7 +294,7 @@ class ChatWindowTest extends React.Component{
 				width : '100%',
 				wordWrap: 'breakWord',
 				height :32,
-				overflowY:scroll
+				overflowY:'scroll'
 			}
 
 			const newMessageNoti = {

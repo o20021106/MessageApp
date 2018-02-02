@@ -1,6 +1,6 @@
-import Test from './test';
-import About from './about';
 import Layout from './layout';
+import ChatWindow from './chatWindow';
+import Messages from './messages';
 
 /*const routes = [
   { component: AppRoot,
@@ -38,11 +38,11 @@ const routes = [
     component:Layout,
     routes:[
       {
-        path:'/message',
+        path:'/message/messages',
         component: Messages 
       },
       {
-        path:'/recipient/:recipientId',
+        path:'/message/recipient/:recipientId',
         component: ChatWindow
       }
     ]

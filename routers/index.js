@@ -57,7 +57,7 @@ router.get('/getConversationByRecipientId/:recipientId', passport.authenticate('
 
 router.get('/recipient/:recipientId', passport.authenticate('jwt', { session: false , failureRedirect:hostRe+'registerLogin'}),chatController.chatLoad, chatController.message.get);
 
-router.get('/message', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.message.get);
+//router.get('/message', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.message.get);
 
 
 router.get('/editProfile', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), userController.editProfileTesting.get);
@@ -65,8 +65,8 @@ router.get('/registerLogin', function(req,res){
     res.sendFile(path.join(__dirname, '/../registerLogin.html'));
 })
 
-var nearbyController = require('../controllers/nearby.js');
-router.get('/nearby/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), nearbyController.getNearby.get);
+var messageController = require('../controllers/message.js');
+router.get('/message/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), messageController.message.get);
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
     res.redirect('https://'+req.headers.host+'/message')
 })

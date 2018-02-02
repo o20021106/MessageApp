@@ -1,17 +1,17 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-
 import { hydrate } from 'react-dom';
 import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
-import ChatFrame from './chatFrame';
-import socketClient from '../socketClient';
-import rootReducer from '../reducers/chatReducer';
-import configureStore from '../configureStore';
-import socketMiddleware from '../socketMiddleware';
-import {LOAD_CONVERSATIONS} from '../actions/type';
+import socketClient from '../../socketClient';
+import rootReducer from '../../reducers/chatReducer';
+import socketMiddleware from '../../socketMiddleware';
+import Radium from 'radium';
 import {StyleRoot} from 'radium';
+import {  BrowserRouter } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
+import routes  from './routes';
 
 const preloadedState = window.__PRELOADED_STATE__
 
@@ -27,13 +27,15 @@ socket.connect();
 
 const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);
 const store = createStoreWithMiddleWare(rootReducer,preloadedState);
-console.log(store);
-
-ReactDOM.render(
+//console.log(store);
+//console.log(radium_prop);
+hydrate(
   <Provider store={store} >
-  	<StyleRoot>
-		<ChatFrame {...radium_prop}/>    
-	</StyleRoot>
+  	<StyleRoot style = {{height:'100%'}} radiumConfig = {radium_prop.radiumConfig}>
+		<BrowserRouter>
+			{renderRoutes(routes)}
+		</BrowserRouter>
+	</StyleRoot>    
   </Provider>,
   document.getElementById('root')
 )

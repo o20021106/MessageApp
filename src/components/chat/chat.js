@@ -1,84 +1,42 @@
 import React from 'react';
-import { connect, Provider } from 'react-redux';
-import fetch from 'isomorphic-fetch';
-import * as actions from '../actions/index';
-import ChatWindow from './chatWindow';
-import Messages from './messages';
-import io from 'socket.io-client';
-import {  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom';
-import { Redirect } from 'react-router';
+import ReactDOM from 'react-dom';
+import { hydrate } from 'react-dom';
+import { Provider } from 'react-redux';
+import thunkMiddleware from 'redux-thunk'
+import {createStore, combineReducers, applyMiddleware} from 'redux';
+import socketClient from '../../socketClient';
+import rootReducer from '../../reducers/chatReducer';
+import socketMiddleware from '../../socketMiddleware';
 import Radium from 'radium';
+import {StyleRoot} from 'radium';
+import {  BrowserRouter } from 'react-router-dom';
+import { renderRoutes } from 'react-router-config';
+import routes  from './routes';
 
+const preloadedState = window.__PRELOADED_STATE__
 
+// Allow the passed state to be garbage-collected
+delete window.__PRELOADED_STATE__
+const radium_prop = window.__RADIUM_PROP__
 
+// Allow the passed state to be garbage-collected
+delete window.__RADIUM_PROP__
 
- 
+const socket = new socketClient();
+socket.connect();
 
-class Chat extends React.Component{	
-	constructor(props){
-		super(props);
-		this.state = {recipientId: '', messageBuffer:'asdfadsfasdf', timeoutId: null};
-		//this.userList = this.userList.bind(this);
-
-	}
-	componentWillMount(){
-		this.props.loadConversations();
-		//this.props.loadRecipients();
-	}
-/*
-	userList(){
-		if(this.props.recipients.length == 0){
-			console.log('User has zero conversation yet');	
-		}
-		else{
-			console.log('here');
-			console.log(this.props.recipients.length);
-			return this.props.recipients.map(function(user){
-				return (
-					<div key = {user._id}>
-						<Link to = {`/recipient/${user._id}`}  >
-							{user.name}
-						</Link>
-					</div>
-					)
-			})
-		}
-	}
-
-*/
-	
-
-    
-	render(){
-		var ChatWindow = Radium(ChatWindow);
-		return (
-				//{JSON.parse(localStorage.getItem("user")).name}
-				<Router>
-					<div style = {{height:'100vh', display:'flex'}}>
-						
-						<Route exact path= '/message' component = {Messages} />
-						<Route path= '/recipient/:recipientId' component = {ChatWindow}/>
-						<Route path= '/conversation/:conversationId'component = {ChatWindow}/>
-					</div>
-				</Router>	
+const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);
+const store = createStoreWithMiddleWare(rootReducer,preloadedState);
+//console.log(store);
+//console.log(radium_prop);
+hydrate(
+  <Provider store={store} >
+  	<StyleRoot style = {{height:'100%'}} radiumConfig = {radium_prop.radiumConfig}>
+		<BrowserRouter>
+			{renderRoutes(routes)}
+		</BrowserRouter>
+	</StyleRoot>    
+  </Provider>,
+  document.getElementById('root')
 )
-	}
-
- 	
-}
-
-
-
-
-
-function mapStateToProps(state) {  
-    return { recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers};
-}
-	
-export default connect(mapStateToProps, actions)(Chat);
- 
-
 

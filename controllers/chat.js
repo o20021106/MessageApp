@@ -176,14 +176,14 @@ exports.getConversationsPre = function(req, resolve, reject){
 	.populate('participants','name avatarURL')
 	.exec(function(err,conversations){
 		if (err){
-			console.log('conv err');
+			console.log('conv err!!!!!!!!!!!!!!');
 			console.log(err);
-			res.json({err:err});
-			return next(err);
+			return reject(1);
 		}
 		else if (conversations.length === 0) {
-		    return res.status(200).json({ conversations: [] });
+		    return resolve({ conversations: [] });
 		}
+
 		let allConversations = [];
 		conversations.forEach(function(conversation){
 			Message.find({conversationId: conversation._id})
@@ -191,16 +191,27 @@ exports.getConversationsPre = function(req, resolve, reject){
 			.limit(1)
 			.populate('author', 'name _id')
 			.exec(function(err, message){
+				console.log('message!!!!!!!!!!!!!!!!');
+				console.log(message);
 				if (err){
-					console.log('conv2 err');
+					console.log('conv2 err!!!!!!!!!!!!!!!!!!!!');
 					console.log(err);
-					res.json({err:err});
-					return reject(err);
+					return reject(2);
 				}
 				allConversations.push({'message': message, 'conversation': conversation});
 				if(allConversations.length === conversations.length) {
+					console.log('in conversations return');
+					allConversations.sort(function(a,b){
+						if (a.message[0].createdAt > b.message[0].createdAt){
+							return -1
+						}
+						if (a.message[0].createdAt < b.message[0].createdAt){
+							return 1
+						}
+						return 0
+					})
 					return resolve({ conversations: allConversations })
-					}
+				}
             	
 
 			})
