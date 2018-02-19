@@ -68,14 +68,14 @@ router.get('/registerLogin', function(req,res){
 var messageController = require('../controllers/message.js');
 router.get('/message/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), messageController.message.get);
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
-    res.redirect('https://'+req.headers.host+'/message/')
+    res.redirect('https://'+req.headers.host+'/message/messages')
 })
 
 
 router.post('/register',userController.register.post);
 router.post('/editProfile', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), userController.editProfile.post);
 
-router.post('/login',userController.login.post);
+router.post('/login',userController.login.post );
 router.post('/newMessage',passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.newConversation);
 //router.post('/authenticate',userController.authenticate.post);
 
