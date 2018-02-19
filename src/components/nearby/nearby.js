@@ -1,6 +1,9 @@
 import ConversationColumn from './conversationColumn';
 import ChatWindow from './chatWindow';
-
+import React from 'react';
+import { connect, Provider } from 'react-redux';
+import * as actions from '../../actions/index';
+import Radium from 'radium';
 
 class Nearby extends React.Component{	
 
@@ -19,21 +22,37 @@ class Nearby extends React.Component{
 				maxWidth:240,
 			}
 		}
-		const chatColumnStyle = {
-			display : 'none',
+		const chatWindowStyle = {
+			/*display : 'none',
 			
 			'@media (min-width: 480px)':{
 				display : 'block',
-				maxWidth:100,
+				maxWidth:200,
 				position:'fixed',
 				right:0,
 				bottom:0
 			}
+			*/
+			backgroundColor: 'orange',
+			display:'none',
+			'@media (min-width : 480px)':{
+				display:'block',
+				backgroundColor: 'green',
+				height: 300,
+				width: 200,
+				position:'fixed',
+				right:50,
+				bottom:0,
+				zIndex:1
+			}
+				
+		
 		}
 		const nearbyStyle = {
 			flex:1,
-			backgroundColor:'red'
+			backgroundColor:'blue'
 		}
+
 		return (
 			<div style = {outerStyle}>
 				<div style = {conversationColumnStyle}>
@@ -42,7 +61,7 @@ class Nearby extends React.Component{
 				<div style = {nearbyStyle}>
 				nearby
 				</div>
-				<div style = {chatColumnStyle}>
+				<div style = {chatWindowStyle}>
 					<ChatWindow/>
 				</div>
 			</div>	
@@ -55,7 +74,7 @@ function mapStateToProps(state) {
     return { user:state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers };
 }
 	
-export default connect(mapStateToProps, actions)(Nearby);
+export default connect(mapStateToProps, actions)(Radium(Nearby));
 
 
 

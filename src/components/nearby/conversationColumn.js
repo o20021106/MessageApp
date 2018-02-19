@@ -8,6 +8,7 @@ import {  BrowserRouter as Router,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import * as getTime from '../../getTimeDisplay';
+import Radium from 'radium';
 
 
 class ConversationColumn extends React.Component{	
@@ -98,6 +99,7 @@ class ConversationColumn extends React.Component{
 			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 			const decoder = this.decoder;
 			const user = this.props.user;
+			const setChosenRecipient = this.props.setChosenRecipient;
 			return (
 				<div>
  					<ul style = {listStyle}>{
@@ -117,7 +119,7 @@ class ConversationColumn extends React.Component{
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
-									<div style = {navLinkDisplayStyle}  onClick= {()=>this.props.setChosenRecipient(participant[0]._id, conversation.conversation._id, 'CON_EXIST'} >
+									<div style = {navLinkDisplayStyle}  onClick= {()=>setChosenRecipient(participant[0]._id, conversation.conversation._id, 'CON_EXIST')} >
 										
 										<div style = {imageWrapperStyle}>
 											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
@@ -401,5 +403,4 @@ function mapStateToProps(state) {
     	user: state.user};
 }
 	
-export default connect(mapStateToProps, actions)(ConversationColumn);
- 
+export default connect(mapStateToProps, actions)(Radium(ConversationColumn));

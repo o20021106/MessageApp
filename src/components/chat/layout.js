@@ -5,7 +5,7 @@ import Radium from 'radium';
 import { renderRoutes } from 'react-router-config';
 
 
-class About extends React.Component{ 
+class Layout extends React.Component{ 
 	/*static fetchData(store) {
     	return store.dispatch(actions.loadConversations());
   	}
@@ -77,5 +77,5 @@ function mapStateToProps(state) {
     return {...state};
 }
 
-export default connect(mapStateToProps)(Radium(About));
+export default connect(mapStateToProps)(Radium(Layout));
 

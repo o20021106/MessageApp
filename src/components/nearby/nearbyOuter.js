@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import socketClient from '../../socketClient';
-import rootReducer from '../../reducers/chatReducer';
+import rootReducer from '../../reducers/nearbyReducer';
 import socketMiddleware from '../../socketMiddleware';
 import Radium from 'radium';
 import {StyleRoot} from 'radium';
@@ -27,8 +27,9 @@ socket.connect();
 
 const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);
 const store = createStoreWithMiddleWare(rootReducer,preloadedState);
-//console.log(store);
-//console.log(radium_prop);
+console.log(store);
+console.log(store.getState());
+console.log(radium_prop);
 hydrate(
   <Provider store={store} >
   	<StyleRoot style = {{height:'100%'}} radiumConfig = {radium_prop.radiumConfig}>

@@ -1,4 +1,4 @@
-export default (html, finalState, radiumProp) => {
+export default (html, finalState, radiumProp,script) => {
 
   return `
     <!DOCTYPE html>
@@ -12,7 +12,7 @@ export default (html, finalState, radiumProp) => {
 			</head>
 		<body style = 'width:100%; margin : 0px; height:100%'>
 		<div id = 'root' style = 'width:100%; height:100%; margin : 0px'>${html}</div>
-		<script src = '/chatBundle.js'></script> 
+		<script src = '/${script}.js'></script> 
 		</body>
 	</html>
 	`;

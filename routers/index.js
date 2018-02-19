@@ -3,6 +3,9 @@ var path = require('path');
 var router = express.Router();
 var userController = require('../controllers/user.js');
 var chatController = require('../controllers/chat.js');
+var messageController = require('../controllers/message.js');
+var nearbyController = require('../controllers/nearby.js');
+
 var searchController = require('../controllers/search.js');
 var config = require("../config/main");
 const PORT = process.env.PORT || 6000;
@@ -65,8 +68,9 @@ router.get('/registerLogin', function(req,res){
     res.sendFile(path.join(__dirname, '/../registerLogin.html'));
 })
 
-var messageController = require('../controllers/message.js');
 router.get('/message/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), messageController.message.get);
+router.get('/nearby', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), nearbyController.nearby.get);
+
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
     res.redirect('https://'+req.headers.host+'/message/messages')
 })

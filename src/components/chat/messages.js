@@ -7,11 +7,7 @@ import {BrowserRouter as Router,
 } from 'react-router-dom';
 import { Redirect } from 'react-router';
 import ConversationColumn from './conversationColumn';
-
-
-
-
- 
+import Radium from 'radium';
 
 class Messages extends React.Component{	
 
@@ -61,4 +57,4 @@ function mapStateToProps(state) {
     return { user:state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers };
 }
 	
-export default connect(mapStateToProps, actions)(Messages);
+export default connect(mapStateToProps, actions)(Radium(Messages));

@@ -2,10 +2,10 @@ const path = require('path');
 
 module.exports = {
   devtool: 'cheap-module-source-map',
-  entry: './src/components/chat/chat.js',
+  entry: './src/components/nearby/nearbyOuter.js',
   output: {
     path: path.join(__dirname, 'dist'),
-    filename: 'chatBundle.js',
+    filename: 'nearbyBundle.js',
   },
   module: {
     loaders: [{
