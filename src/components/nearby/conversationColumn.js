@@ -29,6 +29,8 @@ class ConversationColumn extends React.Component{
 		return decoded;
 	}
 
+
+
 	conversationList(){
 		console.log('in conversation list');
 		console.log(this.props.conversations);
@@ -115,7 +117,7 @@ class ConversationColumn extends React.Component{
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
-									<NavLink style = {navLinkDisplayStyle}  to = {`/message/recipient/${participant[0]._id}`} >
+									<div style = {navLinkDisplayStyle}  onClick= {()=>this.props.setChosenRecipient(participant[0]._id, conversation.conversation._id, 'CON_EXIST'} >
 										
 										<div style = {imageWrapperStyle}>
 											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
@@ -130,7 +132,7 @@ class ConversationColumn extends React.Component{
 													'You' : conversation.message[0].author.name}: {decoder(conversation.message[0].body)}
 											</div>
 										</div>
-									</NavLink>
+									</div>
 								</li>
 							)
 						})

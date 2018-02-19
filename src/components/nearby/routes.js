@@ -1,6 +1,5 @@
 import Layout from './layout';
-import ChatWindow from './chatWindow';
-import Messages from './messages';
+import nearby from './nearby';
 
 /*const routes = [
   { component: AppRoot,
@@ -38,12 +37,8 @@ const routes = [
     component:Layout,
     routes:[
       {
-        path:'/message/messages',
-        component: Messages 
-      },
-      {
-        path:'/message/recipient/:recipientId',
-        component: ChatWindow
+        path:'/nearby',
+        component: nearby
       }
     ]
   }

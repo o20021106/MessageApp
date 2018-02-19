@@ -68,7 +68,7 @@ router.get('/registerLogin', function(req,res){
 var messageController = require('../controllers/message.js');
 router.get('/message/*', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), messageController.message.get);
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
-    res.redirect('https://'+req.headers.host+'/message')
+    res.redirect('https://'+req.headers.host+'/message/')
 })
 
 

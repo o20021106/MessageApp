@@ -5,7 +5,6 @@ import {  BrowserRouter as Router,
   Route,
   Link
 } from 'react-router-dom';
-import ConversationColumn from './conversationColumn';
 import Radium from 'radium';
 import {StyleRoot} from 'radium';
 import * as getTime from '../../getTimeDisplay';
@@ -32,7 +31,7 @@ class ChatWindow extends React.Component{
 		var convExist = 'CON_EXIST';
 		var conNExist = 'CON_N_EXIST';
 		var notLoaded = 'NOT_LOADED';
-
+/*
 		if(this.props.match.params.recipientId in this.props.recipientConversationId){		
 			if(this.props.recipientConversationId[this.props.match.params.recipientId]){
 				console.log('no loaded yet2');
@@ -48,6 +47,7 @@ class ChatWindow extends React.Component{
 				console.log('no loaded yet');					
 				this.props.setChosenRecipient(this.props.match.params.recipientId, null, notLoaded);				
 		}
+*/		
 
 	}
 
@@ -56,7 +56,7 @@ class ChatWindow extends React.Component{
 		var bottomLine = this.conversationWindowEl.scrollHeight - this.conversationWindowEl.clientHeight;
 		var atBottom = this.conversationWindowEl.scrollTop >= bottomLine ? true: false;
 		this.setState({atBottom:atBottom});
-
+/*
 		if(this.props.match.params.recipientId !== nextProps.match.params.recipientId){
 			console.log('transition');
 			var convExist = 'CON_EXIST';
@@ -80,6 +80,7 @@ class ChatWindow extends React.Component{
 					this.props.setChosenRecipient(nextProps.match.params.recipientId, null, notLoaded);				
 			}
 		}
+		*/
 	}	
 
 	createMarkup(string) {
@@ -94,7 +95,8 @@ class ChatWindow extends React.Component{
 		var preMessages = prevProps.conversationData.messages;
 		var thisMessages = this.props.conversationData.messages;
 		var bottomLine = this.state.scrollHeight - this.state.clientHeight;
-		if(this.props.match.params.recipientId !== prevProps.match.params.recipientId){
+		if(this.props.conversationData.chosenId !== prevProps.conversationData.chosenId && 
+			this.props.conversationData.conversationType !== prevProps.conversationData.conversationType){
 			this.inputBox.focus();
 			this.scrollToBottom();
 		}
@@ -132,7 +134,6 @@ class ChatWindow extends React.Component{
 	conversationDisplay(){
 		console.log('indisplay');
 		console.log(this.props.conversationData.chosenId);
-		console.log(this.props.match.params.recipientId);
 
 		const messageStyle = {
 			width : '100%',
@@ -171,7 +172,6 @@ class ChatWindow extends React.Component{
 			}
 		var messages = this.props.conversationData.messages;
 		if(messages.length !==0 &
-		this.props.conversationData.chosenId === this.props.match.params.recipientId & 
 		this.props.conversationData.conversationType === 'RECIPIENT'){
 			console.log('in if messages not empty');
 			console.log(messages);
@@ -241,13 +241,13 @@ class ChatWindow extends React.Component{
 	newMessageFromBox(e){
 		e.preventDefault();
 
-		if(!this.props.recipientConversationId[this.props.match.params.recipientId]){
-			this.props.newConversationSocket('RECIPIENT', this.inputBox.innerHTML, this.props.match.params.recipientId);
+		if(!this.props.recipientConversationId[this.props.conversationData.chosenId]){
+			this.props.newConversationSocket('RECIPIENT', this.inputBox.innerHTML, this.props.conversationData.chosenId);
 		}
 		else{
 			console.log('in new message ChatWindowTest');
-			this.props.newMessageSocket('RECIPIENT', this.props.match.params.recipientId,
-			this.inputBox.innerHTML, this.props.recipientConversationId[this.props.match.params.recipientId]);
+			this.props.newMessageSocket('RECIPIENT', this.props.conversationData.chosenId,
+			this.inputBox.innerHTML, this.props.recipientConversationId[this.props.conversationData.chosenId]);
 		}
 		this.inputBox.innerHTML='';
 	}
@@ -263,7 +263,7 @@ class ChatWindow extends React.Component{
 	}
 
 	render(){
-			const messageWindowStyle = {
+			/*const messageWindowStyle = {
 				display: 'flex',
 				flex:1,
 				minWidth:0
@@ -277,7 +277,7 @@ class ChatWindow extends React.Component{
 					maxWidth:240,
 				}
 			}
-
+*/
 			const conversationWindowStyle = {
 				flex:1, 
 				minWidth:0,
@@ -305,28 +305,22 @@ class ChatWindow extends React.Component{
 				display: 'none'
 			}
 			return (
-				<div style = {messageWindowStyle}>
 
-					<div style = {conversationColumnStyle}>
-						<ConversationColumn/>
+				<div style ={conversationWindowStyle}>
+					<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
+						new Message
 					</div>
-
-					<div style ={conversationWindowStyle}>
-						<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
-							new Message
-						</div>
- 						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
-							{this.conversationDisplay()}
-					 	</div>
-					 	<div >
-					 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
-					 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
-								<input type = 'submit' value="Submit" ></input>
-						 	</form>
-						 </div>
+ 					<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
+						{this.conversationDisplay()}
+				 	</div>
+				 	<div >
+				 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
+				 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
+							<input type = 'submit' value="Submit" ></input>
+					 	</form>
 					 </div>
-					 <div ref = {(el)=>{this.el=el}}></div>
-				 </div>
+				</div>
+
 			)	
 		
 
