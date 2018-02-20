@@ -95,7 +95,7 @@ class ChatWindow extends React.Component{
 		var preMessages = prevProps.conversationData.messages;
 		var thisMessages = this.props.conversationData.messages;
 		var bottomLine = this.state.scrollHeight - this.state.clientHeight;
-		if(this.props.conversationData.chosenId !== prevProps.conversationData.chosenId && 
+		if(this.props.conversationData.chosenId !== prevProps.conversationData.chosenId & 
 			this.props.conversationData.conversationType !== prevProps.conversationData.conversationType){
 			this.inputBox.focus();
 			this.scrollToBottom();
@@ -279,16 +279,16 @@ class ChatWindow extends React.Component{
 			}
 */
 			const conversationWindowStyle = {
-				flex:1, 
-				minWidth:0,
-
+				height:'100%',
+				width:'100%',
 				display: 'flex',
-				flexDirection : 'column' 
+				flexDirection : 'column',
 			}
 			const conversationsStyle = {
 				flex:1, 
 				minWidth:0,
-				overflowY: 'scroll',
+				overflowY: 'scroll'
+
 			}
 			const inputBoxStyle = {
 				width : '100%',
@@ -309,6 +309,9 @@ class ChatWindow extends React.Component{
 				<div style ={conversationWindowStyle}>
 					<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
 						new Message
+					</div>
+					<div onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
+						close window
 					</div>
  					<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
 						{this.conversationDisplay()}

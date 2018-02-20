@@ -33,6 +33,7 @@ exports.message = {
 			//let preloadedStateTemp = { user }
 			const socket = new socketClient();
 
+			
 			let preloadedState = {...initial, user,...conversations};
 			//console.log(preloadedState)
 			const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);

@@ -38627,15 +38627,30 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Nearby = function (_React$Component) {
 	_inherits(Nearby, _React$Component);
 
-	function Nearby() {
+	function Nearby(props) {
 		_classCallCheck(this, Nearby);
 
-		return _possibleConstructorReturn(this, (Nearby.__proto__ || Object.getPrototypeOf(Nearby)).apply(this, arguments));
+		var _this = _possibleConstructorReturn(this, (Nearby.__proto__ || Object.getPrototypeOf(Nearby)).call(this, props));
+
+		_this.state = { chatWindowDisplay: { display: 'none' } };
+		_this.chatWindowDisplayChange = _this.chatWindowDisplayChange.bind(_this);
+		return _this;
 	}
 
 	_createClass(Nearby, [{
+		key: 'chatWindowDisplayChange',
+		value: function chatWindowDisplayChange(show) {
+			if (show) {
+				this.setState({ chatWindowDisplay: { display: 'block' } });
+			} else {
+				this.setState({ chatWindowDisplay: { display: 'none' } });
+			}
+		}
+	}, {
 		key: 'render',
 		value: function render() {
+			console.log('state!!!!!!!!!!!!!!!!!!!!!!!');
+			console.log(this.state);
 			var outerStyle = {
 				display: 'flex',
 				flex: 1,
@@ -38664,7 +38679,6 @@ var Nearby = function (_React$Component) {
 				backgroundColor: 'orange',
 				display: 'none',
 				'@media (min-width : 480px)': {
-					display: 'block',
 					backgroundColor: 'green',
 					height: 300,
 					width: 200,
@@ -38686,7 +38700,7 @@ var Nearby = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ style: conversationColumnStyle },
-					_react2.default.createElement(_conversationColumn2.default, null)
+					_react2.default.createElement(_conversationColumn2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })
 				),
 				_react2.default.createElement(
 					'div',
@@ -38695,8 +38709,8 @@ var Nearby = function (_React$Component) {
 				),
 				_react2.default.createElement(
 					'div',
-					{ style: chatWindowStyle },
-					_react2.default.createElement(_chatWindow2.default, null)
+					{ style: [chatWindowStyle, this.state.chatWindowDisplay] },
+					_react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })
 				)
 			);
 		}
@@ -38804,6 +38818,7 @@ var ConversationColumn = function (_React$Component) {
 		_this.insertKeyWord = _this.insertKeyWord.bind(_this);
 		_this.conversationList = _this.conversationList.bind(_this);
 		_this.clickSearchUser = _this.clickSearchUser.bind(_this);
+		_this.chooseConversation = _this.chooseConversation.bind(_this);
 		return _this;
 	}
 
@@ -38815,6 +38830,14 @@ var ConversationColumn = function (_React$Component) {
 			decoded = decoded.replace(/&lt;/g, '<');
 			decoded = decoded.replace(/&gt;/g, '>');
 			return decoded;
+		}
+	}, {
+		key: 'chooseConversation',
+		value: function chooseConversation(recipientId, conversationId) {
+			this.props.onChatWindowDisplayChange(true);
+			if (recipientId !== this.props.conversationData.chosenId) {
+				this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
+			}
 		}
 	}, {
 		key: 'conversationList',
@@ -38878,7 +38901,8 @@ var ConversationColumn = function (_React$Component) {
 				var monthMap = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'May', 5: 'Jun', 6: 'Jul', 7: 'Aug', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dec' };
 				var decoder = this.decoder;
 				var user = this.props.user;
-				var setChosenRecipient = this.props.setChosenRecipient;
+				//const setChosenRecipient = this.props.setChosenRecipient;
+				var chooseConversation = this.chooseConversation;
 				return _react2.default.createElement(
 					'div',
 					null,
@@ -38905,7 +38929,7 @@ var ConversationColumn = function (_React$Component) {
 								_react2.default.createElement(
 									'div',
 									{ style: navLinkDisplayStyle, onClick: function onClick() {
-											return setChosenRecipient(participant[0]._id, conversation.conversation._id, 'CON_EXIST');
+											return chooseConversation(participant[0]._id, conversation.conversation._id);
 										} },
 									_react2.default.createElement(
 										'div',
@@ -39497,7 +39521,7 @@ var ChatWindow = function (_React$Component) {
 			var preMessages = prevProps.conversationData.messages;
 			var thisMessages = this.props.conversationData.messages;
 			var bottomLine = this.state.scrollHeight - this.state.clientHeight;
-			if (this.props.conversationData.chosenId !== prevProps.conversationData.chosenId && this.props.conversationData.conversationType !== prevProps.conversationData.conversationType) {
+			if (this.props.conversationData.chosenId !== prevProps.conversationData.chosenId & this.props.conversationData.conversationType !== prevProps.conversationData.conversationType) {
 				this.inputBox.focus();
 				this.scrollToBottom();
 			} else if (thisMessages.length !== 0) {
@@ -39692,9 +39716,8 @@ var ChatWindow = function (_React$Component) {
    }
    */
 			var conversationWindowStyle = {
-				flex: 1,
-				minWidth: 0,
-
+				height: '100%',
+				width: '100%',
 				display: 'flex',
 				flexDirection: 'column'
 			};
@@ -39702,6 +39725,7 @@ var ChatWindow = function (_React$Component) {
 				flex: 1,
 				minWidth: 0,
 				overflowY: 'scroll'
+
 			};
 			var inputBoxStyle = {
 				width: '100%',
@@ -39726,6 +39750,13 @@ var ChatWindow = function (_React$Component) {
 							_this3.conversationNoti = el;
 						} },
 					'new Message'
+				),
+				_react2.default.createElement(
+					'div',
+					{ onClick: function onClick() {
+							return _this3.props.onChatWindowDisplayChange(false);
+						} },
+					'close window'
 				),
 				_react2.default.createElement(
 					'div',

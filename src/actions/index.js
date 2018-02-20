@@ -355,3 +355,4 @@ export function searchUser(keyWord){
 export function clearSearch(){
 	return {type:CLEAR_SEARCH }
 }
+

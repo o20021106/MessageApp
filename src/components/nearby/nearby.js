@@ -7,6 +7,22 @@ import Radium from 'radium';
 
 class Nearby extends React.Component{	
 
+	constructor(props){
+		super(props);	
+	    this.state = {chatWindowDisplay:{display:'none'}};
+	    this.chatWindowDisplayChange = this.chatWindowDisplayChange.bind(this);
+	}
+
+	chatWindowDisplayChange(show){
+		if(show){
+			this.setState({chatWindowDisplay:{display:'block'}});	
+		}
+		else{
+			this.setState({chatWindowDisplay:{display:'none'}})
+		}
+		
+	}
+	
 	render(){
 		const outerStyle = {
 			display: 'flex',
@@ -36,7 +52,6 @@ class Nearby extends React.Component{
 			backgroundColor: 'orange',
 			display:'none',
 			'@media (min-width : 480px)':{
-				display:'block',
 				backgroundColor: 'green',
 				height: 300,
 				width: 200,
@@ -56,13 +71,13 @@ class Nearby extends React.Component{
 		return (
 			<div style = {outerStyle}>
 				<div style = {conversationColumnStyle}>
-					<ConversationColumn/>
+					<ConversationColumn onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 				</div>
 				<div style = {nearbyStyle}>
 				nearby
 				</div>
-				<div style = {chatWindowStyle}>
-					<ChatWindow/>
+				<div style = {[chatWindowStyle, this.state.chatWindowDisplay]}>
+					<ChatWindow onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 				</div>
 			</div>	
 		)

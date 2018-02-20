@@ -128,7 +128,7 @@ io.on('connection', function(client){
 	    		client.join(response.conversation._id);
 	    		if(data.recipientId in clients){
 	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
-	    		}
+ 	    		}
 	    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
 	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
 	    		fn({type: 'NOTHING'});

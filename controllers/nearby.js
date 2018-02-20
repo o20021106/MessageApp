@@ -3,7 +3,7 @@ import { Provider } from 'react-redux';
 import thunkMiddleware from 'redux-thunk'
 import {createStore, combineReducers, applyMiddleware} from 'redux';
 import socketClient from '../src/socketClient';
-import rootReducer from '../src/reducers/chatReducer';
+import rootReducer from '../src/reducers/nearbyReducer';
 import socketMiddleware from '../src/socketMiddleware';
 import chatTemplate from '../src/templates/chatTemplate';
 import { renderToString } from 'react-dom/server';
@@ -33,7 +33,29 @@ exports.nearby = {
 			//let preloadedStateTemp = { user }
 			const socket = new socketClient();
 
-			let preloadedState = {...initial, user,...conversations};
+			conversations.conversations.sort(function(a,b){
+				if (a.message[0].createdAt > b.message[0].createdAt){
+					return -1
+				}
+				if (a.message[0].createdAt < b.message[0].createdAt){
+					return 1
+				}
+				return 0
+			})
+
+			var recipientConversationId = {};
+
+			conversations.conversations.forEach(function(conversation){
+				var userId = conversation.conversation.participants.filter(participant => participant._id.toString() !== user._id.toString())[0]._id;
+
+				if (!recipientConversationId.hasOwnProperty(userId)){
+					recipientConversationId[userId] =  conversation.conversation._id;
+				}
+
+			});			
+	
+
+			let preloadedState = {...initial, user,recipientConversationId, ...conversations};
 			//console.log(preloadedState)
 			const createStoreWithMiddleWare = applyMiddleware(socketMiddleware(socket), thunkMiddleware)(createStore);
 			const store = createStoreWithMiddleWare(rootReducer,preloadedState);

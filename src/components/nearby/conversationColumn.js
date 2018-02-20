@@ -20,6 +20,7 @@ class ConversationColumn extends React.Component{
 		this.insertKeyWord = this.insertKeyWord.bind(this);
 		this.conversationList = this.conversationList.bind(this);
 		this.clickSearchUser = this.clickSearchUser.bind(this);
+		this.chooseConversation = this.chooseConversation.bind(this);
 	}
 
 	decoder(encoded){
@@ -30,7 +31,12 @@ class ConversationColumn extends React.Component{
 		return decoded;
 	}
 
-
+	chooseConversation(recipientId, conversationId){
+		this.props.onChatWindowDisplayChange(true);
+		if(recipientId !== this.props.conversationData.chosenId){
+			this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
+		}
+	}
 
 	conversationList(){
 		console.log('in conversation list');
@@ -99,13 +105,15 @@ class ConversationColumn extends React.Component{
 			const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
 			const decoder = this.decoder;
 			const user = this.props.user;
-			const setChosenRecipient = this.props.setChosenRecipient;
+			//const setChosenRecipient = this.props.setChosenRecipient;
+			const chooseConversation = this.chooseConversation;
 			return (
 				<div>
  					<ul style = {listStyle}>{
  						this.props.conversations.map(function(conversation){
 							var navLinkDisplayStyle = navLinkStyle;
 							if(typeof(window)!=='undefined'){
+								
 								navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'black'}:navLinkStyle;
 							}
 							var participant = conversation.conversation.participants.filter(participant => {
@@ -119,7 +127,7 @@ class ConversationColumn extends React.Component{
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
-									<div style = {navLinkDisplayStyle}  onClick= {()=>setChosenRecipient(participant[0]._id, conversation.conversation._id, 'CON_EXIST')} >
+									<div style = {navLinkDisplayStyle}  onClick= {()=>chooseConversation(participant[0]._id, conversation.conversation._id)} >
 										
 										<div style = {imageWrapperStyle}>
 											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
