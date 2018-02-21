@@ -38670,7 +38670,7 @@ var Nearby = function (_React$Component) {
 				if (navigator.geolocation) {
 					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
-						resolve([position.coords.latitude, position.coords.longitude]);
+						resolve([position.coords.longitude, position.coords.latitude]);
 					});
 				} else {
 					alert("geolocation information unavalable");

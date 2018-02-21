@@ -27,7 +27,7 @@ class Nearby extends React.Component{
 		return new Promise(function (resolve, reject) {
 	    	if (navigator.geolocation) {
 	    		alert('navigator');
-	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.latitude, position.coords.longitude])});
+	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])});
 	    	} else { 
 	        	alert("geolocation information unavalable");
 	    	}	
