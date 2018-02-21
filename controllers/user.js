@@ -379,10 +379,10 @@ exports.updateGeolocation = function(req,res){
 			return res.json({error:err});
 		}
 
-		foundUser'loc']={type:'Point',user: foundUseru}
+		foundUser['loc']={type:'Point',coordinates:req.body.coordinates}
 		foundUser.save(function(err, updateUser){
 			if(err){
-				return res.json({error:err, });
+				return res.json({error:err, user:foundUser});
 			}
 			return res.json({user:updateUser})
 		})
