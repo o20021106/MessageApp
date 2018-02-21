@@ -374,15 +374,15 @@ exports.editProfileTesting = {
 
 exports.updateGeolocation = function(req,res){
 	const user = req.user;
-	User.findOne({email:req.user.email}, function(err,user){
+	User.findOne({email:req.user.email}, function(err,foundUser){
 		if(err){
 			return res.json({error:err});
 		}
 
-		user['loc']={type:'Point',coordinates:req.body.coordinates}
-		user.save(function(err, updateUser){
+		foundUser'loc']={type:'Point',user: foundUseru}
+		foundUser.save(function(err, updateUser){
 			if(err){
-				return res.json({error:err, coordinates:req.body.coordinates});
+				return res.json({error:err, });
 			}
 			return res.json({user:updateUser})
 		})
