@@ -4156,6 +4156,7 @@ exports.newConversationSocket = newConversationSocket;
 exports.getConversationByRecipientId = getConversationByRecipientId;
 exports.searchUser = searchUser;
 exports.clearSearch = clearSearch;
+exports.updateGeolocation = updateGeolocation;
 
 var _type = __webpack_require__(75);
 
@@ -4439,6 +4440,18 @@ function searchUser(keyWord) {
 
 function clearSearch() {
 	return { type: _type.CLEAR_SEARCH };
+}
+
+function updateGeolocation(position) {
+	fetch('updateGeolocation', {
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'same-origin',
+		method: "POST",
+		body: JOSN.stringyfy({ coordinates: position })
+	});
 }
 
 /***/ }),
@@ -38536,7 +38549,6 @@ var Layout = function (_React$Component) {
 				height: 35,
 				backgroundColor: 'black',
 				'@media (min-width : 480px)': {
-					height: 100,
 					backgroundColor: 'red' }
 
 			};
@@ -38634,23 +38646,73 @@ var Nearby = function (_React$Component) {
 
 		_this.state = { chatWindowDisplay: { display: 'none' } };
 		_this.chatWindowDisplayChange = _this.chatWindowDisplayChange.bind(_this);
+		_this.getLocation = _this.getLocation.bind(_this);
 		return _this;
 	}
 
 	_createClass(Nearby, [{
 		key: 'chatWindowDisplayChange',
 		value: function chatWindowDisplayChange(show) {
-			if (show) {
+			if (show && window.innerWidth >= 480) {
 				this.setState({ chatWindowDisplay: { display: 'block' } });
 			} else {
 				this.setState({ chatWindowDisplay: { display: 'none' } });
 			}
 		}
 	}, {
+		key: 'getLocation',
+		value: function getLocation() {
+			return new Promise(function (resolve, reject) {
+				if (navigator.geolocation) {
+					navigator.geolocation.getCurrentPosition(function (position) {
+						resolve([position.coords.latitude, position.coords.longitude]);
+					}, this.showError);
+				} else {
+					alert("geolocation information unavalable");
+				}
+			});
+		}
+	}, {
+		key: 'getCoordinates',
+		value: function getCoordinates(position) {
+			console.log('position in');
+			var currentLatitude = position.coords.latitude;
+			var currentLongitude = position.coords.longitude;
+
+			return position;
+			//alert(currentLongitude+" and "+currentLatitude);
+		}
+	}, {
+		key: 'showError',
+		value: function showError(error) {
+			switch (error.code) {
+				case error.PERMISSION_DENIED:
+					console.log("User denied the request for Geolocation.");
+					break;
+				case error.POSITION_UNAVAILABLE:
+					console.log("Location information is unavailable.");
+					break;
+				case error.TIMEOUT:
+					console.log("The request to get user location timed out.");
+					break;
+				case error.UNKNOWN_ERROR:
+					console.log("An unknown error occurred.");
+					break;
+			}
+		}
+	}, {
 		key: 'render',
 		value: function render() {
-			console.log('state!!!!!!!!!!!!!!!!!!!!!!!');
-			console.log(this.state);
+			var _this2 = this;
+
+			if (typeof navigator !== 'undefined') {
+				this.getLocation().then(function (position) {
+					_this2.props.updateGeolocation(position);
+				}).catch(function (error) {
+					console.log(error);
+				});
+			}
+
 			var outerStyle = {
 				display: 'flex',
 				flex: 1,
@@ -38666,28 +38728,17 @@ var Nearby = function (_React$Component) {
 				}
 			};
 			var chatWindowStyle = {
-				/*display : 'none',
-    
-    '@media (min-width: 480px)':{
-    	display : 'block',
-    	maxWidth:200,
-    	position:'fixed',
-    	right:0,
-    	bottom:0
-    }
-    */
 				backgroundColor: 'orange',
 				display: 'none',
 				'@media (min-width : 480px)': {
 					backgroundColor: 'green',
 					height: 300,
-					width: 200,
+					width: 240,
 					position: 'fixed',
 					right: 50,
 					bottom: 0,
 					zIndex: 1
 				}
-
 			};
 			var nearbyStyle = {
 				flex: 1,
@@ -38724,37 +38775,6 @@ function mapStateToProps(state) {
 }
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)((0, _radium2.default)(Nearby));
-
-/*
-
-
-
-(
-				<div style = {messageWindowStyle}>
-
-					<div style = {conversationColumnStyle}>
-						<ConversationColumn/>
-					</div>
-
-					<div style ={conversationWindowStyle}>
-						<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
-							new Message
-						</div>
- 						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
-							{this.conversationDisplay()}
-					 	</div>
-					 	<div >
-					 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
-					 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
-								<input type = 'submit' value="Submit" ></input>
-						 	</form>
-						 </div>
-					 </div>
-					 <div ref = {(el)=>{this.el=el}}></div>
-				 </div>
-			)	
-
-*/
 
 /***/ }),
 /* 244 */
@@ -38834,6 +38854,7 @@ var ConversationColumn = function (_React$Component) {
 	}, {
 		key: 'chooseConversation',
 		value: function chooseConversation(recipientId, conversationId) {
+
 			this.props.onChatWindowDisplayChange(true);
 			if (recipientId !== this.props.conversationData.chosenId) {
 				this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
@@ -38912,6 +38933,7 @@ var ConversationColumn = function (_React$Component) {
 						this.props.conversations.map(function (conversation) {
 							var navLinkDisplayStyle = navLinkStyle;
 							if (typeof window !== 'undefined') {
+
 								navLinkDisplayStyle = window.innerWidth >= 480 && chosenConversationId && conversation.conversation._id === chosenConversationId ? _extends({}, navLinkStyle, { backgroundColor: 'black' }) : navLinkStyle;
 							}
 							var participant = conversation.conversation.participants.filter(function (participant) {
@@ -39671,7 +39693,7 @@ var ChatWindow = function (_React$Component) {
 				return _react2.default.createElement(
 					'div',
 					null,
-					'not showing'
+					'start a conversation'
 				);
 			}
 		}
@@ -39741,6 +39763,12 @@ var ChatWindow = function (_React$Component) {
 				backgroundColor: 'yellow',
 				display: 'none'
 			};
+
+			var chatWindowBarStyle = {
+				backgroundColor: 'yellow',
+				height: 25
+			};
+
 			return _react2.default.createElement(
 				'div',
 				{ style: conversationWindowStyle },
@@ -39753,7 +39781,7 @@ var ChatWindow = function (_React$Component) {
 				),
 				_react2.default.createElement(
 					'div',
-					{ onClick: function onClick() {
+					{ style: chatWindowBarStyle, onClick: function onClick() {
 							return _this3.props.onChatWindowDisplayChange(false);
 						} },
 					'close window'

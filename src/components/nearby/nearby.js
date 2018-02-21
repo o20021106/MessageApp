@@ -11,19 +11,66 @@ class Nearby extends React.Component{
 		super(props);	
 	    this.state = {chatWindowDisplay:{display:'none'}};
 	    this.chatWindowDisplayChange = this.chatWindowDisplayChange.bind(this);
+	    this.getLocation = this.getLocation.bind(this);
 	}
 
 	chatWindowDisplayChange(show){
-		if(show){
+		if(show && window.innerWidth >= 480){
 			this.setState({chatWindowDisplay:{display:'block'}});	
 		}
 		else{
 			this.setState({chatWindowDisplay:{display:'none'}})
 		}
-		
 	}
+
+	getLocation() {
+		return new Promise(function (resolve, reject) {
+	    	if (navigator.geolocation) {
+	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.latitude, position.coords.longitude])}, this.showError);
+	    	} else { 
+	        	alert("geolocation information unavalable");
+	    	}	
+	    })
+	}
+
+	getCoordinates(position) {
+		console.log('position in');
+    	var currentLatitude = position.coords.latitude;
+    	var currentLongitude = position.coords.longitude; 
+
+    	return position;
+	    //alert(currentLongitude+" and "+currentLatitude);
+	}
+
+	showError(error) {
+    	switch(error.code) {
+        	case error.PERMISSION_DENIED:
+            	console.log("User denied the request for Geolocation.");
+            	break;
+        	case error.POSITION_UNAVAILABLE:
+            	console.log("Location information is unavailable.");
+            	break;
+        	case error.TIMEOUT:
+           		console.log("The request to get user location timed out.");
+            	break;
+        	case error.UNKNOWN_ERROR:
+            	console.log("An unknown error occurred.");
+            	break;
+    }
+} 
 	
 	render(){
+		if(typeof(navigator) !== 'undefined'){
+			this.getLocation()
+			.then(position=>
+				{this.props.updateGeolocation(position);
+					console.log(position)};
+			)
+			.catch(error=>{
+				console.log(error)
+			});
+		}
+
 		const outerStyle = {
 			display: 'flex',
 			flex:1,
@@ -39,29 +86,17 @@ class Nearby extends React.Component{
 			}
 		}
 		const chatWindowStyle = {
-			/*display : 'none',
-			
-			'@media (min-width: 480px)':{
-				display : 'block',
-				maxWidth:200,
-				position:'fixed',
-				right:0,
-				bottom:0
-			}
-			*/
 			backgroundColor: 'orange',
 			display:'none',
 			'@media (min-width : 480px)':{
 				backgroundColor: 'green',
 				height: 300,
-				width: 200,
+				width: 240,
 				position:'fixed',
 				right:50,
 				bottom:0,
 				zIndex:1
 			}
-				
-		
 		}
 		const nearbyStyle = {
 			flex:1,
@@ -90,42 +125,3 @@ function mapStateToProps(state) {
 }
 	
 export default connect(mapStateToProps, actions)(Radium(Nearby));
-
-
-
-
-
-
-
-
-
-/*
-
-
-
-(
-				<div style = {messageWindowStyle}>
-
-					<div style = {conversationColumnStyle}>
-						<ConversationColumn/>
-					</div>
-
-					<div style ={conversationWindowStyle}>
-						<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
-							new Message
-						</div>
- 						<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
-							{this.conversationDisplay()}
-					 	</div>
-					 	<div >
-					 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
-					 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
-								<input type = 'submit' value="Submit" ></input>
-						 	</form>
-						 </div>
-					 </div>
-					 <div ref = {(el)=>{this.el=el}}></div>
-				 </div>
-			)	
-
-*/

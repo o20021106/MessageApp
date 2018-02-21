@@ -81,6 +81,6 @@ router.post('/editProfile', passport.authenticate('jwt', { session: false ,failu
 
 router.post('/login',userController.login.post );
 router.post('/newMessage',passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.newConversation);
-//router.post('/authenticate',userController.authenticate.post);
+router.post('/updateGeolocation',passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), userController.updateGeolocation);
 
 module.exports = router;

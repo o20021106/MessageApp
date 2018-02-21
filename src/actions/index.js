@@ -356,3 +356,16 @@ export function clearSearch(){
 	return {type:CLEAR_SEARCH }
 }
 
+export function updateGeolocation(position){
+	fetch('updateGeolocation',
+		{
+			headers: {
+		    	'Accept': 'application/json', 
+		    	'Content-Type': 'application/json',
+			},
+		    credentials: 'same-origin',
+		    method: "POST",
+			body: JOSN.stringyfy({coordinates: position})
+		}
+	)
+}

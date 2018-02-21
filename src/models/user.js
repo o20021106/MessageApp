@@ -10,9 +10,11 @@ var userSchema = new mongoose.Schema({
 	aboutMe:{type:String},
 	height:{type:String},
 	weight:{type:String},
-	role:{type:String}
+	role:{type:String},
+	loc: {type:'point', corridinates:[]}
 });
 
+userSchema.index({ "loc": "2dsphere" });
 /*
 userSchema.pre('save', function(next) {
 	var user = this;

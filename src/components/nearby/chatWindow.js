@@ -172,7 +172,7 @@ class ChatWindow extends React.Component{
 			}
 		var messages = this.props.conversationData.messages;
 		if(messages.length !==0 &
-		this.props.conversationData.conversationType === 'RECIPIENT'){
+			this.props.conversationData.conversationType === 'RECIPIENT'){
 			console.log('in if messages not empty');
 			console.log(messages);
 			
@@ -234,7 +234,7 @@ class ChatWindow extends React.Component{
 		}
 		else{
 			console.log(this.props.conversationData);
-			return <div>not showing</div>
+			return <div>start a conversation</div>
 		} 
 	}  
 
@@ -257,9 +257,7 @@ class ChatWindow extends React.Component{
 		if (e.which === 13 && e.shiftKey != 1){
 			e.preventDefault();
 			this.newMessageFromBox(e);
-
 		}
-
 	}
 
 	render(){
@@ -304,13 +302,19 @@ class ChatWindow extends React.Component{
 				backgroundColor:'yellow',
 				display: 'none'
 			}
+
+			const chatWindowBarStyle = {
+				backgroundColor:'yellow',
+				height: 25
+			}
+
 			return (
 
 				<div style ={conversationWindowStyle}>
 					<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
 						new Message
 					</div>
-					<div onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
+					<div style={chatWindowBarStyle} onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
 						close window
 					</div>
  					<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>

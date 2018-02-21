@@ -45,7 +45,6 @@ class Layout extends React.Component{
 			height:35,
 			backgroundColor: 'black',
 			'@media (min-width : 480px)':{
-				height:100,
 				backgroundColor: 'red'}
 				
 			}

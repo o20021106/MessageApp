@@ -32,10 +32,14 @@ class ConversationColumn extends React.Component{
 	}
 
 	chooseConversation(recipientId, conversationId){
+
 		this.props.onChatWindowDisplayChange(true);
 		if(recipientId !== this.props.conversationData.chosenId){
 			this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
-		}
+		}	
+
+
+		
 	}
 
 	conversationList(){
@@ -113,7 +117,7 @@ class ConversationColumn extends React.Component{
  						this.props.conversations.map(function(conversation){
 							var navLinkDisplayStyle = navLinkStyle;
 							if(typeof(window)!=='undefined'){
-								
+
 								navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'black'}:navLinkStyle;
 							}
 							var participant = conversation.conversation.participants.filter(participant => {

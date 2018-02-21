@@ -361,15 +361,29 @@ exports.editProfile = {
 exports.editProfileTesting = {
 	get: function(req,res){
 		const user = req.user;
-		console.log('edit user');
-  		var initialState = { user };
+		var initialState = { user };
   		initialState = {...initialState, radiumConfig:{userAgent: req.headers['user-agent']}}
-		const appString = renderToString(<EditProfile {...initialState}/>);
-		
+		const appString = renderToString(<EditProfile {...initialState}/>);	
   		res.send(template({
     		body: appString,
     		title: 'Hello World from the server!',
    			initialState: initialState
   		}));
 	}
+}
+
+exports.updateGeolocation = function(req,res){
+	const user = req.user;
+	User.findOne({email:req.user.email}, function(err,user){
+		if(err){
+			return res.json({error:err});
+		}
+
+		user['loc']={coordinates:req.body.coordinates}
+		user.save(function(err, updateUser){
+			if(err){
+				return res.json({error:err});
+			}
+			return res.json({user:updateUser})
+		})
 }
