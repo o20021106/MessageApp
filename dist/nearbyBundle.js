@@ -4452,6 +4452,8 @@ function updateGeolocation(position) {
 		method: "POST",
 		body: JSON.stringify({ coordinates: position })
 	}).then(function (response) {
+		console.log(response);
+		console.log('response');
 		return response.json();
 	}).then(function (json) {
 		console.log(json);

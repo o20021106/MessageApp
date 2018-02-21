@@ -369,6 +369,8 @@ export function updateGeolocation(position){
 		}
 	)
 	.then(function(response) {
+		console.log(response);
+		console.log('response');
 	    return response.json();
 	})
 	.then(json=>{console.log(json)})
