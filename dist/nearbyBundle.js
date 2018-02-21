@@ -38664,6 +38664,7 @@ var Nearby = function (_React$Component) {
 		value: function getLocation() {
 			return new Promise(function (resolve, reject) {
 				if (navigator.geolocation) {
+					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.latitude, position.coords.longitude]);
 					}, this.showError);
@@ -38703,11 +38704,9 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this2 = this;
-
 			if (typeof navigator !== 'undefined') {
 				this.getLocation().then(function (position) {
-					_this2.props.updateGeolocation(position);
+					//this.props.updateGeolocation(position);
 					console.log(position);
 				}).catch(function (error) {
 					console.log(error);
