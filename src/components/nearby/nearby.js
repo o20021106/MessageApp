@@ -14,6 +14,21 @@ class Nearby extends React.Component{
 	    this.getLocation = this.getLocation.bind(this);
 	}
 
+	componentDidMount(){
+		if(typeof(navigator) !== 'undefined'){
+			this.getLocation()
+			.then(position=>
+				{	actions.updateGeolocation(position);
+					//this.props.print('i am here here i am');
+					console.log('get position!!!!!!!!!!!!!');
+					console.log(position);}
+			)
+			.catch(error=>{
+				console.log(error)
+			});
+		}
+	}
+
 	chatWindowDisplayChange(show){
 		if(show && window.innerWidth >= 480){
 			this.setState({chatWindowDisplay:{display:'block'}});	
@@ -61,19 +76,6 @@ class Nearby extends React.Component{
 	} 
 
 	render(){
-		if(typeof(navigator) !== 'undefined'){
-
-			this.getLocation()
-			.then(position=>
-				{	actions.updateGeolocation(position);
-					//this.props.print('i am here here i am');
-					console.log('get position!!!!!!!!!!!!!');
-					console.log(position);}
-			)
-			.catch(error=>{
-				console.log(error)
-			});
-		}
 
 		const outerStyle = {
 			display: 'flex',

@@ -38657,6 +38657,20 @@ var Nearby = function (_React$Component) {
 	}
 
 	_createClass(Nearby, [{
+		key: 'componentDidMount',
+		value: function componentDidMount() {
+			if (typeof navigator !== 'undefined') {
+				this.getLocation().then(function (position) {
+					actions.updateGeolocation(position);
+					//this.props.print('i am here here i am');
+					console.log('get position!!!!!!!!!!!!!');
+					console.log(position);
+				}).catch(function (error) {
+					console.log(error);
+				});
+			}
+		}
+	}, {
 		key: 'chatWindowDisplayChange',
 		value: function chatWindowDisplayChange(show) {
 			if (show && window.innerWidth >= 480) {
@@ -38710,17 +38724,6 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			if (typeof navigator !== 'undefined') {
-
-				this.getLocation().then(function (position) {
-					actions.updateGeolocation(position);
-					//this.props.print('i am here here i am');
-					console.log('get position!!!!!!!!!!!!!');
-					console.log(position);
-				}).catch(function (error) {
-					console.log(error);
-				});
-			}
 
 			var outerStyle = {
 				display: 'flex',
