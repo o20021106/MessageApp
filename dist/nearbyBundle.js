@@ -38708,6 +38708,7 @@ var Nearby = function (_React$Component) {
 			if (typeof navigator !== 'undefined') {
 				this.getLocation().then(function (position) {
 					_this2.props.updateGeolocation(position);
+					console.log(position);
 				}).catch(function (error) {
 					console.log(error);
 				});
