@@ -372,6 +372,41 @@ exports.editProfileTesting = {
 	}
 }
 
+function ipGeolocation(req, res, foundUser){
+	var ipAddress = req.headers['x-forwarded-for'].split(',').pop() || 
+         	req.connection.remoteAddress || 
+         	req.socket.remoteAddress || 
+         	req.connection.socket.remoteAddress;
+	fetch('http://ip-api.com/json/'+ipAddress,
+		{
+			headers: {
+		    	'Accept': 'application/json', 
+		    	'Content-Type': 'application/json',
+			},
+		    credentials: 'same-origin',
+		    method: "GET"
+		}
+	)
+	.then(function(response) {
+	    return response.json();
+	})
+	.then(json=>{
+		foundUser['loc']={type:'Point',coordinates:[json.lon, json.lat]};
+		foundUser.save(function(err, updateUser){
+			if(err){
+				return res.json({error:err, user:foundUser});
+			}
+			updateUser['password'] = undefined;
+			
+			return res.json({user:updateUser});
+		})
+
+	})
+	.catch(err=>{
+		return res.json({error:err});
+	})
+}
+
 exports.updateGeolocation = function(req,res){
 	const user = req.user;
 	User.findOne({email:req.user.email}, function(err,foundUser){
@@ -379,17 +414,19 @@ exports.updateGeolocation = function(req,res){
 			return res.json({error:err});
 		}
 
-		foundUser['loc']={type:'Point',coordinates:req.body.coordinates}
+		if(!req.body.coordinates){
+			ipGeolocation(req, res, foundUser);
+		}
+		else{
+			foundUser['loc']={type:'Point',coordinates:req.body.coordinates};	
+		}
 		foundUser.save(function(err, updateUser){
 			if(err){
 				return res.json({error:err, user:foundUser});
 			}
 			updateUser['password'] = undefined;
-			var ipaddress = req.headers['x-forwarded-for'].split(',').pop() || 
-         	req.connection.remoteAddress || 
-         	req.socket.remoteAddress || 
-         	req.connection.socket.remoteAddress;
-			return res.json({user:updateUser, ip: ipaddress})
+			
+			return res.json({user:updateUser})
 		})
 	})
 }
