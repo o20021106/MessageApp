@@ -4450,7 +4450,7 @@ function updateGeolocation(position) {
 		},
 		credentials: 'same-origin',
 		method: "POST",
-		body: JOSN.stringyfy({ coordinates: position })
+		body: JSON.stringyfy({ coordinates: position })
 	});
 }
 
