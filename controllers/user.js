@@ -373,17 +373,18 @@ exports.editProfileTesting = {
 }
 
 exports.updateGeolocation = function(req,res){
-	const user = req.user;
-	User.findOne({email:req.user.email}, function(err,foundUser){
+	
+	User.findOne({email:req.user.email}, function(err,user){
 		if(err){
 			return res.json({error:err});
 		}
 
-		foundUser['loc']={type:'Point',coordinates:req.body.coordinates}
-		foundUser.save(function(err, updateUser){
+		user['loc']={type:'Point',coordinates:req.body.coordinates}
+		user.save(function(err, updatedUser){
 			if(err){
-				return res.json({error:err, user:foundUser});
+				return res.json({error:err, user:user});
 			}
+			delete updatedUser.password;
 			return res.json({user:updateUser})
 		})
 	})
