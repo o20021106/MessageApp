@@ -382,7 +382,7 @@ exports.updateGeolocation = function(req,res){
 		user['loc']={type:'Point',coordinates:req.body.coordinates}
 		user.save(function(err, updateUser){
 			if(err){
-				return res.json({error:err});
+				return res.json({error:err, coordinates:req.body.coordinates});
 			}
 			return res.json({user:updateUser})
 		})
