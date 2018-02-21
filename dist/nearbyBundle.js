@@ -38682,12 +38682,30 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'getLocation',
 		value: function getLocation() {
+			function showError(error) {
+				switch (error.code) {
+					case error.PERMISSION_DENIED:
+						console.log("User denied the request for Geolocation.");
+						break;
+					case error.POSITION_UNAVAILABLE:
+						console.log("Location information is unavailable.");
+						break;
+					case error.TIMEOUT:
+						console.log("The request to get user location timed out.");
+						break;
+					case error.UNKNOWN_ERROR:
+						console.log("An unknown error occurred.");
+						break;
+				}
+			}
+
 			return new Promise(function (resolve, reject) {
 				if (navigator.geolocation) {
+					//http://ip-api.com/json/208.80.152.201
 					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.longitude, position.coords.latitude]);
-					});
+					}, showError);
 				} else {
 					alert("geolocation information unavalable");
 				}
