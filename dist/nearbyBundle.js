@@ -38708,7 +38708,7 @@ var Nearby = function (_React$Component) {
 						resolve([position.coords.longitude, position.coords.latitude]);
 					}, function (error) {
 						if (error.code === error.PERMISSION_DENIED) {
-							resovle(undefined);
+							resolve(undefined);
 						}
 					});
 				} else {
