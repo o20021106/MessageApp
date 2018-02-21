@@ -19,7 +19,7 @@ class Nearby extends React.Component{
 			this.setState({chatWindowDisplay:{display:'block'}});	
 		}
 		else{
-			this.setState({chatWindowDisplay:{display:'none'}})
+			this.setState({chatWindowDisplay:{display:'none'}});
 		}
 	}
 
@@ -65,8 +65,8 @@ class Nearby extends React.Component{
 
 			this.getLocation()
 			.then(position=>
-				{
-					this.props.updateGeolocation(position);
+				{//this.props.updateGeolocation(position);
+					console.log('get position!!!!!!!!!!!!!');
 					console.log(position);}
 			)
 			.catch(error=>{

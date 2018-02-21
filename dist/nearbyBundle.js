@@ -38704,12 +38704,11 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'render',
 		value: function render() {
-			var _this2 = this;
-
 			if (typeof navigator !== 'undefined') {
 
 				this.getLocation().then(function (position) {
-					_this2.props.updateGeolocation(position);
+					//this.props.updateGeolocation(position);
+					console.log('get position!!!!!!!!!!!!!');
 					console.log(position);
 				}).catch(function (error) {
 					console.log(error);
