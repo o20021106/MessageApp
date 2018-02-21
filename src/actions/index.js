@@ -368,4 +368,8 @@ export function updateGeolocation(position){
 			body: JSON.stringify({coordinates: position})
 		}
 	)
+	.then(function(response) {
+	    return response.json();
+	})
+	.then(json=>{console.log(json)})
 }

@@ -4451,6 +4451,10 @@ function updateGeolocation(position) {
 		credentials: 'same-origin',
 		method: "POST",
 		body: JSON.stringify({ coordinates: position })
+	}).then(function (response) {
+		return response.json();
+	}).then(function (json) {
+		console.log(json);
 	});
 }
 
