@@ -62,9 +62,11 @@ class Nearby extends React.Component{
 	
 	render(){
 		if(typeof(navigator) !== 'undefined'){
+
 			this.getLocation()
 			.then(position=>
 				{//this.props.updateGeolocation(position);
+					console.log('get position!!!!!!!!!!!!!');
 					console.log(position);}
 			)
 			.catch(error=>{
