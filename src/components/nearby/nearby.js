@@ -57,15 +57,16 @@ class Nearby extends React.Component{
         	case error.UNKNOWN_ERROR:
             	console.log("An unknown error occurred.");
             	break;
-    }
-} 
-	
+    	}
+	} 
+
 	render(){
 		if(typeof(navigator) !== 'undefined'){
 
 			this.getLocation()
 			.then(position=>
-				{//this.props.updateGeolocation(position);
+				{	actions.updateGeolocation(position);
+					//this.props.print('i am here here i am');
 					console.log('get position!!!!!!!!!!!!!');
 					console.log(position);}
 			)
