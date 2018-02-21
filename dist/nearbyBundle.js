@@ -38682,10 +38682,11 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'getLocation',
 		value: function getLocation() {
-			function showError(error) {
+			function showError(resolve, error) {
 				switch (error.code) {
 					case error.PERMISSION_DENIED:
 						console.log("User denied the request for Geolocation.");
+						resolve(undefined);
 						break;
 					case error.POSITION_UNAVAILABLE:
 						console.log("Location information is unavailable.");
@@ -38705,7 +38706,7 @@ var Nearby = function (_React$Component) {
 					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.longitude, position.coords.latitude]);
-					}, showError);
+					}, showError(resolve));
 				} else {
 					alert("geolocation information unavalable");
 				}

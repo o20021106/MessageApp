@@ -39,10 +39,11 @@ class Nearby extends React.Component{
 	}
 
 	getLocation() {
-		function showError(error) {
+		function showError(resolve, error) {
     		switch(error.code) {
         		case error.PERMISSION_DENIED:
             		console.log("User denied the request for Geolocation.")
+            		resolve(undefined);
             		break;
         		case error.POSITION_UNAVAILABLE:
             		console.log("Location information is unavailable.")
@@ -60,7 +61,7 @@ class Nearby extends React.Component{
 	    	if (navigator.geolocation) {
 	    		//http://ip-api.com/json/208.80.152.201
 	    		alert('navigator');
-	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])}, showError);
+	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])}, showError(resolve));
 	    	} else { 
 	        	alert("geolocation information unavalable");
 	    	}	
