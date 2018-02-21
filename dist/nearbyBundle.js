@@ -38706,7 +38706,9 @@ var Nearby = function (_React$Component) {
 					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.longitude, position.coords.latitude]);
-					}, showError(resolve));
+					}, showError(function (value) {
+						return resolve(value);
+					}));
 				} else {
 					alert("geolocation information unavalable");
 				}

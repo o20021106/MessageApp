@@ -61,7 +61,7 @@ class Nearby extends React.Component{
 	    	if (navigator.geolocation) {
 	    		//http://ip-api.com/json/208.80.152.201
 	    		alert('navigator');
-	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])}, showError(resolve));
+	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])}, showError((value)=>resolve(value)));
 	    	} else { 
 	        	alert("geolocation information unavalable");
 	    	}	
