@@ -11,7 +11,7 @@ var userSchema = new mongoose.Schema({
 	height:{type:String},
 	weight:{type:String},
 	role:{type:String},
-	loc: {type:{type: String}, corridinates:[]}
+	loc: {type:{type: String}, coordinates:[]}
 });
 
 userSchema.index({ "loc": "2dsphere" });
