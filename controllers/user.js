@@ -384,7 +384,7 @@ exports.updateGeolocation = function(req,res){
 			if(err){
 				return res.json({error:err, user:foundUser});
 			}
-			delete updatedUser['password'];
+			updateUser['password'] = undefined;
 			return res.json({user:updateUser})
 		})
 	})
