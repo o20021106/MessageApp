@@ -385,7 +385,11 @@ exports.updateGeolocation = function(req,res){
 				return res.json({error:err, user:foundUser});
 			}
 			updateUser['password'] = undefined;
-			return res.json({user:updateUser, ip: req.connection.remoteAddress})
+			var ipaddress = req.headers['x-forwarded-for'].split(',').pop() || 
+         	req.connection.remoteAddress || 
+         	req.socket.remoteAddress || 
+         	req.connection.socket.remoteAddress;
+			return res.json({user:updateUser, ip: ipaddress})
 		})
 	})
 }
