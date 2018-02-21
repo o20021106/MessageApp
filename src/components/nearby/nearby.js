@@ -39,7 +39,7 @@ class Nearby extends React.Component{
 	}
 
 	getLocation() {
-		function showError(resolve, error) {
+		function showError(error,resolve) {
     		switch(error.code) {
         		case error.PERMISSION_DENIED:
             		console.log("User denied the request for Geolocation.")

@@ -38682,7 +38682,7 @@ var Nearby = function (_React$Component) {
 	}, {
 		key: 'getLocation',
 		value: function getLocation() {
-			function showError(resolve, error) {
+			function showError(error, resolve) {
 				switch (error.code) {
 					case error.PERMISSION_DENIED:
 						console.log("User denied the request for Geolocation.");
