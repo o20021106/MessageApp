@@ -37,7 +37,7 @@ exports.getNearbyUsers = {
 		}
 		else{
 
-			Model.geoNear(req.user.loc, { maxDistance : 100000, spherical : true }, 
+			User.geoNear(req.user.loc, { maxDistance : 100000, spherical : true }, 
 				function(err, results, stats) {
    					console.log(results);
    					console.log(stats);
