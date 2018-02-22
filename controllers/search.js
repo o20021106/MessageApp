@@ -33,7 +33,7 @@ exports.getNearbyUsers = {
 	get: function(req,res,next){
 		if(!req.user.loc){
 			//if geolocation is undefined
-			res.json({err})
+			res.json({err: 'cannot locate your current location'});
 		}
 		else{
 
