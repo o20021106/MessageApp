@@ -13,7 +13,7 @@ import {StyleRoot} from 'radium';
 import StaticRouter from 'react-router-dom/StaticRouter';
 import routes from '../src/components/nearby/routes';
 import { matchRoutes, renderRoutes } from 'react-router-config';
-import { initial } from '../src/reducers/chatReducer';
+import { initial } from '../src/reducers/nearbyReducer';
 
 var chatController = require('../controllers/chat.js');
 

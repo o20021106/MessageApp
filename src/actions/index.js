@@ -8,7 +8,8 @@ import {LOAD_RECIPIENTS,
 	CHOSEN_RECIPIENT,
 	CONVERSATION_MESSAGES,
 	LOAD_SEARCH_USER,
-	CLEAR_SEARCH} from './type'
+	CLEAR_SEARCH,
+	UPDATE_NEARBY_USERS} from './type'
 
 
 
@@ -374,4 +375,30 @@ export function updateGeolocation(position){
 	    return response.json();
 	})
 	.then(json=>{console.log(json)})
+}
+
+export function getNearbyUsers(){
+	return function(dispatch){
+		fetch(`/getNearbyUsers`,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			    },
+			    credentials: 'same-origin',
+			    method: "GET"
+			})
+		.then(function(response) {
+		    return response.json();
+		})
+		.then(json =>{
+			console.log(json);
+			if(json.users){
+				dispatch({type: UPDATE_NEARBY_USERS, users:json.users});
+			}
+		})
+		.catch(err=>{
+			console.log(err);
+		});
+	}
 }

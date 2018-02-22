@@ -12,17 +12,17 @@ import {LOAD_RECIPIENTS,
 	CONVERSATION_MESSAGES,
 	RECIEVE_NEW_MESSAGE,
 	CLEAR_SEARCH,
-	LOAD_SEARCH_USER } from '../actions/type.js';
+	LOAD_SEARCH_USER,
+	UPDATE_NEARBY_USERS } from '../actions/type.js';
 
 export const initial = {
 	user:{},
+	nearbyUsers:[],
 	recipients:[], 
 	recipientConversationId:{}, 
 	searchedUsers:[],
 	conversations:[], 
-
 	conversationData: {conversationType: null, chosenId: null, messages:[],userInfo:[]},
-
 	chosenConversation:null, 
 	currentConversation:[],
 	currentConversationId:null, 
@@ -62,6 +62,10 @@ export default function(state = initial, action){
 			return {...state, searchedUsers:action.users}
 		case CLEAR_SEARCH:
 			return {...state, searchedUsers:[]}
+		case UPDATE_NEARBY_USERS:{
+			console.log('update nearby users!!!!!!!!!!!!!!!');
+			console.log(action.users);
+		}
 		case CHOSEN_RECIPIENT:
 			console.log('in chosen recipient');
 			var conversationData = Object.assign({},state.conversationData);

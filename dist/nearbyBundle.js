@@ -4157,6 +4157,7 @@ exports.getConversationByRecipientId = getConversationByRecipientId;
 exports.searchUser = searchUser;
 exports.clearSearch = clearSearch;
 exports.updateGeolocation = updateGeolocation;
+exports.getNearbyUsers = getNearbyUsers;
 
 var _type = __webpack_require__(75);
 
@@ -4458,6 +4459,28 @@ function updateGeolocation(position) {
 	}).then(function (json) {
 		console.log(json);
 	});
+}
+
+function getNearbyUsers() {
+	return function (dispatch) {
+		fetch('/getNearbyUsers', {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log(json);
+			if (json.users) {
+				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: json.users });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
 }
 
 /***/ }),
@@ -7519,7 +7542,8 @@ var LOAD_RECIPIENTS = exports.LOAD_RECIPIENTS = 'LOAD_RECIPIENTS',
     CONVERSATION_MESSAGES = exports.CONVERSATION_MESSAGES = 'CONVERSATION_MESSAGES',
     RECIEVE_NEW_MESSAGE = exports.RECIEVE_NEW_MESSAGE = 'RECIEVE_NEW_MESSAGE',
     LOAD_SEARCH_USER = exports.LOAD_SEARCH_USER = 'SEARCH_USER',
-    CLEAR_SEARCH = exports.CLEAR_SEARCH = 'CLEAR_SEARCH';
+    CLEAR_SEARCH = exports.CLEAR_SEARCH = 'CLEAR_SEARCH',
+    UPDATE_NEARBY_USERS = exports.UPDATE_NEARBY_USERS = 'UPDATE_NEARBY_USERS';
 
 /***/ }),
 /* 76 */
@@ -32719,6 +32743,11 @@ exports.default = function () {
 			return _extends({}, state, { searchedUsers: action.users });
 		case _type.CLEAR_SEARCH:
 			return _extends({}, state, { searchedUsers: [] });
+		case _type.UPDATE_NEARBY_USERS:
+			{
+				console.log('update nearby users!!!!!!!!!!!!!!!');
+				console.log(action.users);
+			}
 		case _type.CHOSEN_RECIPIENT:
 			console.log('in chosen recipient');
 			var conversationData = Object.assign({}, state.conversationData);
@@ -32861,13 +32890,12 @@ var _type = __webpack_require__(75);
 
 var initial = exports.initial = {
 	user: {},
+	nearbyUsers: [],
 	recipients: [],
 	recipientConversationId: {},
 	searchedUsers: [],
 	conversations: [],
-
 	conversationData: { conversationType: null, chosenId: null, messages: [], userInfo: [] },
-
 	chosenConversation: null,
 	currentConversation: [],
 	currentConversationId: null,
@@ -38669,6 +38697,7 @@ var Nearby = function (_React$Component) {
 					console.log(error);
 				});
 			}
+			actions.getNearbyUsers();
 		}
 	}, {
 		key: 'chatWindowDisplayChange',

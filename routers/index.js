@@ -53,6 +53,7 @@ router.get("/secrete", passport.authenticate('jwt', { session: false ,failureRed
 });
 
 router.get('/searchUser', passport.authenticate('jwt', {session: false ,failureRedirect:hostRe+'registerLogin'}), searchController.searchUser.get);
+router.get('/getNEarbyUsers', passport.authenticate('jwt', {session: false ,failureRedirect:hostRe+'registerLogin'}), searchController.getNearbyUsers.get);
 router.get('/getRecipients', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.getRecipients);
 router.get('/getConversations', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.getConversations);
 router.get('/getConversation/:conversationId', passport.authenticate('jwt', { session: false ,failureRedirect:hostRe+'registerLogin'}), chatController.getConversation);

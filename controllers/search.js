@@ -28,3 +28,21 @@ exports.searchUser = {
 			})
 		}
 	}
+
+exports.getNearbyUsers = {
+	get: function(req,res,next){
+		if(!req.user.loc){
+			//if geolocation is undefined
+			res.json({err})
+		}
+		else{
+
+			Model.geoNear(req.user.loc, { maxDistance : 100000, spherical : true }, 
+				function(err, results, stats) {
+   					console.log(results);
+   					console.log(stats);
+   					res.json({users: results});
+			});	
+		}
+	}
+}

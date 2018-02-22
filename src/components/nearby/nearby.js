@@ -27,6 +27,7 @@ class Nearby extends React.Component{
 				console.log(error)
 			});
 		}
+		actions.getNearbyUsers();
 	}
 
 	chatWindowDisplayChange(show){
