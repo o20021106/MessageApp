@@ -1,5 +1,5 @@
 import Layout from './layout';
-import nearby from './nearby';
+import nearbyBabel from './nearbyBabel';
 
 /*const routes = [
   { component: AppRoot,
@@ -38,7 +38,7 @@ const routes = [
     routes:[
       {
         path:'/nearby',
-        component: nearby
+        component: nearbyBabel
       }
     ]
   }

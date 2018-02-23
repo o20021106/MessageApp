@@ -1,0 +1,43 @@
+.testing{
+	color:orange;
+}
+
+.container{
+	flex:1;
+	background-color: blue;
+	display:flex;
+	flex-wrap: wrap;
+	height:100%;
+	overflow-y: scroll;
+	align-content: flex-start;
+}
+
+
+.squareWrapper{
+	width:calc(100%/3);
+	cursor: pointer;
+}
+
+@media(min-width: 480px){
+	.squareWrapper{
+		width:calc(100%/6);
+	}
+}
+
+.squareItem{
+	background-color: darkseagreen;
+}
+
+.squareItem::before{
+	content: "";
+  	float: left;
+  	padding-bottom: 100%;
+}
+
+.squareItem::after{
+	clear: left;
+	content: " ";
+	display: table;
+}
+
+

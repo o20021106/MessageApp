@@ -4463,6 +4463,7 @@ function updateGeolocation(position) {
 
 function getNearbyUsers() {
 	return function (dispatch) {
+		console.log('in function');
 		fetch('/getNearbyUsers', {
 			headers: {
 				'Accept': 'application/json',
@@ -4474,14 +4475,28 @@ function getNearbyUsers() {
 			return response.json();
 		}).then(function (json) {
 			console.log(json);
-			if (json.users) {
+			if (json.users && !json.locAvailable) {
 				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: json.users });
+			} else if (json.users && json.locAvailable) {
+				var users = json.users.map(function (user) {
+					var temp = user.obj;
+					temp.dis = user.dis;
+					return temp;
+				});
+				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: users });
+			} else if (json.err) {
+				console.log(json.err);
 			}
 		}).catch(function (err) {
 			console.log(err);
 		});
 	};
 }
+/*
+export function getNearbyUsers(){
+	console.log('in get nearby user function index');
+}
+*/
 
 /***/ }),
 /* 46 */
@@ -32744,10 +32759,10 @@ exports.default = function () {
 		case _type.CLEAR_SEARCH:
 			return _extends({}, state, { searchedUsers: [] });
 		case _type.UPDATE_NEARBY_USERS:
-			{
-				console.log('update nearby users!!!!!!!!!!!!!!!');
-				console.log(action.users);
-			}
+			console.log('update nearby users!!!!!!!!!!!!!!!');
+			console.log(action.users);
+			return _extends({}, state, { nearbyUsers: action.users });
+			break;
 		case _type.CHOSEN_RECIPIENT:
 			console.log('in chosen recipient');
 			var conversationData = Object.assign({}, state.conversationData);
@@ -38449,9 +38464,9 @@ var _layout = __webpack_require__(242);
 
 var _layout2 = _interopRequireDefault(_layout);
 
-var _nearby = __webpack_require__(243);
+var _nearbyBabel = __webpack_require__(243);
 
-var _nearby2 = _interopRequireDefault(_nearby);
+var _nearbyBabel2 = _interopRequireDefault(_nearbyBabel);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -38490,7 +38505,7 @@ var routes = [{
   component: _layout2.default,
   routes: [{
     path: '/nearby',
-    component: _nearby2.default
+    component: _nearbyBabel2.default
   }]
 }];
 
@@ -38632,11 +38647,21 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps)((0, _radium2.default
 "use strict";
 
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _createClass = function () {
+	function defineProperties(target, props) {
+		for (var i = 0; i < props.length; i++) {
+			var descriptor = props[i];descriptor.enumerable = descriptor.enumerable || false;descriptor.configurable = true;if ("value" in descriptor) descriptor.writable = true;Object.defineProperty(target, descriptor.key, descriptor);
+		}
+	}return function (Constructor, protoProps, staticProps) {
+		if (protoProps) defineProperties(Constructor.prototype, protoProps);if (staticProps) defineProperties(Constructor, staticProps);return Constructor;
+	};
+}();
 
 var _conversationColumn = __webpack_require__(244);
 
@@ -38660,15 +38685,46 @@ var _radium = __webpack_require__(15);
 
 var _radium2 = _interopRequireDefault(_radium);
 
-function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+function _interopRequireWildcard(obj) {
+	if (obj && obj.__esModule) {
+		return obj;
+	} else {
+		var newObj = {};if (obj != null) {
+			for (var key in obj) {
+				if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key];
+			}
+		}newObj.default = obj;return newObj;
+	}
+}
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(obj) {
+	return obj && obj.__esModule ? obj : { default: obj };
+}
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) {
+	if (!(instance instanceof Constructor)) {
+		throw new TypeError("Cannot call a class as a function");
+	}
+}
 
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+function _possibleConstructorReturn(self, call) {
+	if (!self) {
+		throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+	}return call && ((typeof call === "undefined" ? "undefined" : _typeof(call)) === "object" || typeof call === "function") ? call : self;
+}
 
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+function _inherits(subClass, superClass) {
+	if (typeof superClass !== "function" && superClass !== null) {
+		throw new TypeError("Super expression must either be null or a function, not " + (typeof superClass === "undefined" ? "undefined" : _typeof(superClass)));
+	}subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } });if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+var testStyle = {
+	'testing': 'aab46387',
+	'container': '_1e71b0c4',
+	'squareWrapper': 'dd8a2fdb',
+	'squareItem': '_8328854e'
+};
 
 var Nearby = function (_React$Component) {
 	_inherits(Nearby, _React$Component);
@@ -38697,7 +38753,9 @@ var Nearby = function (_React$Component) {
 					console.log(error);
 				});
 			}
-			actions.getNearbyUsers();
+			console.log('did mount before');
+			this.props.getNearbyUsers();
+			console.log('did mount after');
 		}
 	}, {
 		key: 'chatWindowDisplayChange',
@@ -38756,6 +38814,32 @@ var Nearby = function (_React$Component) {
 			//alert(currentLongitude+" and "+currentLatitude);
 		}
 	}, {
+		key: 'nearbyUsersList',
+		value: function nearbyUsersList() {
+			/*
+   	return this.props.nearbyUsers.map(nearbyUser=>{
+   	let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
+   	let backgroundStyle = {
+   		backgroundImage : `url("${nearbyUser.avatarURL}")`,
+   		backgroundSize:'cover'
+   	}
+   	return <div key = {nearbyUser._id} className = {testStyle.squareWrapper}>
+   		<div className = {testStyle.squareItem} style = {backgroundStyle}>
+   			{nearbyUser.name} dist {distance}
+   		</div>
+   	</div>
+   })
+   */
+			var userNames = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33];
+			var backgroundStyle = {
+				backgroundImage: 'url("http://res.cloudinary.com/iping/image/upload/v1513696701/ktalox4sncdwrqfqpwf6.jpg")',
+				backgroundSize: 'cover'
+			};
+			return userNames.map(function (userName) {
+				return _react2.default.createElement('div', { key: userName, className: testStyle.squareWrapper }, _react2.default.createElement('div', { className: testStyle.squareItem, style: backgroundStyle }, userName));
+			});
+		}
+	}, {
 		key: 'showError',
 		value: function showError(error) {
 			switch (error.code) {
@@ -38807,27 +38891,10 @@ var Nearby = function (_React$Component) {
 			var nearbyStyle = {
 				flex: 1,
 				backgroundColor: 'blue'
+
 			};
 
-			return _react2.default.createElement(
-				'div',
-				{ style: outerStyle },
-				_react2.default.createElement(
-					'div',
-					{ style: conversationColumnStyle },
-					_react2.default.createElement(_conversationColumn2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })
-				),
-				_react2.default.createElement(
-					'div',
-					{ style: nearbyStyle },
-					'nearby'
-				),
-				_react2.default.createElement(
-					'div',
-					{ style: [chatWindowStyle, this.state.chatWindowDisplay] },
-					_react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })
-				)
-			);
+			return _react2.default.createElement('div', { style: outerStyle }, _react2.default.createElement('div', { style: conversationColumnStyle }, _react2.default.createElement(_conversationColumn2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })), _react2.default.createElement('div', { className: testStyle.container }, this.nearbyUsersList()), _react2.default.createElement('div', { style: [chatWindowStyle, this.state.chatWindowDisplay] }, _react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })));
 		}
 	}]);
 
@@ -38835,7 +38902,7 @@ var Nearby = function (_React$Component) {
 }(_react2.default.Component);
 
 function mapStateToProps(state) {
-	return { user: state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers: state.searchedUsers };
+	return { user: state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers: state.searchedUsers, nearbyUsers: state.nearbyUsers };
 }
 
 exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)((0, _radium2.default)(Nearby));
@@ -39896,4 +39963,3 @@ exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)((0, _radium
 
 /***/ })
 /******/ ]);
-//# sourceMappingURL=nearbyBundle.js.map

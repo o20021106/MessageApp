@@ -379,6 +379,7 @@ export function updateGeolocation(position){
 
 export function getNearbyUsers(){
 	return function(dispatch){
+		console.log('in function');
 		fetch(`/getNearbyUsers`,
 			{
 				headers: {
@@ -393,8 +394,19 @@ export function getNearbyUsers(){
 		})
 		.then(json =>{
 			console.log(json);
-			if(json.users){
+			if(json.users && !json.locAvailable){
 				dispatch({type: UPDATE_NEARBY_USERS, users:json.users});
+			}
+			else if(json.users && json.locAvailable){
+				const users = json.users.map((user)=>{
+					var temp = user.obj;
+					temp.dis = user.dis;
+					return temp;
+				});
+				dispatch({type: UPDATE_NEARBY_USERS, users:users});
+			}
+			else if(json.err){
+				console.log(json.err);
 			}
 		})
 		.catch(err=>{
@@ -402,3 +414,8 @@ export function getNearbyUsers(){
 		});
 	}
 }
+/*
+export function getNearbyUsers(){
+	console.log('in get nearby user function index');
+}
+*/

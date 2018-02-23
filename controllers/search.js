@@ -33,7 +33,15 @@ exports.getNearbyUsers = {
 	get: function(req,res,next){
 		if(!req.user.loc){
 			//if geolocation is undefined
-			res.json({err: 'cannot locate your current location'});
+			User.aggregate([{ $sample: { size: '50'} }])
+			.exec(function(err,randomUsers){
+				if(err){
+					res.json({err:err});
+				}
+				else{
+					res.json({users: randomUsers, locAvailable: false});
+				}
+			})
 		}
 		else{
 
@@ -41,7 +49,12 @@ exports.getNearbyUsers = {
 				function(err, results, stats) {
    					console.log(results);
    					console.log(stats);
-   					res.json({users: results});
+   					if(err){
+   						res.json({err:err});
+   					}
+   					else{
+						res.json({users: results, stats:stats, locAvailable: true});   					
+					}
 			});	
 		}
 	}

@@ -4,6 +4,7 @@ import React from 'react';
 import { connect, Provider } from 'react-redux';
 import * as actions from '../../actions/index';
 import Radium from 'radium';
+import testStyle from './testing.css';
 
 class Nearby extends React.Component{	
 
@@ -18,7 +19,8 @@ class Nearby extends React.Component{
 		if(typeof(navigator) !== 'undefined'){
 			this.getLocation()
 			.then(position=>
-				{	actions.updateGeolocation(position);
+				{	
+					actions.updateGeolocation(position);
 					//this.props.print('i am here here i am');
 					console.log('get position!!!!!!!!!!!!!');
 					console.log(position);}
@@ -27,7 +29,9 @@ class Nearby extends React.Component{
 				console.log(error)
 			});
 		}
-		actions.getNearbyUsers();
+		console.log('did mount before');
+		this.props.getNearbyUsers();
+		console.log('did mount after');
 	}
 
 	chatWindowDisplayChange(show){
@@ -79,6 +83,38 @@ class Nearby extends React.Component{
 	    //alert(currentLongitude+" and "+currentLatitude);
 	}
 
+	nearbyUsersList(){
+		/*
+
+		return this.props.nearbyUsers.map(nearbyUser=>{
+			let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
+			let backgroundStyle = {
+				backgroundImage : `url("${nearbyUser.avatarURL}")`,
+				backgroundSize:'cover'
+			}
+			return <div key = {nearbyUser._id} className = {testStyle.squareWrapper}>
+				<div className = {testStyle.squareItem} style = {backgroundStyle}>
+					{nearbyUser.name} dist {distance}
+				</div>
+			</div>
+		})
+		*/
+		var userNames = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33];
+		let backgroundStyle = {
+				backgroundImage : `url("http://res.cloudinary.com/iping/image/upload/v1513696701/ktalox4sncdwrqfqpwf6.jpg")`,
+				backgroundSize:'cover'
+			}
+		return userNames.map(userName=>{
+			return <div key = {userName} className = {testStyle.squareWrapper}>
+				<div className = {testStyle.squareItem} style = {backgroundStyle}>
+					{userName}
+				</div>
+			</div>
+		})
+
+			
+	}
+
 	showError(error) {
     	switch(error.code) {
         	case error.PERMISSION_DENIED:
@@ -128,15 +164,18 @@ class Nearby extends React.Component{
 		const nearbyStyle = {
 			flex:1,
 			backgroundColor:'blue'
+
+
 		}
+
 
 		return (
 			<div style = {outerStyle}>
 				<div style = {conversationColumnStyle}>
 					<ConversationColumn onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 				</div>
-				<div style = {nearbyStyle}>
-				nearby
+				<div className = {testStyle.container}>
+					{this.nearbyUsersList()}
 				</div>
 				<div style = {[chatWindowStyle, this.state.chatWindowDisplay]}>
 					<ChatWindow onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
@@ -148,7 +187,7 @@ class Nearby extends React.Component{
 }
 
 function mapStateToProps(state) {  
-    return { user:state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers };
+    return { user:state.user, recipients: state.recipients, conversations: state.conversations, searchedUsers:state.searchedUsers, nearbyUsers: state.nearbyUsers };
 }
 	
 export default connect(mapStateToProps, actions)(Radium(Nearby));

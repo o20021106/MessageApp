@@ -5,6 +5,8 @@ export default (html, finalState, radiumProp,script) => {
     <html style = 'width:100%; margin : 0px; height: 100vh'>
 		<head>
 			<link rel="stylesheet" href="/web-fonts-with-css/css/fontawesome-all.min.css">	
+			<link rel="stylesheet" href="testing.css">	
+			
 			<meta name= 'viewport' content = 'width = device-width, initial-scale=1'>
 			<script>window.__PRELOADED_STATE__ = ${JSON.stringify(finalState).replace(/</g, '\\u003c')}</script>
 			<script>window.__RADIUM_PROP__ = ${JSON.stringify(radiumProp).replace(/</g, '\\u003c')}</script>

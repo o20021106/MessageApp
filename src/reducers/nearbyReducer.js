@@ -62,10 +62,11 @@ export default function(state = initial, action){
 			return {...state, searchedUsers:action.users}
 		case CLEAR_SEARCH:
 			return {...state, searchedUsers:[]}
-		case UPDATE_NEARBY_USERS:{
+		case UPDATE_NEARBY_USERS:
 			console.log('update nearby users!!!!!!!!!!!!!!!');
 			console.log(action.users);
-		}
+			return {...state, nearbyUsers: action.users}
+			break;
 		case CHOSEN_RECIPIENT:
 			console.log('in chosen recipient');
 			var conversationData = Object.assign({},state.conversationData);
