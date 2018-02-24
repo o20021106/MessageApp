@@ -48,11 +48,14 @@ export function setChosenRecipient(recipientId, conversationId, status){
     	var convExist = 'CON_EXIST';
 		var conNExist = 'CON_N_EXIST';
 		var notLoaded = 'NOT_LOADED';
-
+		console.log(recipientId);
+		console.log(conversationId);
+		console.log(status);
     	dispatch({type:CHOSEN_RECIPIENT, recipientId: recipientId});
- 		
+ 		console.log(status);
  		switch (status){
 			case convExist:
+				console.log('how dare you');
 				getConversationByConId(recipientId,conversationId, dispatch);
 				break;
 			case conNExist:
@@ -393,7 +396,6 @@ export function getNearbyUsers(){
 		    return response.json();
 		})
 		.then(json =>{
-			console.log(json);
 			if(json.users && !json.locAvailable){
 				dispatch({type: UPDATE_NEARBY_USERS, users:json.users});
 			}

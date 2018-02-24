@@ -6,7 +6,6 @@ import { connect, Provider } from 'react-redux';
 import * as actions from '../../actions/index';
 import Radium from 'radium';
 import testStyle from './testing.css';
-import utility from '../../../utility/utility';
 class Nearby extends React.Component{	
 
 	constructor(props){
@@ -18,6 +17,8 @@ class Nearby extends React.Component{
 	    this.clickNearbyUser = this.clickNearbyUser.bind(this);
 	    this.nearbyUsersList = this.nearbyUsersList.bind(this);
 	    this.getLocation = this.getLocation.bind(this);
+	    this.hideOnclickOutSide = this.hideOnclickOutSide.bind(this);
+	    this.closeProfile = this.closeProfile.bind(this);
 	}
 
 	componentDidMount(){
@@ -105,7 +106,7 @@ class Nearby extends React.Component{
 		//const listener = utility.hideOnClickOutside('.profile', this.profile,()=>alert('you'));
 	}
 
-	clickOff(e){
+	hideOnclickOutSide(e){
 		e.preventDefault();
 		if(!e.target.closest('.profile')){
 			if(this.state.profileDisplay.display == 'flex'){
@@ -114,7 +115,12 @@ class Nearby extends React.Component{
 		}
 	}
 
-
+	closeProfile(){
+		console.log('inclick profile close');
+		if(this.state.profileDisplay.display == 'flex'){
+				this.setState({profileDisplay:{display:'none'},nearbyScroll:{overflowY:'scroll'},nearbyBlur:{filter:'blur(0px)'}});
+		}
+	}
 
 	nearbyUsersList(){
 
@@ -213,9 +219,9 @@ class Nearby extends React.Component{
 					<ConversationColumn onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 				</div>
 				<div style = {nearbyStyle}>
-					<div onClick = {(e)=>this.clickOff(e)} ref = {(el)=>{this.profile = el}} style={[{zIndex:1, overflowY: 'scroll',width:'100%', height:'100%', position:'absolute', justifyContent:'center',alignItems:'center'}, this.state.profileDisplay]}>
+					<div onClick = {(e)=>this.hideOnclickOutSide(e)} ref = {(el)=>{this.profile = el}} style={[{zIndex:1, overflowY: 'scroll',width:'100%', height:'100%', position:'absolute', justifyContent:'center',alignItems:'center'}, this.state.profileDisplay]}>
 						<div  className ='profile' style = {{width:'80%',backgroundColor:'white', position:'absolute', top:'100px'}}>
-							<Profile nearbyUser = {this.state.nearbyUser}/>
+							<Profile nearbyUser = {this.state.nearbyUser} onCloseProfile = {this.closeProfile} onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 						</div>
 					</div>
 					<div className = {testStyle.container} style = {[this.state.nearbyBlur, this.state.nearbyScroll]}>

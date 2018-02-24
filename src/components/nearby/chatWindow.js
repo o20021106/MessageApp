@@ -171,6 +171,7 @@ class ChatWindow extends React.Component{
 				display: 'inline-block'
 			}
 		var messages = this.props.conversationData.messages;
+		console.log('after declaire messages');
 		if(messages.length !==0 &
 			this.props.conversationData.conversationType === 'RECIPIENT'){
 			console.log('in if messages not empty');
@@ -233,6 +234,7 @@ class ChatWindow extends React.Component{
 			});
 		}
 		else{
+			console.log('no message');
 			console.log(this.props.conversationData);
 			return <div>start a conversation</div>
 		} 

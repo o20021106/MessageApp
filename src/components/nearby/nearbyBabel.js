@@ -34,10 +34,6 @@ var _radium = require('radium');
 
 var _radium2 = _interopRequireDefault(_radium);
 
-var _utility = require('../../../utility/utility');
-
-var _utility2 = _interopRequireDefault(_utility);
-
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
@@ -70,6 +66,8 @@ var Nearby = function (_React$Component) {
 		_this.clickNearbyUser = _this.clickNearbyUser.bind(_this);
 		_this.nearbyUsersList = _this.nearbyUsersList.bind(_this);
 		_this.getLocation = _this.getLocation.bind(_this);
+		_this.hideOnclickOutSide = _this.hideOnclickOutSide.bind(_this);
+		_this.closeProfile = _this.closeProfile.bind(_this);
 		return _this;
 	}
 
@@ -165,13 +163,21 @@ var Nearby = function (_React$Component) {
 			//const listener = utility.hideOnClickOutside('.profile', this.profile,()=>alert('you'));
 		}
 	}, {
-		key: 'clickOff',
-		value: function clickOff(e) {
+		key: 'hideOnclickOutSide',
+		value: function hideOnclickOutSide(e) {
 			e.preventDefault();
 			if (!e.target.closest('.profile')) {
 				if (this.state.profileDisplay.display == 'flex') {
 					this.setState({ profileDisplay: { display: 'none' }, nearbyScroll: { overflowY: 'scroll' }, nearbyBlur: { filter: 'blur(0px)' } });
 				}
+			}
+		}
+	}, {
+		key: 'closeProfile',
+		value: function closeProfile() {
+			console.log('inclick profile close');
+			if (this.state.profileDisplay.display == 'flex') {
+				this.setState({ profileDisplay: { display: 'none' }, nearbyScroll: { overflowY: 'scroll' }, nearbyBlur: { filter: 'blur(0px)' } });
 			}
 		}
 	}, {
@@ -286,14 +292,14 @@ var Nearby = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ onClick: function onClick(e) {
-								return _this2.clickOff(e);
+								return _this2.hideOnclickOutSide(e);
 							}, ref: function ref(el) {
 								_this2.profile = el;
 							}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] },
 						_react2.default.createElement(
 							'div',
 							{ className: 'profile', style: { width: '80%', backgroundColor: 'white', position: 'absolute', top: '100px' } },
-							_react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser })
+							_react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange })
 						)
 					),
 					_react2.default.createElement(

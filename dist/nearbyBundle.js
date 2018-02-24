@@ -2536,6 +2536,369 @@ var locationsAreEqual = function locationsAreEqual(a, b) {
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports.loadRecipients = loadRecipients;
+exports.setChosenRecipient = setChosenRecipient;
+exports.loadConversations = loadConversations;
+exports.loadCurrentConversation = loadCurrentConversation;
+exports.newMessageSocket = newMessageSocket;
+exports.newConversationSocket = newConversationSocket;
+exports.getConversationByRecipientId = getConversationByRecipientId;
+exports.searchUser = searchUser;
+exports.clearSearch = clearSearch;
+exports.updateGeolocation = updateGeolocation;
+exports.getNearbyUsers = getNearbyUsers;
+
+var _type = __webpack_require__(75);
+
+function loadRecipients() {
+	return function (dispatch) {
+		fetch("/getRecipients", {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log(json.users);
+			console.log('load recipients here!!');
+			dispatch({ type: _type.LOAD_RECIPIENTS, recipients: json.users, conversationType: 'RECIPIENT' });
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+
+function setChosenRecipient(recipientId, conversationId, status) {
+	return function (dispatch) {
+		console.log(recipientId);
+		console.log('in set chosenRecipient!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+		var convExist = 'CON_EXIST';
+		var conNExist = 'CON_N_EXIST';
+		var notLoaded = 'NOT_LOADED';
+		console.log(recipientId);
+		console.log(conversationId);
+		console.log(status);
+		dispatch({ type: _type.CHOSEN_RECIPIENT, recipientId: recipientId });
+		console.log(status);
+		switch (status) {
+			case convExist:
+				console.log('how dare you');
+				getConversationByConId(recipientId, conversationId, dispatch);
+				break;
+			case conNExist:
+				break;
+			case notLoaded:
+				getConversationByReId(recipientId, dispatch, 'RECIPIENT');
+				break;
+		}
+	};
+
+	function getConversationByConId(recipientId, conversationId, dispatch) {
+		fetch("/getConversation/" + conversationId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			//console.log('messages');			
+			//console.log(json);
+			//console.log('load curruent conversations here!!');
+			dispatch({ type: _type.CONVERSATION_MESSAGES,
+				messages: json.conversation,
+				conversationId: conversationId,
+				recipientId: recipientId,
+				conversationType: 'RECIPIENT' });
+			return json;
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+
+	function getConversationByReId(recipientId, dispatch, conversationType) {
+		fetch("/getConversationByRecipientId/" + recipientId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log('return conversation by recipientId');
+			console.log(json);
+			if (json.status) {
+				//no existing conversation
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
+					conversationId: null,
+					chosenId: recipientId,
+					conversationType: conversationType });
+			} else {
+				//conversation already exists
+				console.log(json);
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
+					conversationId: json.conversation._id,
+					payload: json,
+					chosenId: recipientId,
+					conversationType: conversationType });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+}
+
+/*
+export function setChosenConversation(conversationId){
+    return function(dispatch){
+    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
+    	getCurrentConversation(conversationId, dispatch);
+    }
+}
+*/
+/*
+export function setLatestRecipient(){
+    return {type:UPDATE_RECIPIENT, latestRecipient: null}
+}
+*/
+function loadConversations() {
+	return function (dispatch) {
+		fetch("/getConversations", {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			//console.log(json.conversations);
+			//console.log('load conversations here!!');
+			dispatch({ type: _type.LOAD_CONVERSATIONS, conversations: json.conversations });
+			return json;
+		})
+		/*		.then(function(json){
+  			//console.log(json.conversations[0].conversation._id);
+  			//console.log('load conversatjion id')
+  			dispatch({type:CHOSEN_CONVERSATION, chosenConversation: json.conversations[0].conversation._id});
+  			//getCurrentConversation(json.conversations[0].conversation._id, dispatch);
+  
+  		})*/
+		.catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+
+function getCurrentConversation(conversationId, dispatch) {
+	fetch("/getConversation/" + conversationId, {
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+			//'Authorization' : localStorage.getItem("token")
+		},
+		credentials: 'same-origin',
+		method: "GET"
+	}).then(function (response) {
+		return response.json();
+	}).then(function (json) {
+		//console.log('messages');			
+		//console.log(json);
+		//console.log('load curruent conversations here!!');
+		dispatch({ type: _type.CHOSEN_CONVERSATION_MESSAGES, currentConversation: json.conversation, currentConversationId: conversationId });
+		return json;
+	}).catch(function (err) {
+		console.log(err);
+	});
+}
+
+function loadCurrentConversation(conversationId) {
+	return function (dispatch) {
+		fetch("/getConversation/" + conversationId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			//console.log('messages');			
+			//console.log(json);
+			//console.log('load conversations here!!');
+			dispatch({ type: _type.CHOSEN_CONVERSATION_MESSAGES, currentConversation: json.conversation });
+			return json;
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+
+function newMessageSocket(conversationType, recipientId, composedMessage, conversationId) {
+	return {
+		type: 'socket',
+		promise: function promise(socket, next) {
+			console.log('inside socket here');
+			return socket.emit('newMessage', { composedMessage: composedMessage, conversationId: conversationId, recipientId: recipientId, conversationType: conversationType });
+		}
+	};
+}
+
+function newConversationSocket(conversationType, composedMessage, recipientId) {
+	console.log('in new conversation socket');
+	return {
+		type: 'socket',
+		promise: function promise(socket, next) {
+			console.log('creating new conversation action creator');
+			console.log(recipientId);
+			return socket.emit('newConversation', { composedMessage: composedMessage, recipientId: recipientId, conversationType: conversationType });
+		}
+	};
+}
+
+function getConversationByRecipientId(recipientId) {
+	return function (dispatch) {
+		console.log('recipientId');
+		console.log(recipientId);
+		dispatch({ type: _type.UPDATE_RECIPIENT, latestRecipient: recipientId });
+
+		fetch("/getConversationByRecipientId/" + recipientId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log('return conversation by recipientId');
+			console.log(json);
+			if (json.status) {
+				//no existing conversation
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT, chosenConversation: null, latestRecipient: recipientId });
+			} else {
+				//conversation already exists
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT, chosenConversation: json.conversationId, messages: json.conversation });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+
+function searchUser(keyWord) {
+	return function (dispatch) {
+		if (keyWord === '') {
+			console.log('emptystring');
+			return dispatch({ type: _type.LOAD_SEARCH_USER, users: [] });
+		}
+		dispatch({ type: _type.LOAD_SEARCH_USER, users: [] });
+		fetch('/searchUser?keyword=' + keyWord, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			credentials: 'same-origin',
+			method: "GET"
+
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log(json);
+			if (json.users) {
+				dispatch({ type: _type.LOAD_SEARCH_USER, users: json.users });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+
+function clearSearch() {
+	return { type: _type.CLEAR_SEARCH };
+}
+
+function updateGeolocation(position) {
+	fetch('updateGeolocation', {
+		headers: {
+			'Accept': 'application/json',
+			'Content-Type': 'application/json'
+		},
+		credentials: 'same-origin',
+		method: "POST",
+		body: JSON.stringify({ coordinates: position })
+	}).then(function (response) {
+		console.log(response);
+		console.log('response');
+		return response.json();
+	}).then(function (json) {
+		console.log(json);
+	});
+}
+
+function getNearbyUsers() {
+	return function (dispatch) {
+		console.log('in function');
+		fetch('/getNearbyUsers', {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			if (json.users && !json.locAvailable) {
+				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: json.users });
+			} else if (json.users && json.locAvailable) {
+				var users = json.users.map(function (user) {
+					var temp = user.obj;
+					temp.dis = user.dis;
+					return temp;
+				});
+				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: users });
+			} else if (json.err) {
+				console.log(json.err);
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	};
+}
+/*
+export function getNearbyUsers(){
+	console.log('in get nearby user function index');
+}
+*/
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
@@ -2548,7 +2911,7 @@ var locationsAreEqual = function locationsAreEqual(a, b) {
 if (process.env.NODE_ENV !== 'production') {
   var invariant = __webpack_require__(15);
   var warning = __webpack_require__(19);
-  var ReactPropTypesSecret = __webpack_require__(27);
+  var ReactPropTypesSecret = __webpack_require__(28);
   var loggedTypeFailures = {};
 }
 
@@ -2599,7 +2962,7 @@ module.exports = checkPropTypes;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1)))
 
 /***/ }),
-/* 27 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2618,7 +2981,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 28 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2646,7 +3009,7 @@ function warning(message) {
 }
 
 /***/ }),
-/* 29 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -2718,7 +3081,7 @@ function isPlainObject(value) {
 
 
 /***/ }),
-/* 30 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
@@ -3124,7 +3487,7 @@ function error() {
 
 
 /***/ }),
-/* 31 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {// browser shim for xmlhttprequest module
@@ -3168,7 +3531,7 @@ module.exports = function (opts) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4)))
 
 /***/ }),
-/* 32 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -3331,7 +3694,7 @@ Transport.prototype.onClose = function () {
 
 
 /***/ }),
-/* 33 */
+/* 34 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3404,7 +3767,7 @@ exports.default = StyleKeeper;
 module.exports = exports['default'];
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3427,7 +3790,7 @@ var _mapObject = __webpack_require__(79);
 
 var _mapObject2 = _interopRequireDefault(_mapObject);
 
-var _prefixer = __webpack_require__(35);
+var _prefixer = __webpack_require__(36);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -3454,7 +3817,7 @@ function cssRuleSetToString(selector, rules, userAgent) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3539,7 +3902,7 @@ function getPrefixedStyle(style, userAgent) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(4), __webpack_require__(1)))
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3557,7 +3920,7 @@ exports.default = function (str) {
 module.exports = exports["default"];
 
 /***/ }),
-/* 37 */
+/* 38 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3576,7 +3939,7 @@ exports.default = function (value) {
 module.exports = exports['default'];
 
 /***/ }),
-/* 38 */
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3597,7 +3960,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_6__Redirect__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_7__Route__ = __webpack_require__(92);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_7__Route__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_8__Router__ = __webpack_require__(42);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_8__Router__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_9__StaticRouter__ = __webpack_require__(232);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "StaticRouter", function() { return __WEBPACK_IMPORTED_MODULE_9__StaticRouter__["a"]; });
@@ -3635,7 +3998,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 
 /***/ }),
-/* 39 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3719,7 +4082,7 @@ var locationsAreEqual = exports.locationsAreEqual = function locationsAreEqual(a
 };
 
 /***/ }),
-/* 40 */
+/* 41 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3810,7 +4173,7 @@ var createTransitionManager = function createTransitionManager() {
 exports.default = createTransitionManager;
 
 /***/ }),
-/* 41 */
+/* 42 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3821,7 +4184,7 @@ exports.default = createTransitionManager;
 /* harmony default export */ __webpack_exports__["a"] = (__WEBPACK_IMPORTED_MODULE_0_react_router_es_Router__["a" /* default */]);
 
 /***/ }),
-/* 42 */
+/* 43 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3970,7 +4333,7 @@ Route.childContextTypes = {
 /* harmony default export */ __webpack_exports__["a"] = (Route);
 
 /***/ }),
-/* 43 */
+/* 44 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -4055,7 +4418,7 @@ var createTransitionManager = function createTransitionManager() {
 /* harmony default export */ __webpack_exports__["a"] = (createTransitionManager);
 
 /***/ }),
-/* 44 */
+/* 45 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4136,367 +4499,6 @@ var matchPath = function matchPath(pathname) {
 };
 
 exports.default = matchPath;
-
-/***/ }),
-/* 45 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-	value: true
-});
-exports.loadRecipients = loadRecipients;
-exports.setChosenRecipient = setChosenRecipient;
-exports.loadConversations = loadConversations;
-exports.loadCurrentConversation = loadCurrentConversation;
-exports.newMessageSocket = newMessageSocket;
-exports.newConversationSocket = newConversationSocket;
-exports.getConversationByRecipientId = getConversationByRecipientId;
-exports.searchUser = searchUser;
-exports.clearSearch = clearSearch;
-exports.updateGeolocation = updateGeolocation;
-exports.getNearbyUsers = getNearbyUsers;
-
-var _type = __webpack_require__(75);
-
-function loadRecipients() {
-	return function (dispatch) {
-		fetch("/getRecipients", {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			console.log(json.users);
-			console.log('load recipients here!!');
-			dispatch({ type: _type.LOAD_RECIPIENTS, recipients: json.users, conversationType: 'RECIPIENT' });
-		}).catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-
-function setChosenRecipient(recipientId, conversationId, status) {
-	return function (dispatch) {
-		console.log(recipientId);
-		console.log('in set chosenRecipient!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-		var convExist = 'CON_EXIST';
-		var conNExist = 'CON_N_EXIST';
-		var notLoaded = 'NOT_LOADED';
-
-		dispatch({ type: _type.CHOSEN_RECIPIENT, recipientId: recipientId });
-
-		switch (status) {
-			case convExist:
-				getConversationByConId(recipientId, conversationId, dispatch);
-				break;
-			case conNExist:
-				break;
-			case notLoaded:
-				getConversationByReId(recipientId, dispatch, 'RECIPIENT');
-				break;
-		}
-	};
-
-	function getConversationByConId(recipientId, conversationId, dispatch) {
-		fetch("/getConversation/" + conversationId, {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			//console.log('messages');			
-			//console.log(json);
-			//console.log('load curruent conversations here!!');
-			dispatch({ type: _type.CONVERSATION_MESSAGES,
-				messages: json.conversation,
-				conversationId: conversationId,
-				recipientId: recipientId,
-				conversationType: 'RECIPIENT' });
-			return json;
-		}).catch(function (err) {
-			console.log(err);
-		});
-	}
-
-	function getConversationByReId(recipientId, dispatch, conversationType) {
-		fetch("/getConversationByRecipientId/" + recipientId, {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			console.log('return conversation by recipientId');
-			console.log(json);
-			if (json.status) {
-				//no existing conversation
-				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
-					conversationId: null,
-					chosenId: recipientId,
-					conversationType: conversationType });
-			} else {
-				//conversation already exists
-				console.log(json);
-				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
-					conversationId: json.conversation._id,
-					payload: json,
-					chosenId: recipientId,
-					conversationType: conversationType });
-			}
-		}).catch(function (err) {
-			console.log(err);
-		});
-	}
-}
-
-/*
-export function setChosenConversation(conversationId){
-    return function(dispatch){
-    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
-    	getCurrentConversation(conversationId, dispatch);
-    }
-}
-*/
-/*
-export function setLatestRecipient(){
-    return {type:UPDATE_RECIPIENT, latestRecipient: null}
-}
-*/
-function loadConversations() {
-	return function (dispatch) {
-		fetch("/getConversations", {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			//console.log(json.conversations);
-			//console.log('load conversations here!!');
-			dispatch({ type: _type.LOAD_CONVERSATIONS, conversations: json.conversations });
-			return json;
-		})
-		/*		.then(function(json){
-  			//console.log(json.conversations[0].conversation._id);
-  			//console.log('load conversatjion id')
-  			dispatch({type:CHOSEN_CONVERSATION, chosenConversation: json.conversations[0].conversation._id});
-  			//getCurrentConversation(json.conversations[0].conversation._id, dispatch);
-  
-  		})*/
-		.catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-
-function getCurrentConversation(conversationId, dispatch) {
-	fetch("/getConversation/" + conversationId, {
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json'
-			//'Authorization' : localStorage.getItem("token")
-		},
-		credentials: 'same-origin',
-		method: "GET"
-	}).then(function (response) {
-		return response.json();
-	}).then(function (json) {
-		//console.log('messages');			
-		//console.log(json);
-		//console.log('load curruent conversations here!!');
-		dispatch({ type: _type.CHOSEN_CONVERSATION_MESSAGES, currentConversation: json.conversation, currentConversationId: conversationId });
-		return json;
-	}).catch(function (err) {
-		console.log(err);
-	});
-}
-
-function loadCurrentConversation(conversationId) {
-	return function (dispatch) {
-		fetch("/getConversation/" + conversationId, {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			//console.log('messages');			
-			//console.log(json);
-			//console.log('load conversations here!!');
-			dispatch({ type: _type.CHOSEN_CONVERSATION_MESSAGES, currentConversation: json.conversation });
-			return json;
-		}).catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-
-function newMessageSocket(conversationType, recipientId, composedMessage, conversationId) {
-	return {
-		type: 'socket',
-		promise: function promise(socket, next) {
-			console.log('inside socket here');
-			return socket.emit('newMessage', { composedMessage: composedMessage, conversationId: conversationId, recipientId: recipientId, conversationType: conversationType });
-		}
-	};
-}
-
-function newConversationSocket(conversationType, composedMessage, recipientId) {
-	console.log('in new conversation socket');
-	return {
-		type: 'socket',
-		promise: function promise(socket, next) {
-			console.log('creating new conversation action creator');
-			console.log(recipientId);
-			return socket.emit('newConversation', { composedMessage: composedMessage, recipientId: recipientId, conversationType: conversationType });
-		}
-	};
-}
-
-function getConversationByRecipientId(recipientId) {
-	return function (dispatch) {
-		console.log('recipientId');
-		console.log(recipientId);
-		dispatch({ type: _type.UPDATE_RECIPIENT, latestRecipient: recipientId });
-
-		fetch("/getConversationByRecipientId/" + recipientId, {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-				//'Authorization' : localStorage.getItem("token")
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			console.log('return conversation by recipientId');
-			console.log(json);
-			if (json.status) {
-				//no existing conversation
-				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT, chosenConversation: null, latestRecipient: recipientId });
-			} else {
-				//conversation already exists
-				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT, chosenConversation: json.conversationId, messages: json.conversation });
-			}
-		}).catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-
-function searchUser(keyWord) {
-	return function (dispatch) {
-		if (keyWord === '') {
-			console.log('emptystring');
-			return dispatch({ type: _type.LOAD_SEARCH_USER, users: [] });
-		}
-		dispatch({ type: _type.LOAD_SEARCH_USER, users: [] });
-		fetch('/searchUser?keyword=' + keyWord, {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			credentials: 'same-origin',
-			method: "GET"
-
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			console.log(json);
-			if (json.users) {
-				dispatch({ type: _type.LOAD_SEARCH_USER, users: json.users });
-			}
-		}).catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-
-function clearSearch() {
-	return { type: _type.CLEAR_SEARCH };
-}
-
-function updateGeolocation(position) {
-	fetch('updateGeolocation', {
-		headers: {
-			'Accept': 'application/json',
-			'Content-Type': 'application/json'
-		},
-		credentials: 'same-origin',
-		method: "POST",
-		body: JSON.stringify({ coordinates: position })
-	}).then(function (response) {
-		console.log(response);
-		console.log('response');
-		return response.json();
-	}).then(function (json) {
-		console.log(json);
-	});
-}
-
-function getNearbyUsers() {
-	return function (dispatch) {
-		console.log('in function');
-		fetch('/getNearbyUsers', {
-			headers: {
-				'Accept': 'application/json',
-				'Content-Type': 'application/json'
-			},
-			credentials: 'same-origin',
-			method: "GET"
-		}).then(function (response) {
-			return response.json();
-		}).then(function (json) {
-			console.log(json);
-			if (json.users && !json.locAvailable) {
-				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: json.users });
-			} else if (json.users && json.locAvailable) {
-				var users = json.users.map(function (user) {
-					var temp = user.obj;
-					temp.dis = user.dis;
-					return temp;
-				});
-				dispatch({ type: _type.UPDATE_NEARBY_USERS, users: users });
-			} else if (json.err) {
-				console.log(json.err);
-			}
-		}).catch(function (err) {
-			console.log(err);
-		});
-	};
-}
-/*
-export function getNearbyUsers(){
-	console.log('in get nearby user function index');
-}
-*/
 
 /***/ }),
 /* 46 */
@@ -5249,7 +5251,7 @@ if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' 
 "use strict";
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return ActionTypes; });
 /* harmony export (immutable) */ __webpack_exports__["b"] = createStore;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable__ = __webpack_require__(129);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_symbol_observable__);
 
@@ -5694,8 +5696,8 @@ function wrapMapToPropsFunc(mapToProps, methodName) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = verifyPlainObject;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(29);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__warning__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__warning__ = __webpack_require__(29);
 
 
 
@@ -6082,7 +6084,7 @@ function isBuf(obj) {
 var eio = __webpack_require__(156);
 var Socket = __webpack_require__(72);
 var Emitter = __webpack_require__(11);
-var parser = __webpack_require__(30);
+var parser = __webpack_require__(31);
 var on = __webpack_require__(73);
 var bind = __webpack_require__(74);
 var debug = __webpack_require__(6)('socket.io-client:manager');
@@ -6657,7 +6659,7 @@ Manager.prototype.onreconnect = function () {
  * Module dependencies
  */
 
-var XMLHttpRequest = __webpack_require__(31);
+var XMLHttpRequest = __webpack_require__(32);
 var XHR = __webpack_require__(159);
 var JSONP = __webpack_require__(166);
 var websocket = __webpack_require__(167);
@@ -6717,7 +6719,7 @@ function polling (opts) {
  * Module dependencies.
  */
 
-var Transport = __webpack_require__(32);
+var Transport = __webpack_require__(33);
 var parseqs = __webpack_require__(20);
 var parser = __webpack_require__(12);
 var inherit = __webpack_require__(21);
@@ -6735,7 +6737,7 @@ module.exports = Polling;
  */
 
 var hasXHR2 = (function () {
-  var XMLHttpRequest = __webpack_require__(31);
+  var XMLHttpRequest = __webpack_require__(32);
   var xhr = new XMLHttpRequest({ xdomain: false });
   return null != xhr.responseType;
 })();
@@ -7059,7 +7061,7 @@ module.exports = function(arr, obj){
  * Module dependencies.
  */
 
-var parser = __webpack_require__(30);
+var parser = __webpack_require__(31);
 var Emitter = __webpack_require__(11);
 var toArray = __webpack_require__(169);
 var on = __webpack_require__(73);
@@ -7583,7 +7585,7 @@ var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _styleKeeper = __webpack_require__(33);
+var _styleKeeper = __webpack_require__(34);
 
 var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
@@ -7824,7 +7826,7 @@ var _appendImportantToEachValue = __webpack_require__(173);
 
 var _appendImportantToEachValue2 = _interopRequireDefault(_appendImportantToEachValue);
 
-var _cssRuleSetToString = __webpack_require__(34);
+var _cssRuleSetToString = __webpack_require__(35);
 
 var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
@@ -8815,7 +8817,7 @@ MemoryRouter.propTypes = {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_es_Route__ = __webpack_require__(43);
 // Written in this round about way for babel-transform-imports
 
 
@@ -9806,7 +9808,7 @@ Switch.propTypes = {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__ = __webpack_require__(54);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_hoist_non_react_statics__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(43);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 function _objectWithoutProperties(obj, keys) { var target = {}; for (var i in obj) { if (keys.indexOf(i) >= 0) continue; if (!Object.prototype.hasOwnProperty.call(obj, i)) continue; target[i] = obj[i]; } return target; }
@@ -9940,7 +9942,7 @@ var _radium = __webpack_require__(13);
 
 var _radium2 = _interopRequireDefault(_radium);
 
-var _reactRouterDom = __webpack_require__(38);
+var _reactRouterDom = __webpack_require__(39);
 
 var _reactRouterConfig = __webpack_require__(100);
 
@@ -10036,7 +10038,7 @@ var emptyObject = __webpack_require__(18);
 var invariant = __webpack_require__(15);
 var warning = __webpack_require__(19);
 var emptyFunction = __webpack_require__(8);
-var checkPropTypes = __webpack_require__(26);
+var checkPropTypes = __webpack_require__(27);
 
 // TODO: this is special because it gets imported during build.
 
@@ -11746,7 +11748,7 @@ var shallowEqual = __webpack_require__(49);
 var containsNode = __webpack_require__(50);
 var focusNode = __webpack_require__(51);
 var emptyObject = __webpack_require__(18);
-var checkPropTypes = __webpack_require__(26);
+var checkPropTypes = __webpack_require__(27);
 var hyphenateStyleName = __webpack_require__(110);
 var camelizeStyleName = __webpack_require__(112);
 
@@ -27281,7 +27283,7 @@ module.exports = camelize;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_PropTypes__ = __webpack_require__(52);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_warning__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__utils_warning__ = __webpack_require__(29);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -27375,8 +27377,8 @@ var invariant = __webpack_require__(15);
 var warning = __webpack_require__(19);
 var assign = __webpack_require__(14);
 
-var ReactPropTypesSecret = __webpack_require__(27);
-var checkPropTypes = __webpack_require__(26);
+var ReactPropTypesSecret = __webpack_require__(28);
+var checkPropTypes = __webpack_require__(27);
 
 module.exports = function(isValidElement, throwOnDirectAccess) {
   /* global Symbol */
@@ -27922,7 +27924,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 
 var emptyFunction = __webpack_require__(8);
 var invariant = __webpack_require__(15);
-var ReactPropTypesSecret = __webpack_require__(27);
+var ReactPropTypesSecret = __webpack_require__(28);
 
 module.exports = function() {
   function shim(props, propName, componentName, location, propFullName, secret) {
@@ -28555,7 +28557,7 @@ function symbolObservablePonyfill(root) {
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/* harmony export (immutable) */ __webpack_exports__["a"] = combineReducers;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(56);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_warning__ = __webpack_require__(59);
 
 
@@ -28997,7 +28999,7 @@ function finalPropsSelectorFactory(dispatch, _ref2) {
 
 "use strict";
 /* harmony export (immutable) */ __webpack_exports__["a"] = verifySubselectors;
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_warning__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__utils_warning__ = __webpack_require__(29);
 
 
 function verify(selector, methodName, displayName) {
@@ -29612,7 +29614,7 @@ Promise.disableSynchronous = function() {
  */
 
 var url = __webpack_require__(150);
-var parser = __webpack_require__(30);
+var parser = __webpack_require__(31);
 var Manager = __webpack_require__(67);
 var debug = __webpack_require__(6)('socket.io-client');
 
@@ -30483,7 +30485,7 @@ Socket.protocol = parser.protocol; // this is an int
  */
 
 Socket.Socket = Socket;
-Socket.Transport = __webpack_require__(32);
+Socket.Transport = __webpack_require__(33);
 Socket.transports = __webpack_require__(68);
 Socket.parser = __webpack_require__(12);
 
@@ -31117,7 +31119,7 @@ try {
  * Module requirements.
  */
 
-var XMLHttpRequest = __webpack_require__(31);
+var XMLHttpRequest = __webpack_require__(32);
 var Polling = __webpack_require__(69);
 var Emitter = __webpack_require__(11);
 var inherit = __webpack_require__(21);
@@ -32306,7 +32308,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
  * Module dependencies.
  */
 
-var Transport = __webpack_require__(32);
+var Transport = __webpack_require__(33);
 var parser = __webpack_require__(12);
 var parseqs = __webpack_require__(20);
 var inherit = __webpack_require__(21);
@@ -33051,7 +33053,7 @@ var _getPrefixedKeyframes = __webpack_require__(190);
 
 var _getPrefixedKeyframes2 = _interopRequireDefault(_getPrefixedKeyframes);
 
-var _capitalizeString = __webpack_require__(36);
+var _capitalizeString = __webpack_require__(37);
 
 var _capitalizeString2 = _interopRequireDefault(_capitalizeString);
 
@@ -33275,7 +33277,7 @@ var _prefixProps = __webpack_require__(80);
 
 var _prefixProps2 = _interopRequireDefault(_prefixProps);
 
-var _capitalizeString = __webpack_require__(36);
+var _capitalizeString = __webpack_require__(37);
 
 var _capitalizeString2 = _interopRequireDefault(_capitalizeString);
 
@@ -33431,7 +33433,7 @@ var _joinPrefixedValue = __webpack_require__(22);
 
 var _joinPrefixedValue2 = _interopRequireDefault(_joinPrefixedValue);
 
-var _isPrefixedValue = __webpack_require__(37);
+var _isPrefixedValue = __webpack_require__(38);
 
 var _isPrefixedValue2 = _interopRequireDefault(_isPrefixedValue);
 
@@ -33558,7 +33560,7 @@ var _joinPrefixedValue = __webpack_require__(22);
 
 var _joinPrefixedValue2 = _interopRequireDefault(_joinPrefixedValue);
 
-var _isPrefixedValue = __webpack_require__(37);
+var _isPrefixedValue = __webpack_require__(38);
 
 var _isPrefixedValue2 = _interopRequireDefault(_isPrefixedValue);
 
@@ -33589,11 +33591,11 @@ var _hyphenateStyleName = __webpack_require__(82);
 
 var _hyphenateStyleName2 = _interopRequireDefault(_hyphenateStyleName);
 
-var _capitalizeString = __webpack_require__(36);
+var _capitalizeString = __webpack_require__(37);
 
 var _capitalizeString2 = _interopRequireDefault(_capitalizeString);
 
-var _isPrefixedValue = __webpack_require__(37);
+var _isPrefixedValue = __webpack_require__(38);
 
 var _isPrefixedValue2 = _interopRequireDefault(_isPrefixedValue);
 
@@ -35222,7 +35224,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = prefixPlugin;
 
-var _prefixer = __webpack_require__(35);
+var _prefixer = __webpack_require__(36);
 
 function prefixPlugin(_ref) {
   var config = _ref.config,
@@ -35731,7 +35733,7 @@ var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol
 
 var _class, _temp;
 
-var _cssRuleSetToString = __webpack_require__(34);
+var _cssRuleSetToString = __webpack_require__(35);
 
 var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
@@ -35851,7 +35853,7 @@ var _enhancer = __webpack_require__(76);
 
 var _enhancer2 = _interopRequireDefault(_enhancer);
 
-var _styleKeeper = __webpack_require__(33);
+var _styleKeeper = __webpack_require__(34);
 
 var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
@@ -35949,7 +35951,7 @@ var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _styleKeeper = __webpack_require__(33);
+var _styleKeeper = __webpack_require__(34);
 
 var _styleKeeper2 = _interopRequireDefault(_styleKeeper);
 
@@ -36019,7 +36021,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.default = keyframes;
 
-var _cssRuleSetToString = __webpack_require__(34);
+var _cssRuleSetToString = __webpack_require__(35);
 
 var _cssRuleSetToString2 = _interopRequireDefault(_cssRuleSetToString);
 
@@ -36027,7 +36029,7 @@ var _hash = __webpack_require__(85);
 
 var _hash2 = _interopRequireDefault(_hash);
 
-var _prefixer = __webpack_require__(35);
+var _prefixer = __webpack_require__(36);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -36061,7 +36063,7 @@ module.exports = exports['default'];
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory__ = __webpack_require__(219);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_history_createBrowserHistory__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(42);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -36136,11 +36138,11 @@ var _invariant = __webpack_require__(5);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _LocationUtils = __webpack_require__(39);
+var _LocationUtils = __webpack_require__(40);
 
 var _PathUtils = __webpack_require__(16);
 
-var _createTransitionManager = __webpack_require__(40);
+var _createTransitionManager = __webpack_require__(41);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
@@ -36441,7 +36443,7 @@ exports.default = createBrowserHistory;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_prop_types___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_prop_types__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createHashHistory__ = __webpack_require__(221);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_history_createHashHistory___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_3_history_createHashHistory__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(41);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(42);
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -36513,11 +36515,11 @@ var _invariant = __webpack_require__(5);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _LocationUtils = __webpack_require__(39);
+var _LocationUtils = __webpack_require__(40);
 
 var _PathUtils = __webpack_require__(16);
 
-var _createTransitionManager = __webpack_require__(40);
+var _createTransitionManager = __webpack_require__(41);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
@@ -36854,9 +36856,9 @@ var _warning2 = _interopRequireDefault(_warning);
 
 var _PathUtils = __webpack_require__(16);
 
-var _LocationUtils = __webpack_require__(39);
+var _LocationUtils = __webpack_require__(40);
 
-var _createTransitionManager = __webpack_require__(40);
+var _createTransitionManager = __webpack_require__(41);
 
 var _createTransitionManager2 = _interopRequireDefault(_createTransitionManager);
 
@@ -37161,7 +37163,7 @@ module.exports = Array.isArray || function (arr) {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(96);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -37465,7 +37467,7 @@ var createBrowserHistory = function createBrowserHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_invariant___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_invariant__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(25);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__PathUtils__ = __webpack_require__(17);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__createTransitionManager__ = __webpack_require__(44);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__DOMUtils__ = __webpack_require__(96);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -37784,7 +37786,7 @@ var createHashHistory = function createHashHistory() {
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_warning___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_warning__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__PathUtils__ = __webpack_require__(17);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__LocationUtils__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__createTransitionManager__ = __webpack_require__(43);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__createTransitionManager__ = __webpack_require__(44);
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
@@ -37992,7 +37994,7 @@ var createMemoryHistory = function createMemoryHistory() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_matchPath__ = __webpack_require__(44);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_matchPath__ = __webpack_require__(45);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react_router_matchPath___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react_router_matchPath__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_router_Router__ = __webpack_require__(237);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_router_Router___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_router_Router__);
@@ -38214,7 +38216,7 @@ var _invariant = __webpack_require__(5);
 
 var _invariant2 = _interopRequireDefault(_invariant);
 
-var _matchPath = __webpack_require__(44);
+var _matchPath = __webpack_require__(45);
 
 var _matchPath2 = _interopRequireDefault(_matchPath);
 
@@ -38318,7 +38320,7 @@ var _propTypes = __webpack_require__(2);
 
 var _propTypes2 = _interopRequireDefault(_propTypes);
 
-var _matchPath = __webpack_require__(44);
+var _matchPath = __webpack_require__(45);
 
 var _matchPath2 = _interopRequireDefault(_matchPath);
 
@@ -38687,17 +38689,13 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = __webpack_require__(9);
 
-var _index = __webpack_require__(45);
+var _index = __webpack_require__(26);
 
 var actions = _interopRequireWildcard(_index);
 
 var _radium = __webpack_require__(13);
 
 var _radium2 = _interopRequireDefault(_radium);
-
-var _utility = __webpack_require__(248);
-
-var _utility2 = _interopRequireDefault(_utility);
 
 function _interopRequireWildcard(obj) {
 	if (obj && obj.__esModule) {
@@ -38755,6 +38753,8 @@ var Nearby = function (_React$Component) {
 		_this.clickNearbyUser = _this.clickNearbyUser.bind(_this);
 		_this.nearbyUsersList = _this.nearbyUsersList.bind(_this);
 		_this.getLocation = _this.getLocation.bind(_this);
+		_this.hideOnclickOutSide = _this.hideOnclickOutSide.bind(_this);
+		_this.closeProfile = _this.closeProfile.bind(_this);
 		return _this;
 	}
 
@@ -38850,13 +38850,21 @@ var Nearby = function (_React$Component) {
 			//const listener = utility.hideOnClickOutside('.profile', this.profile,()=>alert('you'));
 		}
 	}, {
-		key: 'clickOff',
-		value: function clickOff(e) {
+		key: 'hideOnclickOutSide',
+		value: function hideOnclickOutSide(e) {
 			e.preventDefault();
 			if (!e.target.closest('.profile')) {
 				if (this.state.profileDisplay.display == 'flex') {
 					this.setState({ profileDisplay: { display: 'none' }, nearbyScroll: { overflowY: 'scroll' }, nearbyBlur: { filter: 'blur(0px)' } });
 				}
+			}
+		}
+	}, {
+		key: 'closeProfile',
+		value: function closeProfile() {
+			console.log('inclick profile close');
+			if (this.state.profileDisplay.display == 'flex') {
+				this.setState({ profileDisplay: { display: 'none' }, nearbyScroll: { overflowY: 'scroll' }, nearbyBlur: { filter: 'blur(0px)' } });
 			}
 		}
 	}, {
@@ -38948,10 +38956,10 @@ var Nearby = function (_React$Component) {
 			};
 
 			return _react2.default.createElement('div', { style: outerStyle }, _react2.default.createElement('div', { style: conversationColumnStyle }, _react2.default.createElement(_conversationColumn2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })), _react2.default.createElement('div', { style: nearbyStyle }, _react2.default.createElement('div', { onClick: function onClick(e) {
-					return _this2.clickOff(e);
+					return _this2.hideOnclickOutSide(e);
 				}, ref: function ref(el) {
 					_this2.profile = el;
-				}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] }, _react2.default.createElement('div', { className: 'profile', style: { width: '80%', backgroundColor: 'white', position: 'absolute', top: '100px' } }, _react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser }))), _react2.default.createElement('div', { className: testStyle.container, style: [this.state.nearbyBlur, this.state.nearbyScroll] }, this.nearbyUsersList())), _react2.default.createElement('div', { style: [chatWindowStyle, this.state.chatWindowDisplay] }, _react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })));
+				}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] }, _react2.default.createElement('div', { className: 'profile', style: { width: '80%', backgroundColor: 'white', position: 'absolute', top: '100px' } }, _react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange }))), _react2.default.createElement('div', { className: testStyle.container, style: [this.state.nearbyBlur, this.state.nearbyScroll] }, this.nearbyUsersList())), _react2.default.createElement('div', { style: [chatWindowStyle, this.state.chatWindowDisplay] }, _react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })));
 		}
 	}]);
 
@@ -38988,11 +38996,11 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = __webpack_require__(9);
 
-var _index = __webpack_require__(45);
+var _index = __webpack_require__(26);
 
 var actions = _interopRequireWildcard(_index);
 
-var _reactRouterDom = __webpack_require__(38);
+var _reactRouterDom = __webpack_require__(39);
 
 var _reactRouter = __webpack_require__(245);
 
@@ -39566,7 +39574,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Prompt", function() { return __WEBPACK_IMPORTED_MODULE_1__Prompt__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__Redirect__ = __webpack_require__(95);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Redirect", function() { return __WEBPACK_IMPORTED_MODULE_2__Redirect__["a"]; });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__Route__ = __webpack_require__(43);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Route", function() { return __WEBPACK_IMPORTED_MODULE_3__Route__["a"]; });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__Router__ = __webpack_require__(23);
 /* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "Router", function() { return __WEBPACK_IMPORTED_MODULE_4__Router__["a"]; });
@@ -39616,11 +39624,11 @@ var _react2 = _interopRequireDefault(_react);
 
 var _reactRedux = __webpack_require__(9);
 
-var _index = __webpack_require__(45);
+var _index = __webpack_require__(26);
 
 var actions = _interopRequireWildcard(_index);
 
-var _reactRouterDom = __webpack_require__(38);
+var _reactRouterDom = __webpack_require__(39);
 
 var _radium = __webpack_require__(13);
 
@@ -39809,6 +39817,7 @@ var ChatWindow = function (_React$Component) {
 				display: 'inline-block'
 			};
 			var messages = this.props.conversationData.messages;
+			console.log('after declaire messages');
 			if (messages.length !== 0 & this.props.conversationData.conversationType === 'RECIPIENT') {
 				console.log('in if messages not empty');
 				console.log(messages);
@@ -39880,6 +39889,7 @@ var ChatWindow = function (_React$Component) {
 					);
 				});
 			} else {
+				console.log('no message');
 				console.log(this.props.conversationData);
 				return _react2.default.createElement(
 					'div',
@@ -40044,6 +40054,12 @@ var _radium = __webpack_require__(13);
 
 var _radium2 = _interopRequireDefault(_radium);
 
+var _index = __webpack_require__(26);
+
+var actions = _interopRequireWildcard(_index);
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -40055,21 +40071,66 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var Profile = function (_React$Component) {
     _inherits(Profile, _React$Component);
 
-    function Profile() {
+    function Profile(props) {
         _classCallCheck(this, Profile);
 
-        return _possibleConstructorReturn(this, (Profile.__proto__ || Object.getPrototypeOf(Profile)).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, (Profile.__proto__ || Object.getPrototypeOf(Profile)).call(this, props));
+
+        _this.chatWithUser = _this.chatWithUser.bind(_this);
+        _this.chooseConversation = _this.chooseConversation.bind(_this);
+
+        return _this;
     }
 
     _createClass(Profile, [{
+        key: 'chatWithUser',
+        value: function chatWithUser() {
+            console.log('chatWithUser');
+            console.log(this.props.nearbyUser._id);
+            if (window.innerWidth >= 480) {
+                console.log('larger than 480');
+                var conStatus = !this.props.recipientConversationId[this.props.nearbyUser._id] ? 'CON_N_EXIST' : 'CON_EXIST';
+                console.log(conStatus);
+                this.chooseConversation(this.props.nearbyUser._id, this.props.recipientConversationId[this.props.nearbyUser._id], conStatus);
+            } else {
+                console.log('smaller than 480');
+                window.location.href = 'https://' + window.location.host + '/message/recipient/' + this.props.nearbyUser._id;
+            }
+        }
+    }, {
+        key: 'chooseConversation',
+        value: function chooseConversation(recipientId, conversationId, conStatus) {
+            console.log('choose conversation');
+            this.props.onChatWindowDisplayChange(true);
+            if (recipientId !== this.props.conversationData.chosenId) {
+                this.props.setChosenRecipient(recipientId, conversationId, conStatus);
+            }
+        }
+    }, {
         key: 'render',
         value: function render() {
+            var _this2 = this;
+
             return _react2.default.createElement(
                 'div',
                 null,
                 _react2.default.createElement(
                     'div',
                     null,
+                    _react2.default.createElement(
+                        'div',
+                        { onClick: function onClick() {
+                                return _this2.props.onCloseProfile();
+                            } },
+                        'click to close profile'
+                    ),
+                    _react2.default.createElement(
+                        'div',
+                        { onClick: function onClick() {
+                                return _this2.chatWithUser();
+                            } },
+                        'talk with me'
+                    ),
                     _react2.default.createElement('img', { src: this.props.nearbyUser.avatarURL, style: { width: '80%', margin: 'auto' } }),
                     this.props.nearbyUser.name,
                     this.props.nearbyUser.role,
@@ -40086,68 +40147,12 @@ var Profile = function (_React$Component) {
 function mapStateToProps(state) {
     return {
         conversationData: state.conversationData,
-        user: state.user
+        user: state.user,
+        recipientConversationId: state.recipientConversationId
     };
 }
 
-exports.default = (0, _reactRedux.connect)(mapStateToProps)((0, _radium2.default)(Profile));
-
-/***/ }),
-/* 248 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-/*var sendinblue = require('sendinblue-api');
-exports.sendVer = function(token){	
-	var sendinblue = require('sendinblue-api');
-	console.log()
-	var parameters = { "apiKey": "sZtE1P0VGJr7H8Sc", "timeout": 5000 };
-	var sendinObj = new sendinblue(parameters);
-
-	var input =	{ 'to': { 'o20021106@gmail.com': 'to whom!' },
-		'from': ['r04325008@ntu.edu.tw', 'from email!'],
-		'subject': 'Test mail form sendinblue',
-		'html': 'This is the <h1>HTML</h1>'+toString(token)
-	};
-
-	sendinObj.send_email(input, function(err, response){
-	    if(err){
-	        console.log(err);
-	    } else {
-	        console.log(response);
-	    }
-	});
-}
-*/
-
-exports.hideOnClickOutside = function (selector, targetElement, callback) {
-  var outsideClickListener = function outsideClickListener(event) {
-    console.log(event.target);
-    console.log(selector);
-    console.log(_typeof(event.target.closest));
-    if (!event.target.closest(selector)) {
-      if (!isHidden(targetElement)) {
-        callback();
-        removeClickListener();
-      }
-    }
-  };
-
-  var removeClickListener = function removeClickListener() {
-    document.removeEventListener('click', outsideClickListener);
-  };
-
-  document.addEventListener('click', outsideClickListener);
-  return outsideClickListener;
-};
-
-function isHidden(el) {
-  return el.offsetParent === null;
-}
+exports.default = (0, _reactRedux.connect)(mapStateToProps, actions)((0, _radium2.default)(Profile));
 
 /***/ })
 /******/ ]);

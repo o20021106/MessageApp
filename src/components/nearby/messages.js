@@ -45,8 +45,8 @@ class Messages extends React.Component{
 			console.log('undefined!!!!!!!!!!!')
 			return <ConversationColumn/>
 		}
-		else if(window.innerWidth>=960 & this.props.conversations.length!=0){
-			console.log('width>=960 IN TEST');
+		else if(window.innerWidth>=480 & this.props.conversations.length!=0){
+			console.log('width>=480 IN TEST');
 			console.log(this.props.conversations);
 			var recipient=this.props.conversations[0].conversation.participants.filter(participant => participant._id!==this.props.user._id);
 			return <Redirect to = {`/message/recipient/${recipient[0]._id}`} />
