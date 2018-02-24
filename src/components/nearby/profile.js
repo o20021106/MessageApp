@@ -1,20 +1,20 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import * as actions from '../actions/index';
-import {  BrowserRouter as Router,
-  Route,
-  Link
-} from 'react-router-dom';
 import Radium from 'radium';
-import * as getTime from '../getTimeDisplay';
 
 class Profile extends React.Component{
 
 
     render(){
-        if(conversationData.chosenId ){
-            return <div></div>    
-        }
+        return(<div>
+                <div>
+                    <img src={this.props.nearbyUser.avatarURL} style = {{width:'80%', margin:'auto'}}></img>
+                    {this.props.nearbyUser.name}
+                    {this.props.nearbyUser.role}
+                    {this.props.nearbyUser.height}
+                    {this.props.nearbyUser.weight}
+                </div>
+            </div>)
         
     }
 }
@@ -29,5 +29,5 @@ function mapStateToProps(state) {
     }
 }
 	
-export default connect(mapStateToProps, actions)(Radium(Profile));
+export default connect(mapStateToProps)(Radium(Profile));
  

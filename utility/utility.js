@@ -1,4 +1,4 @@
-var sendinblue = require('sendinblue-api');
+/*var sendinblue = require('sendinblue-api');
 exports.sendVer = function(token){	
 	var sendinblue = require('sendinblue-api');
 	console.log()
@@ -18,4 +18,31 @@ exports.sendVer = function(token){
 	        console.log(response);
 	    }
 	});
+}
+*/
+
+exports.hideOnClickOutside = function(selector, targetElement,callback) {
+  const outsideClickListener = (event) => {
+  	console.log(event.target);
+  	console.log(selector);
+  	console.log(typeof(event.target.closest));
+    if (!event.target.closest(selector)) {
+      if (!isHidden(targetElement)) {
+      		callback();
+          	removeClickListener();
+      }
+    }
+  }
+
+  const removeClickListener = () => {
+    document.removeEventListener('click', outsideClickListener)
+  }
+
+  document.addEventListener('click', outsideClickListener)
+  return outsideClickListener;
+}
+
+
+function isHidden(el) {
+    return (el.offsetParent === null)
 }

@@ -373,10 +373,16 @@ exports.editProfileTesting = {
 }
 
 function ipGeolocation(req, res, foundUser){
-	var ipAddress = req.headers['x-forwarded-for'].split(',').pop() || 
+	console.log('header');
+	var x='';
+	if(req.headers['x-forwarded-for']){
+		req.headers['x-forwarded-for'].split(',').pop();
+	}
+	var ipAddress = x || 
          	req.connection.remoteAddress || 
          	req.socket.remoteAddress || 
          	req.connection.socket.remoteAddress;
+    console.log(ipAddress);
 	fetch('http://ip-api.com/json/'+ipAddress,
 		{
 			headers: {
@@ -388,21 +394,30 @@ function ipGeolocation(req, res, foundUser){
 		}
 	)
 	.then(function(response) {
+		console.log('in response');
 	    return response.json();
 	})
 	.then(json=>{
-		foundUser['loc']={type:'Point',coordinates:[json.lon, json.lat]};
-		foundUser.save(function(err, updateUser){
-			if(err){
-				return res.json({error:err, user:foundUser});
-			}
-			updateUser['password'] = undefined;
-			
-			return res.json({user:updateUser});
-		})
-
+		console.log(json);
+		if(!json.lon || !json.lat ){
+			return res.json({err:'unable to obtain postion'});
+		}
+		else{
+			foundUser['loc']={type:'Point',coordinates:[json.lon, json.lat]};
+			foundUser.save(function(err, updateUser){
+				if(err){
+					console.log('err1');
+					console.log(err);
+					return res.json({error:err, user:foundUser});
+				}
+				updateUser['password'] = undefined;
+				console.log('sendUser');
+				return res.json({user:updateUser});
+			})
+		}
 	})
 	.catch(err=>{
+		console.log('err3');
 		return res.json({error:err});
 	})
 }
@@ -418,15 +433,17 @@ exports.updateGeolocation = function(req,res){
 			ipGeolocation(req, res, foundUser);
 		}
 		else{
-			foundUser['loc']={type:'Point',coordinates:req.body.coordinates};	
+			foundUser['loc']={type:'Point',coordinates:req.body.coordinates};
+			foundUser.save(function(err, updateUser){
+				if(err){
+					return res.json({error:err, user:foundUser});
+				}
+				updateUser['password'] = undefined;
+				
+				return res.json({user:updateUser})
+			})	
 		}
-		foundUser.save(function(err, updateUser){
-			if(err){
-				return res.json({error:err, user:foundUser});
-			}
-			updateUser['password'] = undefined;
-			
-			return res.json({user:updateUser})
-		})
+
+		
 	})
 }
