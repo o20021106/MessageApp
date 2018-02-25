@@ -40,3 +40,39 @@ exports.getMessageTime = function(timeStamp){
 	
 	return {time: displayTime, date : year+month+' '+date}
 }
+
+exports.getAge = function(birthDate){
+	const dayMap= {0:'Sun',1:'Mon',2:'Tue',3:'Wed',4:'Thr',5:'Fri',6:'Sat'}
+	const monthMap = {0:'Jan',1:'Feb',2:'Mar',3:'Apr',4:'May',5:'Jun',6:'Jul',7:'Aug',8:'Sep',9:'Oct',10:'Nov',11:'Dec'}
+	var now = new Date();
+	var BD = new Date(birthDate);
+	var age = now.getFullYear()-BD.getFullYear();
+	console.log('birthday');
+	console.log(birthDate);
+	console.log(BD);
+	console.log(now);
+	console.log(age);
+	if(now.getMonth() > BD.getMonth()){
+		console.log('in 1');
+		return age;
+	}
+	else if(now.getMonth() < BD.getMonth()){
+				console.log('in 2');
+
+		return age-1;
+	}
+	else if(now.getMonth() === BD.getMonth()){
+		if(now.getDate() >= BD.getDate()){
+					console.log('in 3');
+
+			return age
+		}
+		else{
+					console.log('in 4');
+
+			return age -1
+		}
+	}
+
+
+}

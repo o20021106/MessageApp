@@ -299,8 +299,12 @@ var Nearby = function (_React$Component) {
 							}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] },
 						_react2.default.createElement(
 							'div',
-							{ className: 'profile', style: { width: '80%', backgroundColor: 'white', position: 'absolute', top: '100px' } },
-							_react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange })
+							{ className: 'profile', style: { width: '80%', position: 'absolute', top: '100px', paddingBottom: '100px' } },
+							_react2.default.createElement(
+								'div',
+								{ style: { width: '100%', backgroundColor: 'white' } },
+								_react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange })
+							)
 						)
 					),
 					_react2.default.createElement(

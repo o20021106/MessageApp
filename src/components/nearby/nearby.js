@@ -221,8 +221,10 @@ class Nearby extends React.Component{
 				</div>
 				<div style = {nearbyStyle}>
 					<div onClick = {(e)=>this.hideOnclickOutSide(e)} ref = {(el)=>{this.profile = el}} style={[{zIndex:1, overflowY: 'scroll',width:'100%', height:'100%', position:'absolute', justifyContent:'center',alignItems:'center'}, this.state.profileDisplay]}>
-						<div  className ='profile' style = {{width:'80%',backgroundColor:'white', position:'absolute', top:'100px'}}>
-							<Profile nearbyUser = {this.state.nearbyUser} onCloseProfile = {this.closeProfile} onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
+						<div  className ='profile' style = {{width:'80%', position:'absolute', top:'100px', paddingBottom:'100px'}}>
+							<div style = {{width:'100%',backgroundColor:'white'}}>
+								<Profile nearbyUser = {this.state.nearbyUser} onCloseProfile = {this.closeProfile} onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
+							</div>
 						</div>
 					</div>
 					<div className = {testStyle.container} style = {[this.state.nearbyBlur, this.state.nearbyScroll]}>
