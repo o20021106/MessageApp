@@ -112,45 +112,80 @@ exports.newConversation = function(user, recipientId, composedMessage,){
 	  	}
 		console.log('after new COnversation before if');
 
-		
-	  	const conversation = new Conversation({
-	  		participants: [user._id, recipientId]
-	  	})
+		//check whether a conversation already exist  
+		//find({ words: { $all: ["text", "here"] }})
+		//Conversation.findOne({$and: [{participants: {$in:[req.user._id]}}, {participants: {$size :2} }]})
+		console.log('whats happening');
+		console.log(user._id);
 
-	  	conversation.save(function(err, newConversation){
+		console.log(recipientId);
+
+		Conversation.find({$and:[{participants: {$all:[user._id, recipientId]}},{participants: {$size :2}}]})
+	  	.exec(function(err,searchedConversation){
+	  		console.log('executed');
 	  		if(err){
-	  			return reject({error:err})
+	  			console.log('in search con err');
+	  			return reject(err);
 	  		}
-	  		const message = new Message({
-	  	  		conversationId: newConversation._id,
-	      		body: composedMessage,
-	      		author: user._id
-	  		});
-			console.log('new conversation before message save');
+	  		else if(searchedConversation.length != 0){
+	  			console.log('con existed');
 
-	  		message.save(function(err, newMessage) {
-	    		if (err) {
-	    			return reject({error:err})
-	     		}
-	     		Conversation.populate(newConversation, {path:'participants',select:'name _id avatarURL'}, function(err, newConversation){
-	     			
-	     			if(err){
-	     				console.log(err);
-	     			}
-	     			Message.populate(newMessage,{path:'author', select:'name _id avatarURL'},function(err,newPopulatedMessage){
-	     				if(err){
-	     					console.log(err);
-	     				}
-	     				return resolve({
-	     					message :newPopulatedMessage,
-	     					conversation:newConversation
-	     				})
+	  			newMessage(user, searchedConversation._id, composedMessage)
+	  			.then(response=>{
+	  				resolve({conversationAlreadyExist:true, message:response.message});
+	  			})
+	  			.catch(err=>{
+	  				console.log(err);
+	  				resolve({conversationAlreadyExist:true, conversation:searchedConversation[0]},{err:err});
+	  			})
+	  		}
+	  		else{
+	  			console.log('not existed');
+	  			const conversation = new Conversation({
+			  		participants: [user._id, recipientId]
+			  	})
+
+			  	conversation.save(function(err, newConversation){
+			  		if(err){
+			  			return reject({error:err})
+			  		}
+			  		const message = new Message({
+			  	  		conversationId: newConversation._id,
+			      		body: composedMessage,
+			      		author: user._id
+			  		});
+					console.log('new conversation before message save');
+
+			  		message.save(function(err, newMessage) {
+			    		if (err) {
+			    			return reject({error:err})
+			     		}
+			     		Conversation.populate(newConversation, {path:'participants',select:'name _id avatarURL'}, function(err, newConversation){
+			     			
+			     			if(err){
+			     				console.log(err);
+			     			}
+			     			Message.populate(newMessage,{path:'author', select:'name _id avatarURL'},function(err,newPopulatedMessage){
+			     				if(err){
+			     					console.log(err);
+			     					reject(err);
+			     				}
+			     				console.log('save successfully');
+			     				return resolve({
+			     					message :newPopulatedMessage,
+			     					conversation:newConversation
+			     				})
 
 
-	     			})
-	     		})
-	    	});
+			     			})
+			     		})
+			    	});
 
+			  	});
+
+	  		}
 	  	});
+
+	  	
 	})
 }

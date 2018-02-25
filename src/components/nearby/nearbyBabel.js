@@ -190,7 +190,8 @@ var Nearby = function (_React$Component) {
 				var distance = _typeof(nearbyUser.dis !== 'undefined') ? nearbyUser.dis : '';
 				var backgroundStyle = {
 					backgroundImage: 'url("' + nearbyUser.avatarURL + '")',
-					backgroundSize: 'cover'
+					backgroundSize: 'cover',
+					overflow: 'hidden'
 				};
 				return _react2.default.createElement(
 					'div',

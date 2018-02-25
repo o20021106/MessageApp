@@ -108,7 +108,11 @@ io.on('connection', function(client){
 	    	chatControllerSocket.newMessage(user,data.recipient, data.composedMessage)
 	    	.then(response => {
 	    		fn(response);
-	    	});
+	    	})
+	    	.catch(err=>{
+	    		console({err:err});
+	    		}
+	    	);
 	    }); 
 
 	    client.on('newMessage', function(data,fn){
@@ -116,23 +120,44 @@ io.on('connection', function(client){
 	    	.then(response => {
 	    		io.to(data.conversationId).emit('newMessage', {message: response.message, chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
 	    		fn(response.status);
-	    	});
+	    	}).catch(err=>{
+	    		console({err:err});
+	    		}
+	    	);
 	    });
 
 	    client.on('newConversation', function(data,fn){
 	    	chatControllerSocket.newConversation(user, data.recipientId, data.composedMessage)
 	    	.then(response =>{
-	    		console.log('new conversation!!!!!!!!!!!!!!!!!!')
-	    		console.log(data.recipientId);
-	    		console.log(clients);
-	    		client.join(response.conversation._id);
-	    		if(data.recipientId in clients){
-	    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
- 	    		}
-	    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
-	    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
-	    		fn({type: 'NOTHING'});
-	    	}); 
+	    		console.log('returned');
+	    		if(response.hasOwnProperty('conversationAlreadyExist')){
+	    			console.log('has own key');
+	    			if(response.hasOwnProperty('message')){
+	    				io.to(data.conversationId)
+	    				.emit('newMessage', {message: response.message, 
+	    					chosenId:[data.recipientId, user._id], 
+	    					conversationType: data.conversationType});
+
+	    				fn(response.status);
+	    			}
+	    		}
+	    		else
+	    		{
+	    			console.log('new conversation!!!!!!!!!!!!!!!!!!')
+		    		console.log(data.recipientId);
+		    		console.log(clients);
+		    		client.join(response.conversation._id);
+		    		if(data.recipientId in clients){
+		    			io.sockets.connected[clients[data.recipientId]].join(response.conversation._id);
+	 	    		}
+		    		io.to(response.conversation._id).emit('NEW_CONVERSATION', 
+		    				{payload: response,chosenId:[data.recipientId, user._id], conversationType: data.conversationType});
+		    		fn({type: 'NOTHING'});
+	    		}
+	    	}) 
+	    	.catch(err=>{
+	    		console({err:err});
+	    	});
 
 	    }); 
 	    client.on('event', function(data,fn){

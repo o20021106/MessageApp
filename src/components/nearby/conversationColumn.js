@@ -31,11 +31,11 @@ class ConversationColumn extends React.Component{
 		return decoded;
 	}
 
-	chooseConversation(recipientId, conversationId){
+	chooseConversation(recipientId, conversationId, conStatus){
 
 		this.props.onChatWindowDisplayChange(true);
 		if(recipientId !== this.props.conversationData.chosenId){
-			this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
+			this.props.setChosenRecipient(recipientId, conversationId, conStatus);
 		}	
 
 
@@ -131,7 +131,7 @@ class ConversationColumn extends React.Component{
 							var displayTime = getTime.getTimeConversationList(conversation.message[0].createdAt);
 							return(
 								<li style = {{width : '100%'}} key = {conversation.conversation._id} >
-									<div style = {navLinkDisplayStyle}  onClick= {()=>chooseConversation(participant[0]._id, conversation.conversation._id)} >
+									<div style = {navLinkDisplayStyle}  onClick= {()=>chooseConversation(participant[0]._id, conversation.conversation._id,'CON_EXIST')} >
 										
 										<div style = {imageWrapperStyle}>
 											<img style = {avatarStyle} src = {participant[0].avatarURL}></img>
@@ -175,12 +175,23 @@ class ConversationColumn extends React.Component{
 		this.setState({keyWord:e.target.value});
 	}
 
-	clickSearchUser(){
-		this.props.clearSearch();
-		this.setState({keyWord:''});
-		console.log('click searchBoxStyle');
-		console.log(this.input);
-		this.input.value ='';
+	clickSearchUser(recipientId){
+		if(window.innerWidth>=480){
+            console.log('larger than 480 in search user');
+            var conStatus = !this.props.recipientConversationId[recipientId]?'CON_N_EXIST':'CON_EXIST';
+            console.log(conStatus);
+            this.chooseConversation(recipientId, 
+            	this.props.recipientConversationId[recipientId], conStatus);
+            this.props.clearSearch();
+			this.setState({keyWord:''});
+			console.log('click searchBoxStyle');
+			console.log(this.input);
+			this.input.value ='';
+        }
+        else{
+            console.log('smaller than 480');
+            window.location.href = `https://${window.location.host}/message/recipient/${this.props.nearbyUser._id}`;
+        }
 	}
 
 
@@ -244,7 +255,7 @@ class ConversationColumn extends React.Component{
 			return this.props.searchedUsers.map(user=>{
 				return (
 					<div style = {listItemStyle} key = {user._id}>
-							<NavLink style = {navLinkStyle} to = {`/message/recipient/${user._id}`} onClick = {this.clickSearchUser} >
+							<div style = {navLinkStyle}  onClick = {()=>this.clickSearchUser(user._id)} >
 								<div style = {imageWrapperStyle}>
 									<img src = {user.avatarURL} style = {avatarStyle}></img>
 								</div>
@@ -253,7 +264,7 @@ class ConversationColumn extends React.Component{
 										<span style = {nameStyle}>{user.name}</span>
 									</div> 
 								</div>
-							</NavLink>
+							</div>
 					</div>
 					)
 			}) 

@@ -34,16 +34,48 @@ class Profile extends React.Component{
         }       
     }
 
+
+
     render(){
-        return(<div>
+
+        const profileOuterStyle= {
+            width :'100%',
+            padding: 15,
+            boxSizing: 'border-box'
+
+        };
+        const closeStyle = {
+            display:'flex',
+            justifyContent:'flex-end'
+        };
+
+        const buttonStyle = {
+            color:'green',
+            ':hover': {
+                 color:'orange'
+            },
+            cursor:'pointer'
+        };
+
+        return(<div style = {profileOuterStyle}>
+                <div style = {closeStyle}>
+                    <div key = 'close' style = {buttonStyle} onClick = {()=>this.props.onCloseProfile()}>
+                        <i className="far fa-times-circle fa-lg"></i>
+                    </div>
+                </div>
+
                 <div>
-                    <div onClick = {()=>this.props.onCloseProfile()}>click to close profile</div>
-                    <div onClick = {()=>this.chatWithUser()} >talk with me</div>
-                    <img src={this.props.nearbyUser.avatarURL} style = {{width:'80%', margin:'auto'}}></img>
-                    {this.props.nearbyUser.name}
-                    {this.props.nearbyUser.role}
-                    {this.props.nearbyUser.height}
-                    {this.props.nearbyUser.weight}
+                    <div key = 'talk' style = {buttonStyle} onClick = {()=>this.chatWithUser()} >
+                        <i className="far fa-comment-alt fa-lg"></i>
+                    </div>
+                <div>
+                </div>
+                    <img src={this.props.nearbyUser.avatarURL} style = {{width:'100%', margin:'auto'}}></img>
+                    {this.props.nearbyUser.name}<br/>
+                    {this.props.nearbyUser.role}<br/>
+                    {this.props.nearbyUser.height}<br/>
+                    {this.props.nearbyUser.weight}<br/>
+                    {this.props.nearbyUser.aboutMe}<br/>
                 </div>
             </div>)
         

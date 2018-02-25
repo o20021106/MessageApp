@@ -131,7 +131,8 @@ class Nearby extends React.Component{
 			let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
 			let backgroundStyle = {
 				backgroundImage : `url("${nearbyUser.avatarURL}")`,
-				backgroundSize:'cover'
+				backgroundSize:'cover',
+				overflow:'hidden'
 			}
 			return( <div key = {nearbyUser._id} className = {testStyle.squareWrapper} onClick ={()=>clickNearbyUser(nearbyUser)}>
 				<div className = {testStyle.squareItem} style = {backgroundStyle}>

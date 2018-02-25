@@ -1,4 +1,4 @@
-import Layout from './layout';
+import Layout from '../layout';
 import ChatWindow from './chatWindow';
 import Messages from './messages';
 

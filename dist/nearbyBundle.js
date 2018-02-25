@@ -38597,11 +38597,23 @@ var Layout = function (_React$Component) {
 		key: 'render',
 		value: function render() {
 			var navbarStyle = {
-				height: 35,
+				height: 40,
+				display: 'flex',
+				justifyContent: 'flex-end',
 				backgroundColor: 'black',
+				padding: '0 50px',
 				'@media (min-width : 480px)': {
 					backgroundColor: 'red' }
 
+			};
+			var buttonStyle = {
+				margin: 'auto 0',
+				padding: '0 10px',
+				color: 'blue',
+				':hover': {
+					color: 'orange'
+				},
+				cursor: 'pointer'
 			};
 			var layoutStyle = {
 				height: '100%',
@@ -38622,7 +38634,27 @@ var Layout = function (_React$Component) {
 				_react2.default.createElement(
 					'div',
 					{ style: navbarStyle },
-					'red'
+					_react2.default.createElement(
+						'div',
+						{ style: buttonStyle, key: 'user' },
+						_react2.default.createElement('i', { className: 'far fa-user-circle fa-lg fa-fw', onClick: function onClick() {
+								window.location.href = 'https://' + window.location.host + '/editProfile';
+							} })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: buttonStyle, key: 'messages', onClick: function onClick() {
+								window.location.href = 'https://' + window.location.host + '/messages';
+							} },
+						_react2.default.createElement('i', { className: 'far fa-comments fa-lg fa-fw' })
+					),
+					_react2.default.createElement(
+						'div',
+						{ style: buttonStyle, key: 'users' },
+						_react2.default.createElement('i', { className: 'fa fa-map-marker-alt fa-lg fa-fw', onClick: function onClick() {
+								window.location.href = 'https://' + window.location.host + '/nearby';
+							} })
+					)
 				),
 				_react2.default.createElement(
 					'div',
@@ -38877,7 +38909,8 @@ var Nearby = function (_React$Component) {
 				var distance = _typeof(nearbyUser.dis !== 'undefined') ? nearbyUser.dis : '';
 				var backgroundStyle = {
 					backgroundImage: 'url("' + nearbyUser.avatarURL + '")',
-					backgroundSize: 'cover'
+					backgroundSize: 'cover',
+					overflow: 'hidden'
 				};
 				return _react2.default.createElement('div', { key: nearbyUser._id, className: testStyle.squareWrapper, onClick: function onClick() {
 						return clickNearbyUser(nearbyUser);
@@ -39052,11 +39085,11 @@ var ConversationColumn = function (_React$Component) {
 		}
 	}, {
 		key: 'chooseConversation',
-		value: function chooseConversation(recipientId, conversationId) {
+		value: function chooseConversation(recipientId, conversationId, conStatus) {
 
 			this.props.onChatWindowDisplayChange(true);
 			if (recipientId !== this.props.conversationData.chosenId) {
-				this.props.setChosenRecipient(recipientId, conversationId, 'CON_EXIST');
+				this.props.setChosenRecipient(recipientId, conversationId, conStatus);
 			}
 		}
 	}, {
@@ -39150,7 +39183,7 @@ var ConversationColumn = function (_React$Component) {
 								_react2.default.createElement(
 									'div',
 									{ style: navLinkDisplayStyle, onClick: function onClick() {
-											return chooseConversation(participant[0]._id, conversation.conversation._id);
+											return chooseConversation(participant[0]._id, conversation.conversation._id, 'CON_EXIST');
 										} },
 									_react2.default.createElement(
 										'div',
@@ -39210,12 +39243,21 @@ var ConversationColumn = function (_React$Component) {
 		}
 	}, {
 		key: 'clickSearchUser',
-		value: function clickSearchUser() {
-			this.props.clearSearch();
-			this.setState({ keyWord: '' });
-			console.log('click searchBoxStyle');
-			console.log(this.input);
-			this.input.value = '';
+		value: function clickSearchUser(recipientId) {
+			if (window.innerWidth >= 480) {
+				console.log('larger than 480 in search user');
+				var conStatus = !this.props.recipientConversationId[recipientId] ? 'CON_N_EXIST' : 'CON_EXIST';
+				console.log(conStatus);
+				this.chooseConversation(recipientId, this.props.recipientConversationId[recipientId], conStatus);
+				this.props.clearSearch();
+				this.setState({ keyWord: '' });
+				console.log('click searchBoxStyle');
+				console.log(this.input);
+				this.input.value = '';
+			} else {
+				console.log('smaller than 480');
+				window.location.href = 'https://' + window.location.host + '/message/recipient/' + this.props.nearbyUser._id;
+			}
 		}
 	}, {
 		key: 'searchedUsersList',
@@ -39274,8 +39316,10 @@ var ConversationColumn = function (_React$Component) {
 						'div',
 						{ style: listItemStyle, key: user._id },
 						_react2.default.createElement(
-							_reactRouterDom.NavLink,
-							{ style: navLinkStyle, to: '/message/recipient/' + user._id, onClick: _this2.clickSearchUser },
+							'div',
+							{ style: navLinkStyle, onClick: function onClick() {
+									return _this2.clickSearchUser(user._id);
+								} },
 							_react2.default.createElement(
 								'div',
 								{ style: imageWrapperStyle },
@@ -40111,31 +40155,61 @@ var Profile = function (_React$Component) {
         value: function render() {
             var _this2 = this;
 
+            var profileOuterStyle = {
+                width: '100%',
+                padding: 15,
+                boxSizing: 'border-box'
+
+            };
+            var closeStyle = {
+                display: 'flex',
+                justifyContent: 'flex-end'
+            };
+
+            var buttonStyle = {
+                color: 'green',
+                ':hover': {
+                    color: 'orange'
+                },
+                cursor: 'pointer'
+            };
+
             return _react2.default.createElement(
                 'div',
-                null,
+                { style: profileOuterStyle },
+                _react2.default.createElement(
+                    'div',
+                    { style: closeStyle },
+                    _react2.default.createElement(
+                        'div',
+                        { key: 'close', style: buttonStyle, onClick: function onClick() {
+                                return _this2.props.onCloseProfile();
+                            } },
+                        _react2.default.createElement('i', { className: 'far fa-times-circle fa-lg' })
+                    )
+                ),
                 _react2.default.createElement(
                     'div',
                     null,
                     _react2.default.createElement(
                         'div',
-                        { onClick: function onClick() {
-                                return _this2.props.onCloseProfile();
-                            } },
-                        'click to close profile'
-                    ),
-                    _react2.default.createElement(
-                        'div',
-                        { onClick: function onClick() {
+                        { key: 'talk', style: buttonStyle, onClick: function onClick() {
                                 return _this2.chatWithUser();
                             } },
-                        'talk with me'
+                        _react2.default.createElement('i', { className: 'far fa-comment-alt fa-lg' })
                     ),
-                    _react2.default.createElement('img', { src: this.props.nearbyUser.avatarURL, style: { width: '80%', margin: 'auto' } }),
+                    _react2.default.createElement('div', null),
+                    _react2.default.createElement('img', { src: this.props.nearbyUser.avatarURL, style: { width: '100%', margin: 'auto' } }),
                     this.props.nearbyUser.name,
+                    _react2.default.createElement('br', null),
                     this.props.nearbyUser.role,
+                    _react2.default.createElement('br', null),
                     this.props.nearbyUser.height,
-                    this.props.nearbyUser.weight
+                    _react2.default.createElement('br', null),
+                    this.props.nearbyUser.weight,
+                    _react2.default.createElement('br', null),
+                    this.props.nearbyUser.aboutMe,
+                    _react2.default.createElement('br', null)
                 )
             );
         }

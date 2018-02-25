@@ -1,4 +1,4 @@
-import Layout from './layout';
+import Layout from '../layout';
 import nearbyBabel from './nearbyBabel';
 
 /*const routes = [

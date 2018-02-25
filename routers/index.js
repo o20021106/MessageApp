@@ -73,7 +73,7 @@ router.get('/message/*', passport.authenticate('jwt', {failureRedirect:hostRe+'r
 router.get('/nearby', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }), nearbyController.nearby.get);
 
 router.get('/', passport.authenticate('jwt', {failureRedirect:hostRe+'registerLogin',session: false }),function(req,res){
-    res.redirect('https://'+req.headers.host+'/message/messages')
+    res.redirect('https://'+req.headers.host+'/nearby')
 })
 
 
