@@ -44,11 +44,13 @@ class Layout extends React.Component{
 		const navbarStyle = {
 			height:40,
 			display:'flex',
-			justifyContent:'flex-end',
 			backgroundColor: 'black',
-			padding:'0 50px',
+			zIndex:1,justifyContent:'space-evenly',
+				padding:'0 30px',
 			'@media (min-width : 480px)':{
-				backgroundColor: 'red'}
+				justifyContent:'flex-end',
+				padding:'0 50px',
+				}
 				
 			}
 		const buttonStyle = {
@@ -77,13 +79,13 @@ class Layout extends React.Component{
 			<div style = {layoutStyle}>
 				<div style = {navbarStyle}>
 					<div style={buttonStyle} key = 'user'>
-  						<i className="far fa-user-circle fa-lg fa-fw" onClick = {()=>{window.location.href = 'https://'+window.location.host+'/editProfile'}}></i>
+  						<i className="fa fa-user fa-2x fa-fw" onClick = {()=>{window.location.href = 'https://'+window.location.host+'/editProfile'}}></i>
 					</div>
-					<div style={buttonStyle} key = 'messages' onClick = {()=>{window.location.href = 'https://'+window.location.host+'/messages'}}>
-  						<i className="far fa-comments fa-lg fa-fw"></i>
+					<div style={buttonStyle} key = 'messages' onClick = {()=>{window.location.href = 'https://'+window.location.host+'/message/messages'}}>
+  						<i className="fa fa-comments-o fa-2x fa-fw"></i>
 					</div>
 					<div style={buttonStyle} key = 'users'>
-						<i className="fa fa-map-marker-alt fa-lg fa-fw" onClick = {()=>{window.location.href = 'https://'+window.location.host+'/nearby'}}></i>
+						<i className="fa fa-map-marker fa-2x fa-fw" onClick = {()=>{window.location.href = 'https://'+window.location.host+'/nearby'}}></i>
 					</div>
 				</div>
 				<div style = {pageStyle}>

@@ -16,6 +16,7 @@
 .dd8a2fdb{
 	width:calc(100%/3);
 	cursor: pointer;
+
 }
 
 @media(min-width: 480px){

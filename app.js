@@ -59,7 +59,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan('dev'));  
 app.use(validator());
 app.use(express.static(DIST_DIR));
-app.use(express.static(path.join(__dirname,'fontawesome-free-5.0.2/')));
+app.use(express.static(path.join(__dirname,'icons')));
+
 app.use('/',index);
 
 server.listen(PORT,function(){

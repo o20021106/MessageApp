@@ -47,29 +47,17 @@ exports.getAge = function(birthDate){
 	var now = new Date();
 	var BD = new Date(birthDate);
 	var age = now.getFullYear()-BD.getFullYear();
-	console.log('birthday');
-	console.log(birthDate);
-	console.log(BD);
-	console.log(now);
-	console.log(age);
 	if(now.getMonth() > BD.getMonth()){
-		console.log('in 1');
 		return age;
 	}
 	else if(now.getMonth() < BD.getMonth()){
-				console.log('in 2');
-
 		return age-1;
 	}
 	else if(now.getMonth() === BD.getMonth()){
 		if(now.getDate() >= BD.getDate()){
-					console.log('in 3');
-
 			return age
 		}
 		else{
-					console.log('in 4');
-
 			return age -1
 		}
 	}

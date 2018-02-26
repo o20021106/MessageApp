@@ -15,17 +15,17 @@ class Profile extends React.Component{
         if(window.innerWidth>=480){
             var conStatus = !this.props.recipientConversationId[this.props.nearbyUser._id]?'CON_N_EXIST':'CON_EXIST';
             this.chooseConversation(this.props.nearbyUser._id, 
-                this.props.recipientConversationId[this.props.nearbyUser._id], conStatus);
+                this.props.recipientConversationId[this.props.nearbyUser._id], conStatus, this.props.nearbyUser);
         }
         else{
             window.location.href = `https://${window.location.host}/message/recipient/${this.props.nearbyUser._id}`;
         }
     }
 
-    chooseConversation(recipientId, conversationId,conStatus){
+    chooseConversation(recipientId, conversationId, conStatus, recipient){
         this.props.onChatWindowDisplayChange(true);
         if(recipientId !== this.props.conversationData.chosenId){
-            this.props.setChosenRecipient(recipientId, conversationId, conStatus);
+            this.props.setChosenRecipientNearby(recipientId, conversationId, conStatus, recipient);
         }       
     }
 
@@ -41,6 +41,8 @@ class Profile extends React.Component{
         var infoList = [];
         var user = this.props.nearbyUser;
         var age =  typeof(user.birthday)=== 'undefined'? undefined:getTimeDisplay.getAge(user.birthday);
+
+        infoList.push(typeof(this.props.nearbyUser.dis !== 'undefined')? ['distance',`${Math.round(this.props.nearbyUser.dis)} m`]: null);
         infoList.push(typeof(user.aboutMe) !== 'undefined'? ['aboutMe',`${user.aboutMe}`]: null);
         infoList.push(typeof(age) !== 'undefined'? ['age',`AGE ${age}`]: null);
         infoList.push(typeof(user.height) !== 'undefined'? ['height',`HEIGHT ${user.height} cm`]: null);
@@ -69,62 +71,128 @@ class Profile extends React.Component{
             padding: 30,
             boxSizing: 'border-box'
 
+
         };
 
-
         const buttonStyle = {
-            position:'absolute',
-            right: 15,
-            top:15,
+            
+            position:'fixed',
+            right: 30,
+            bottom:30,
             color:'green',
+            width:45,
+            height:45,
+            backgroundColor:'red',
+            borderRadius:'50%',
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
             ':hover': {
                  color:'orange'
             },
-            cursor:'pointer'
+            cursor:'pointer',
+            '@media (min-width: 480px)':{
+                position:'absolute',
+                right: 15,
+                top:15,
+                background: 'transparent',
+                width:'auto',
+                height:'auto',
+                bottom:'auto'
+            }
+        };
+        const chatButtonStyleSmall = {
+            
+            position:'fixed',
+            right: 30,
+            bottom:100,
+            color:'green',
+            width:45,
+            height:45,
+            backgroundColor:'red',
+            borderRadius:'50%',
+            display:'flex',
+            justifyContent:'center',
+            alignItems:'center',
+            cursor:'pointer',
+            ':hover': {
+                 color:'orange'
+            },
+            '@media (min-width: 480px)':{
+                display:'none'
+            }
         };
 
-        const chatButtonStyle = {
+        const chatButtonStyleBig = {
+            display:'none',
             backgroundColor:'lightblue',
+            color:'white',                
             textAlign:'center',
             padding:10,
-            borderRadius:3,
-            color:'white',
+            cursor:'pointer', 
+            borderRadius: 3,
+            width:'100%',
+            boxSizing: 'border-box',
             ':hover': {
                  backgroundColor:'darkblue'
             },
-            cursor:'pointer'
+            '@media (min-width: 480px)':{
+                display:'block'
+            }
         };
+
         const contentStyle = {
-            display:'flex'
+            display:'block',
+            '@media (min-width: 480px)':{
+                display:'flex'
+            }
+        }
+        const imageStyle ={
+            '@media (min-width: 480px)':{
+                flex:'3 3 1px'
+            }
         }
 
+        const profileInfoStyle = {
+            '@media (min-width: 480px)':{
+                flex:'2 2 1px',
+                paddingLeft:30
+            }
+        }
+
+        const nameStyle ={
+            textOverflow : 'ellipsis',
+            flex: 1,
+            whiteSpace: 'nowrap',
+            overflow:'hidden'
+
+        }
+
+
         return(<div style = {profileOuterStyle}>
-                <div>
                     <div key = 'close' style = {buttonStyle} onClick = {()=>this.props.onCloseProfile()}>
-                        <i className="far fa-times-circle fa-lg"></i>
+                        <i className="fa fa-times"></i>
                     </div>
-                </div>
+                    <div key = 'chat' style = {chatButtonStyleSmall} onClick = {()=>this.chatWithUser()}>
+                        <i className="fa fa-comment fa-lg"></i>
+                    </div> 
+                    <div style = {contentStyle}>
 
- 
-                <div style = {contentStyle}>
-
-                    <div style = {{flex:'3 3 1px'}}>
-                        <img src={this.props.nearbyUser.avatarURL} style = {{width:'100%', margin:'auto'}}></img>
-                    </div>
-                    <div style={{flex:'2 2 1px'}}>  
-                        <div style = {{paddingLeft:30}}>
-                            <div>
-                                <h1 >{this.props.nearbyUser.name}</h1>
-                            </div>
-                            {this.userInfoDidsplay()}
-                            <div style = {chatButtonStyle} onClick = {()=>this.chatWithUser()}>
-                                    CHAT
-                            </div>
+                        <div style = {imageStyle}>
+                            <img src={this.props.nearbyUser.avatarURL} style = {{width:'100%', margin:'auto'}}></img>
+                        </div>
+                        <div style={profileInfoStyle}>  
+                                <div style={nameStyle}>
+                                    {this.props.nearbyUser.name}
+                                </div>
+                               {this.userInfoDidsplay()}
+                                <div style = {chatButtonStyleBig} onClick = {()=>this.chatWithUser()}>
+                                        CHAT
+                                </div>
                         </div>
                     </div>
-                </div>
-            </div>)
-        
+                    
+                </div>)
     }
 }
 

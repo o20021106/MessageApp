@@ -78,15 +78,11 @@ var Nearby = function (_React$Component) {
 				this.getLocation().then(function (position) {
 					actions.updateGeolocation(position);
 					//this.props.print('i am here here i am');
-					console.log('get position!!!!!!!!!!!!!');
-					console.log(position);
 				}).catch(function (error) {
 					console.log(error);
 				});
 			}
-			console.log('did mount before');
 			this.props.getNearbyUsers();
-			console.log('did mount after');
 		}
 	}, {
 		key: 'chatWindowDisplayChange',
@@ -129,8 +125,6 @@ var Nearby = function (_React$Component) {
 
 			return new Promise(function (resolve, reject) {
 				if (navigator.geolocation) {
-					//http://ip-api.com/json/208.80.152.201
-					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.longitude, position.coords.latitude]);
 					}, function (error) {
@@ -139,7 +133,7 @@ var Nearby = function (_React$Component) {
 						}
 					});
 				} else {
-					alert("geolocation information unavalable");
+					console.log("geolocation information unavalable");
 				}
 			});
 		}
@@ -151,7 +145,6 @@ var Nearby = function (_React$Component) {
 			var currentLongitude = position.coords.longitude;
 
 			return position;
-			//alert(currentLongitude+" and "+currentLatitude);
 		}
 	}, {
 		key: 'clickNearbyUser',
@@ -186,6 +179,14 @@ var Nearby = function (_React$Component) {
 
 			var clickNearbyUser = this.clickNearbyUser;
 
+			var nameStyle = {
+				textOverflow: 'ellipsis',
+				flex: 1,
+				whiteSpace: 'nowrap',
+				overflow: 'hidden'
+
+			};
+
 			return this.props.nearbyUsers.map(function (nearbyUser) {
 				var distance = _typeof(nearbyUser.dis !== 'undefined') ? nearbyUser.dis : '';
 				var backgroundStyle = {
@@ -193,20 +194,61 @@ var Nearby = function (_React$Component) {
 					backgroundSize: 'cover',
 					overflow: 'hidden'
 				};
+				var squareWrapper = {
+					width: 'calc(100%/3)',
+					paddingBottom: 'calc(100%/3)',
+					height: 0,
+					cursor: 'pointer',
+					position: 'relative',
+					overflow: 'hidden',
+					'@media (min-width: 480px)': {
+						width: 'calc(100%/6)',
+						paddingBottom: 'calc(100%/6)'
+					}
+				};
+
+				var squareItem = {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: '100%',
+					display: 'flex',
+					alignItems: 'flex-end',
+					padding: '10px',
+					boxSizing: 'border-box'
+				};
 				return _react2.default.createElement(
 					'div',
-					{ key: nearbyUser._id, className: testStyle.squareWrapper, onClick: function onClick() {
+					{ key: nearbyUser._id, style: [squareWrapper, backgroundStyle], onClick: function onClick() {
 							return clickNearbyUser(nearbyUser);
 						} },
 					_react2.default.createElement(
 						'div',
-						{ className: testStyle.squareItem, style: backgroundStyle },
-						nearbyUser.name,
-						' dist ',
-						distance
+						{ style: squareItem },
+						_react2.default.createElement(
+							'span',
+							{ style: nameStyle },
+							nearbyUser.name
+						)
 					)
 				);
 			});
+			/*let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
+   	let backgroundStyle = {
+   		backgroundImage : `url("${nearbyUser.avatarURL}")`,
+   		backgroundSize:'cover',
+   		overflow:'hidden'
+   	}
+   	return( <div key = {nearbyUser._id} className = {testStyle.squareWrapper} onClick ={()=>clickNearbyUser(nearbyUser)}>
+   		<div className = {testStyle.squareItem} style = {backgroundStyle}>
+   			<span style = {nameStyle}>
+   				{nearbyUser.name}
+   			</span>
+   		</div>
+   	</div>)
+   })
+   */
 			/*
    var userNames = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33];
    let backgroundStyle = {
@@ -253,7 +295,7 @@ var Nearby = function (_React$Component) {
 
 			var conversationColumnStyle = {
 				display: 'none',
-
+				zIndex: 1,
 				'@media (min-width: 480px)': {
 					display: 'block',
 					maxWidth: 240
@@ -275,8 +317,21 @@ var Nearby = function (_React$Component) {
 			var nearbyStyle = {
 				flex: 1,
 				backgroundColor: 'blue',
+				minWidth: 0,
 				position: 'relative'
 
+			};
+
+			var profileStyle = {
+				width: '100%',
+				position: 'absolute',
+				top: 0,
+				'@media (min-width: 480px)': {
+					width: '80%',
+					position: 'absolute',
+					top: '100px',
+					paddingBottom: '100px'
+				}
 			};
 
 			return _react2.default.createElement(
@@ -299,7 +354,7 @@ var Nearby = function (_React$Component) {
 							}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] },
 						_react2.default.createElement(
 							'div',
-							{ className: 'profile', style: { width: '80%', position: 'absolute', top: '100px', paddingBottom: '100px' } },
+							{ className: 'profile', style: profileStyle },
 							_react2.default.createElement(
 								'div',
 								{ style: { width: '100%', backgroundColor: 'white' } },
@@ -310,7 +365,83 @@ var Nearby = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ className: testStyle.container, style: [this.state.nearbyBlur, this.state.nearbyScroll] },
-						this.nearbyUsersList()
+						this.nearbyUsersList(),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null),
+						'hi',
+						_react2.default.createElement('br', null)
 					)
 				),
 				_react2.default.createElement(

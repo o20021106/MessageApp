@@ -307,7 +307,11 @@ class ChatWindow extends React.Component{
 
 			const chatWindowBarStyle = {
 				backgroundColor:'yellow',
-				height: 25
+				height: 25,
+				display:'flex',
+				justifyContent:'flex-end',
+				alignItems:'center',
+				padding : '0 5px 0px 15px'
 			}
 
 			return (
@@ -316,8 +320,13 @@ class ChatWindow extends React.Component{
 					<div style = {newMessageNoti} ref = {(el)=> {this.conversationNoti=el}}>
 						new Message
 					</div>
-					<div style={chatWindowBarStyle} onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
-						close window
+					<div style={chatWindowBarStyle}>
+						<span style ={{flex:1, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis'}}>
+							{!this.props.conversationData.recipient?'':this.props.conversationData.recipient.name}
+						</span>
+						<div onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
+							<i className="fa fa-times"></i>
+						</div>
 					</div>
  					<div style = {conversationsStyle} ref = {(el)=>{this.conversationWindowEl=el}}>
 						{this.conversationDisplay()}

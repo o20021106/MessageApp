@@ -2543,6 +2543,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.loadRecipients = loadRecipients;
 exports.setChosenRecipient = setChosenRecipient;
+exports.setChosenRecipientNearby = setChosenRecipientNearby;
 exports.loadConversations = loadConversations;
 exports.loadCurrentConversation = loadCurrentConversation;
 exports.newMessageSocket = newMessageSocket;
@@ -2628,7 +2629,7 @@ function setChosenRecipient(recipientId, conversationId, status) {
 		});
 	}
 
-	function getConversationByReId(recipientId, dispatch, conversationType) {
+	function getConversationByReId(recipientId, recipient, dispatch, conversationType) {
 		fetch("/getConversationByRecipientId/" + recipientId, {
 			headers: {
 				'Accept': 'application/json',
@@ -2663,20 +2664,93 @@ function setChosenRecipient(recipientId, conversationId, status) {
 	}
 }
 
-/*
-export function setChosenConversation(conversationId){
-    return function(dispatch){
-    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
-    	getCurrentConversation(conversationId, dispatch);
-    }
+function setChosenRecipientNearby(recipientId, conversationId, status, recipient) {
+	return function (dispatch) {
+		console.log(recipientId);
+		console.log('in set chosenRecipient!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+		var convExist = 'CON_EXIST';
+		var conNExist = 'CON_N_EXIST';
+		var notLoaded = 'NOT_LOADED';
+		console.log(recipientId);
+		console.log(conversationId);
+		console.log(status);
+		dispatch({ type: _type.CHOSEN_RECIPIENT, recipientId: recipientId, recipient: recipient });
+		console.log(status);
+		switch (status) {
+			case convExist:
+				console.log('how dare you');
+				getConversationByConIdNearby(recipientId, recipient, conversationId, dispatch);
+				break;
+			case conNExist:
+				break;
+			case notLoaded:
+				getConversationByReIdNearby(recipientId, recipient, dispatch, 'RECIPIENT');
+				break;
+		}
+	};
+
+	function getConversationByConIdNearby(recipientId, recipient, conversationId, dispatch) {
+		fetch("/getConversation/" + conversationId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+
+			dispatch({ type: _type.CONVERSATION_MESSAGES,
+				messages: json.conversation,
+				conversationId: conversationId,
+				recipientId: recipientId,
+				conversationType: 'RECIPIENT',
+				recipient: recipient });
+			return json;
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
+
+	function getConversationByReIdNearby(recipientId, recipient, dispatch, conversationType) {
+		fetch("/getConversationByRecipientId/" + recipientId, {
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+				//'Authorization' : localStorage.getItem("token")
+			},
+			credentials: 'same-origin',
+			method: "GET"
+		}).then(function (response) {
+			return response.json();
+		}).then(function (json) {
+			console.log('return conversation by recipientId');
+			console.log(json);
+			if (json.status) {
+				//no existing conversation
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
+					conversationId: null,
+					chosenId: recipientId,
+					conversationType: conversationType,
+					recipient: recipient });
+			} else {
+				//conversation already exists
+				console.log(json);
+				dispatch({ type: _type.CONVERSATION_BY_RECIPIENT,
+					conversationId: json.conversation._id,
+					payload: json,
+					chosenId: recipientId,
+					conversationType: conversationType,
+					recipient: recipient });
+			}
+		}).catch(function (err) {
+			console.log(err);
+		});
+	}
 }
-*/
-/*
-export function setLatestRecipient(){
-    return {type:UPDATE_RECIPIENT, latestRecipient: null}
-}
-*/
+
 function loadConversations() {
 	return function (dispatch) {
 		fetch("/getConversations", {
@@ -4552,26 +4626,14 @@ exports.getAge = function (birthDate) {
 	var now = new Date();
 	var BD = new Date(birthDate);
 	var age = now.getFullYear() - BD.getFullYear();
-	console.log('birthday');
-	console.log(birthDate);
-	console.log(BD);
-	console.log(now);
-	console.log(age);
 	if (now.getMonth() > BD.getMonth()) {
-		console.log('in 1');
 		return age;
 	} else if (now.getMonth() < BD.getMonth()) {
-		console.log('in 2');
-
 		return age - 1;
 	} else if (now.getMonth() === BD.getMonth()) {
 		if (now.getDate() >= BD.getDate()) {
-			console.log('in 3');
-
 			return age;
 		} else {
-			console.log('in 4');
-
 			return age - 1;
 		}
 	}
@@ -32802,6 +32864,7 @@ exports.default = function () {
 			conversationData.conversationType = 'RECIPIENT';
 			conversationData.chosenId = action.recipientId;
 			conversationData.messages = [];
+			conversationData.recipient = action.recipient;
 			console.log(conversationData);
 			return _extends({}, state, { conversationData: conversationData });
 		case _type.CONVERSATION_MESSAGES:
@@ -32810,6 +32873,7 @@ exports.default = function () {
 				console.log(state.conversationData);
 				var conversationData = Object.assign({}, state.conversationData);
 				conversationData.messages = action.messages;
+				conversationData.recipient = action.recipient;
 				return _extends({}, state, { conversationData: conversationData });
 			}
 		case _type.RECIEVE_NEW_MESSAGE:
@@ -32881,7 +32945,7 @@ exports.default = function () {
 			var conversationData = Object.assign({}, state.conversationData);
 			var recipientConversationId = Object.assign({}, state.recipientConversationId);
 			var conversations = state.conversations.slice();
-
+			conversationData.recipient = action.recipient;
 			if (action.conversationType === 'RECIPIENT') {
 				if (!state.recipientConversationId[action.chosenId]) {
 					console.log('in first if');
@@ -32943,7 +33007,7 @@ var initial = exports.initial = {
 	recipientConversationId: {},
 	searchedUsers: [],
 	conversations: [],
-	conversationData: { conversationType: null, chosenId: null, messages: [], userInfo: [] },
+	conversationData: { conversationType: null, chosenId: null, messages: [], userInfo: [], recipient: '' },
 	chosenConversation: null,
 	currentConversation: [],
 	currentConversationId: null,
@@ -38630,11 +38694,13 @@ var Layout = function (_React$Component) {
 			var navbarStyle = {
 				height: 40,
 				display: 'flex',
-				justifyContent: 'flex-end',
 				backgroundColor: 'black',
-				padding: '0 50px',
+				zIndex: 1, justifyContent: 'space-evenly',
+				padding: '0 30px',
 				'@media (min-width : 480px)': {
-					backgroundColor: 'red' }
+					justifyContent: 'flex-end',
+					padding: '0 50px'
+				}
 
 			};
 			var buttonStyle = {
@@ -38668,21 +38734,21 @@ var Layout = function (_React$Component) {
 					_react2.default.createElement(
 						'div',
 						{ style: buttonStyle, key: 'user' },
-						_react2.default.createElement('i', { className: 'far fa-user-circle fa-lg fa-fw', onClick: function onClick() {
+						_react2.default.createElement('i', { className: 'fa fa-user fa-2x fa-fw', onClick: function onClick() {
 								window.location.href = 'https://' + window.location.host + '/editProfile';
 							} })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: buttonStyle, key: 'messages', onClick: function onClick() {
-								window.location.href = 'https://' + window.location.host + '/messages';
+								window.location.href = 'https://' + window.location.host + '/message/messages';
 							} },
-						_react2.default.createElement('i', { className: 'far fa-comments fa-lg fa-fw' })
+						_react2.default.createElement('i', { className: 'fa fa-comments-o fa-2x fa-fw' })
 					),
 					_react2.default.createElement(
 						'div',
 						{ style: buttonStyle, key: 'users' },
-						_react2.default.createElement('i', { className: 'fa fa-map-marker-alt fa-lg fa-fw', onClick: function onClick() {
+						_react2.default.createElement('i', { className: 'fa fa-map-marker fa-2x fa-fw', onClick: function onClick() {
 								window.location.href = 'https://' + window.location.host + '/nearby';
 							} })
 					)
@@ -38828,15 +38894,11 @@ var Nearby = function (_React$Component) {
 				this.getLocation().then(function (position) {
 					actions.updateGeolocation(position);
 					//this.props.print('i am here here i am');
-					console.log('get position!!!!!!!!!!!!!');
-					console.log(position);
 				}).catch(function (error) {
 					console.log(error);
 				});
 			}
-			console.log('did mount before');
 			this.props.getNearbyUsers();
-			console.log('did mount after');
 		}
 	}, {
 		key: 'chatWindowDisplayChange',
@@ -38879,8 +38941,6 @@ var Nearby = function (_React$Component) {
 
 			return new Promise(function (resolve, reject) {
 				if (navigator.geolocation) {
-					//http://ip-api.com/json/208.80.152.201
-					alert('navigator');
 					navigator.geolocation.getCurrentPosition(function (position) {
 						resolve([position.coords.longitude, position.coords.latitude]);
 					}, function (error) {
@@ -38889,7 +38949,7 @@ var Nearby = function (_React$Component) {
 						}
 					});
 				} else {
-					alert("geolocation information unavalable");
+					console.log("geolocation information unavalable");
 				}
 			});
 		}
@@ -38901,7 +38961,6 @@ var Nearby = function (_React$Component) {
 			var currentLongitude = position.coords.longitude;
 
 			return position;
-			//alert(currentLongitude+" and "+currentLatitude);
 		}
 	}, {
 		key: 'clickNearbyUser',
@@ -38936,6 +38995,14 @@ var Nearby = function (_React$Component) {
 
 			var clickNearbyUser = this.clickNearbyUser;
 
+			var nameStyle = {
+				textOverflow: 'ellipsis',
+				flex: 1,
+				whiteSpace: 'nowrap',
+				overflow: 'hidden'
+
+			};
+
 			return this.props.nearbyUsers.map(function (nearbyUser) {
 				var distance = _typeof(nearbyUser.dis !== 'undefined') ? nearbyUser.dis : '';
 				var backgroundStyle = {
@@ -38943,10 +39010,49 @@ var Nearby = function (_React$Component) {
 					backgroundSize: 'cover',
 					overflow: 'hidden'
 				};
-				return _react2.default.createElement('div', { key: nearbyUser._id, className: testStyle.squareWrapper, onClick: function onClick() {
+				var squareWrapper = {
+					width: 'calc(100%/3)',
+					paddingBottom: 'calc(100%/3)',
+					height: 0,
+					cursor: 'pointer',
+					position: 'relative',
+					overflow: 'hidden',
+					'@media (min-width: 480px)': {
+						width: 'calc(100%/6)',
+						paddingBottom: 'calc(100%/6)'
+					}
+				};
+
+				var squareItem = {
+					position: 'absolute',
+					top: 0,
+					left: 0,
+					width: '100%',
+					height: '100%',
+					display: 'flex',
+					alignItems: 'flex-end',
+					padding: '10px',
+					boxSizing: 'border-box'
+				};
+				return _react2.default.createElement('div', { key: nearbyUser._id, style: [squareWrapper, backgroundStyle], onClick: function onClick() {
 						return clickNearbyUser(nearbyUser);
-					} }, _react2.default.createElement('div', { className: testStyle.squareItem, style: backgroundStyle }, nearbyUser.name, ' dist ', distance));
+					} }, _react2.default.createElement('div', { style: squareItem }, _react2.default.createElement('span', { style: nameStyle }, nearbyUser.name)));
 			});
+			/*let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
+   	let backgroundStyle = {
+   		backgroundImage : `url("${nearbyUser.avatarURL}")`,
+   		backgroundSize:'cover',
+   		overflow:'hidden'
+   	}
+   	return( <div key = {nearbyUser._id} className = {testStyle.squareWrapper} onClick ={()=>clickNearbyUser(nearbyUser)}>
+   		<div className = {testStyle.squareItem} style = {backgroundStyle}>
+   			<span style = {nameStyle}>
+   				{nearbyUser.name}
+   			</span>
+   		</div>
+   	</div>)
+   })
+   */
 			/*
    var userNames = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33];
    let backgroundStyle = {
@@ -38993,7 +39099,7 @@ var Nearby = function (_React$Component) {
 
 			var conversationColumnStyle = {
 				display: 'none',
-
+				zIndex: 1,
 				'@media (min-width: 480px)': {
 					display: 'block',
 					maxWidth: 240
@@ -39015,15 +39121,28 @@ var Nearby = function (_React$Component) {
 			var nearbyStyle = {
 				flex: 1,
 				backgroundColor: 'blue',
+				minWidth: 0,
 				position: 'relative'
 
+			};
+
+			var profileStyle = {
+				width: '100%',
+				position: 'absolute',
+				top: 0,
+				'@media (min-width: 480px)': {
+					width: '80%',
+					position: 'absolute',
+					top: '100px',
+					paddingBottom: '100px'
+				}
 			};
 
 			return _react2.default.createElement('div', { style: outerStyle }, _react2.default.createElement('div', { style: conversationColumnStyle }, _react2.default.createElement(_conversationColumn2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })), _react2.default.createElement('div', { style: nearbyStyle }, _react2.default.createElement('div', { onClick: function onClick(e) {
 					return _this2.hideOnclickOutSide(e);
 				}, ref: function ref(el) {
 					_this2.profile = el;
-				}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] }, _react2.default.createElement('div', { className: 'profile', style: { width: '80%', position: 'absolute', top: '100px', paddingBottom: '100px' } }, _react2.default.createElement('div', { style: { width: '100%', backgroundColor: 'white' } }, _react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange })))), _react2.default.createElement('div', { className: testStyle.container, style: [this.state.nearbyBlur, this.state.nearbyScroll] }, this.nearbyUsersList())), _react2.default.createElement('div', { style: [chatWindowStyle, this.state.chatWindowDisplay] }, _react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })));
+				}, style: [{ zIndex: 1, overflowY: 'scroll', width: '100%', height: '100%', position: 'absolute', justifyContent: 'center', alignItems: 'center' }, this.state.profileDisplay] }, _react2.default.createElement('div', { className: 'profile', style: profileStyle }, _react2.default.createElement('div', { style: { width: '100%', backgroundColor: 'white' } }, _react2.default.createElement(_profile2.default, { nearbyUser: this.state.nearbyUser, onCloseProfile: this.closeProfile, onChatWindowDisplayChange: this.chatWindowDisplayChange })))), _react2.default.createElement('div', { className: testStyle.container, style: [this.state.nearbyBlur, this.state.nearbyScroll] }, this.nearbyUsersList(), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null), 'hi', _react2.default.createElement('br', null))), _react2.default.createElement('div', { style: [chatWindowStyle, this.state.chatWindowDisplay] }, _react2.default.createElement(_chatWindow2.default, { onChatWindowDisplayChange: this.chatWindowDisplayChange })));
 		}
 	}]);
 
@@ -39116,11 +39235,11 @@ var ConversationColumn = function (_React$Component) {
 		}
 	}, {
 		key: 'chooseConversation',
-		value: function chooseConversation(recipientId, conversationId, conStatus) {
+		value: function chooseConversation(recipientId, conversationId, conStatus, recipient) {
 
 			this.props.onChatWindowDisplayChange(true);
 			if (recipientId !== this.props.conversationData.chosenId) {
-				this.props.setChosenRecipient(recipientId, conversationId, conStatus);
+				this.props.setChosenRecipientNearby(recipientId, conversationId, conStatus, recipient);
 			}
 		}
 	}, {
@@ -39185,7 +39304,6 @@ var ConversationColumn = function (_React$Component) {
 				var monthMap = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'May', 5: 'Jun', 6: 'Jul', 7: 'Aug', 8: 'Sep', 9: 'Oct', 10: 'Nov', 11: 'Dec' };
 				var decoder = this.decoder;
 				var user = this.props.user;
-				//const setChosenRecipient = this.props.setChosenRecipient;
 				var chooseConversation = this.chooseConversation;
 				return _react2.default.createElement(
 					'div',
@@ -39214,7 +39332,7 @@ var ConversationColumn = function (_React$Component) {
 								_react2.default.createElement(
 									'div',
 									{ style: navLinkDisplayStyle, onClick: function onClick() {
-											return chooseConversation(participant[0]._id, conversation.conversation._id, 'CON_EXIST');
+											return chooseConversation(participant[0]._id, conversation.conversation._id, 'CON_EXIST', participant[0]);
 										} },
 									_react2.default.createElement(
 										'div',
@@ -39381,8 +39499,8 @@ var ConversationColumn = function (_React$Component) {
 
 			var searchBoxStyle = {
 				padding: '12px 12px',
-				border: 0
-
+				border: 0,
+				backgroundColor: 'white'
 			};
 			var searchBarStyle = {
 				height: '30px',
@@ -40042,7 +40160,11 @@ var ChatWindow = function (_React$Component) {
 
 			var chatWindowBarStyle = {
 				backgroundColor: 'yellow',
-				height: 25
+				height: 25,
+				display: 'flex',
+				justifyContent: 'flex-end',
+				alignItems: 'center',
+				padding: '0 5px 0px 15px'
 			};
 
 			return _react2.default.createElement(
@@ -40057,10 +40179,19 @@ var ChatWindow = function (_React$Component) {
 				),
 				_react2.default.createElement(
 					'div',
-					{ style: chatWindowBarStyle, onClick: function onClick() {
-							return _this3.props.onChatWindowDisplayChange(false);
-						} },
-					'close window'
+					{ style: chatWindowBarStyle },
+					_react2.default.createElement(
+						'span',
+						{ style: { flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } },
+						!this.props.conversationData.recipient ? '' : this.props.conversationData.recipient.name
+					),
+					_react2.default.createElement(
+						'div',
+						{ onClick: function onClick() {
+								return _this3.props.onChatWindowDisplayChange(false);
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-times' })
+					)
 				),
 				_react2.default.createElement(
 					'div',
@@ -40117,6 +40248,8 @@ Object.defineProperty(exports, "__esModule", {
     value: true
 });
 
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 var _react = __webpack_require__(0);
@@ -40166,17 +40299,17 @@ var Profile = function (_React$Component) {
         value: function chatWithUser() {
             if (window.innerWidth >= 480) {
                 var conStatus = !this.props.recipientConversationId[this.props.nearbyUser._id] ? 'CON_N_EXIST' : 'CON_EXIST';
-                this.chooseConversation(this.props.nearbyUser._id, this.props.recipientConversationId[this.props.nearbyUser._id], conStatus);
+                this.chooseConversation(this.props.nearbyUser._id, this.props.recipientConversationId[this.props.nearbyUser._id], conStatus, this.props.nearbyUser);
             } else {
                 window.location.href = 'https://' + window.location.host + '/message/recipient/' + this.props.nearbyUser._id;
             }
         }
     }, {
         key: 'chooseConversation',
-        value: function chooseConversation(recipientId, conversationId, conStatus) {
+        value: function chooseConversation(recipientId, conversationId, conStatus, recipient) {
             this.props.onChatWindowDisplayChange(true);
             if (recipientId !== this.props.conversationData.chosenId) {
-                this.props.setChosenRecipient(recipientId, conversationId, conStatus);
+                this.props.setChosenRecipientNearby(recipientId, conversationId, conStatus, recipient);
             }
         }
     }, {
@@ -40197,6 +40330,8 @@ var Profile = function (_React$Component) {
             var infoList = [];
             var user = this.props.nearbyUser;
             var age = typeof user.birthday === 'undefined' ? undefined : _getTimeDisplay2.default.getAge(user.birthday);
+
+            infoList.push(_typeof(this.props.nearbyUser.dis !== 'undefined') ? ['distance', Math.round(this.props.nearbyUser.dis) + ' m'] : null);
             infoList.push(typeof user.aboutMe !== 'undefined' ? ['aboutMe', '' + user.aboutMe] : null);
             infoList.push(typeof age !== 'undefined' ? ['age', 'AGE ' + age] : null);
             infoList.push(typeof user.height !== 'undefined' ? ['height', 'HEIGHT ' + user.height + ' cm'] : null);
@@ -40235,29 +40370,97 @@ var Profile = function (_React$Component) {
             };
 
             var buttonStyle = {
-                position: 'absolute',
-                right: 15,
-                top: 15,
+
+                position: 'fixed',
+                right: 30,
+                bottom: 30,
                 color: 'green',
+                width: 45,
+                height: 45,
+                backgroundColor: 'red',
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
                 ':hover': {
                     color: 'orange'
                 },
-                cursor: 'pointer'
+                cursor: 'pointer',
+                '@media (min-width: 480px)': {
+                    position: 'absolute',
+                    right: 15,
+                    top: 15,
+                    background: 'transparent',
+                    width: 'auto',
+                    height: 'auto',
+                    bottom: 'auto'
+                }
+            };
+            var chatButtonStyleSmall = {
+
+                position: 'fixed',
+                right: 30,
+                bottom: 100,
+                color: 'green',
+                width: 45,
+                height: 45,
+                backgroundColor: 'red',
+                borderRadius: '50%',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                cursor: 'pointer',
+                ':hover': {
+                    color: 'orange'
+                },
+                '@media (min-width: 480px)': {
+                    display: 'none'
+                }
             };
 
-            var chatButtonStyle = {
+            var chatButtonStyleBig = {
+                display: 'none',
                 backgroundColor: 'lightblue',
+                color: 'white',
                 textAlign: 'center',
                 padding: 10,
+                cursor: 'pointer',
                 borderRadius: 3,
-                color: 'white',
+                width: '100%',
+                boxSizing: 'border-box',
                 ':hover': {
                     backgroundColor: 'darkblue'
                 },
-                cursor: 'pointer'
+                '@media (min-width: 480px)': {
+                    display: 'block'
+                }
             };
+
             var contentStyle = {
-                display: 'flex'
+                display: 'block',
+                '@media (min-width: 480px)': {
+                    display: 'flex'
+                }
+            };
+            var imageStyle = {
+                '@media (min-width: 480px)': {
+                    flex: '3 3 1px'
+                }
+            };
+
+            var profileInfoStyle = {
+                '@media (min-width: 480px)': {
+                    flex: '2 2 1px',
+                    paddingLeft: 30
+                }
+            };
+
+            var nameStyle = {
+                textOverflow: 'ellipsis',
+                flex: 1,
+                whiteSpace: 'nowrap',
+                overflow: 'hidden'
+
             };
 
             return _react2.default.createElement(
@@ -40265,46 +40468,41 @@ var Profile = function (_React$Component) {
                 { style: profileOuterStyle },
                 _react2.default.createElement(
                     'div',
-                    null,
-                    _react2.default.createElement(
-                        'div',
-                        { key: 'close', style: buttonStyle, onClick: function onClick() {
-                                return _this3.props.onCloseProfile();
-                            } },
-                        _react2.default.createElement('i', { className: 'far fa-times-circle fa-lg' })
-                    )
+                    { key: 'close', style: buttonStyle, onClick: function onClick() {
+                            return _this3.props.onCloseProfile();
+                        } },
+                    _react2.default.createElement('i', { className: 'fa fa-times' })
+                ),
+                _react2.default.createElement(
+                    'div',
+                    { key: 'chat', style: chatButtonStyleSmall, onClick: function onClick() {
+                            return _this3.chatWithUser();
+                        } },
+                    _react2.default.createElement('i', { className: 'fa fa-comment fa-lg' })
                 ),
                 _react2.default.createElement(
                     'div',
                     { style: contentStyle },
                     _react2.default.createElement(
                         'div',
-                        { style: { flex: '3 3 1px' } },
+                        { style: imageStyle },
                         _react2.default.createElement('img', { src: this.props.nearbyUser.avatarURL, style: { width: '100%', margin: 'auto' } })
                     ),
                     _react2.default.createElement(
                         'div',
-                        { style: { flex: '2 2 1px' } },
+                        { style: profileInfoStyle },
                         _react2.default.createElement(
                             'div',
-                            { style: { paddingLeft: 30 } },
-                            _react2.default.createElement(
-                                'div',
-                                null,
-                                _react2.default.createElement(
-                                    'h1',
-                                    null,
-                                    this.props.nearbyUser.name
-                                )
-                            ),
-                            this.userInfoDidsplay(),
-                            _react2.default.createElement(
-                                'div',
-                                { style: chatButtonStyle, onClick: function onClick() {
-                                        return _this3.chatWithUser();
-                                    } },
-                                'CHAT'
-                            )
+                            { style: nameStyle },
+                            this.props.nearbyUser.name
+                        ),
+                        this.userInfoDidsplay(),
+                        _react2.default.createElement(
+                            'div',
+                            { style: chatButtonStyleBig, onClick: function onClick() {
+                                    return _this3.chatWithUser();
+                                } },
+                            'CHAT'
                         )
                     )
                 )

@@ -67,7 +67,10 @@ export function setChosenRecipient(recipientId, conversationId, status){
 }
 
 
-function getConversationByConId(recipientId, conversationId, dispatch){
+
+
+
+function getConversationByConId(recipientId,conversationId, dispatch){
 	fetch("/getConversation/"+conversationId,
 		{
 			headers: {
@@ -98,7 +101,7 @@ function getConversationByConId(recipientId, conversationId, dispatch){
 }
 
 
-function getConversationByReId(recipientId, dispatch, conversationType){
+function getConversationByReId(recipientId, recipient, dispatch, conversationType){
 		fetch("/getConversationByRecipientId/"+recipientId,
 			{
 				headers: {
@@ -140,36 +143,113 @@ function getConversationByReId(recipientId, dispatch, conversationType){
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-export function setChosenConversation(conversationId){
+export function setChosenRecipientNearby(recipientId, conversationId, status, recipient){
     return function(dispatch){
-    	console.log('in set chosenConversation!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-    	dispatch({type:CHOSEN_CONVERSATION, chosenConversation: conversationId});
-    	getCurrentConversation(conversationId, dispatch);
+    	console.log(recipientId);
+    	console.log('in set chosenRecipient!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+    	var convExist = 'CON_EXIST';
+		var conNExist = 'CON_N_EXIST';
+		var notLoaded = 'NOT_LOADED';
+		console.log(recipientId);
+		console.log(conversationId);
+		console.log(status);
+    	dispatch({type:CHOSEN_RECIPIENT, recipientId: recipientId, recipient:recipient});
+ 		console.log(status);
+ 		switch (status){
+			case convExist:
+				console.log('how dare you');
+				getConversationByConIdNearby(recipientId,recipient,conversationId, dispatch);
+				break;
+			case conNExist:
+				break;
+			case notLoaded:
+				getConversationByReIdNearby(recipientId,recipient,dispatch, 'RECIPIENT');
+				break;
     }
 }
-*/
-/*
-export function setLatestRecipient(){
-    return {type:UPDATE_RECIPIENT, latestRecipient: null}
+
+
+
+
+function getConversationByConIdNearby(recipientId,recipient, conversationId, dispatch){
+	fetch("/getConversation/"+conversationId,
+		{
+			headers: {
+		      'Accept': 'application/json', 
+		      'Content-Type': 'application/json',
+		      //'Authorization' : localStorage.getItem("token")
+		    },
+		    credentials: 'same-origin',
+		    method: "GET",
+		})
+		.then(function(response) {
+		    return response.json();
+		})
+		.then(json=>{
+
+			dispatch({type: CONVERSATION_MESSAGES , 
+				messages: json.conversation, 
+				conversationId: conversationId, 
+				recipientId:recipientId,
+				conversationType: 'RECIPIENT',
+				recipient:recipient});
+			return json;
+		})
+		.catch(err=>{
+			console.log(err);
+		});
 }
-*/
+
+
+function getConversationByReIdNearby(recipientId, recipient, dispatch, conversationType){
+		fetch("/getConversationByRecipientId/"+recipientId,
+			{
+				headers: {
+			      'Accept': 'application/json', 
+			      'Content-Type': 'application/json',
+			      //'Authorization' : localStorage.getItem("token")
+			    },
+			    credentials: 'same-origin',
+			    method: "GET",
+			})
+			.then(function(response) {
+			    return response.json();
+			})
+			.then(json=>{
+				console.log('return conversation by recipientId');
+				console.log(json);
+				if(json.status){
+					//no existing conversation
+					dispatch({type: CONVERSATION_BY_RECIPIENT, 
+						conversationId: null, 
+						chosenId: recipientId,
+						conversationType: conversationType,
+						recipient:recipient});
+				}
+				else{
+					//conversation already exists
+					console.log(json);
+					dispatch({type: CONVERSATION_BY_RECIPIENT, 
+						conversationId: json.conversation._id, 
+						payload: json, 
+						chosenId: recipientId,
+						conversationType: conversationType,
+						recipient:recipient});
+				}
+			})
+			.catch(err=>{
+				console.log(err);
+			});
+	}
+}
+
+
+
+
+
+
+
+
 export function loadConversations(){
 	return function(dispatch){
 		fetch("/getConversations",

@@ -28,16 +28,14 @@ class Nearby extends React.Component{
 				{	
 					actions.updateGeolocation(position);
 					//this.props.print('i am here here i am');
-					console.log('get position!!!!!!!!!!!!!');
-					console.log(position);}
+
+				}
 			)
 			.catch(error=>{
 				console.log(error)
 			});
 		}
-		console.log('did mount before');
 		this.props.getNearbyUsers();
-		console.log('did mount after');
 	}
 
 	chatWindowDisplayChange(show){
@@ -79,12 +77,10 @@ class Nearby extends React.Component{
 
 		return new Promise(function (resolve, reject) {
 	    	if (navigator.geolocation) {
-	    		//http://ip-api.com/json/208.80.152.201
-	    		alert('navigator');
 	        	navigator.geolocation.getCurrentPosition(function(position){resolve([position.coords.longitude, position.coords.latitude])}, 
 	        		function(error){if (error.code === error.PERMISSION_DENIED){resolve(undefined)}});
 	    	} else { 
-	        	alert("geolocation information unavalable");
+	        	console.log("geolocation information unavalable");
 	    	}	
 	    })
 	}
@@ -95,7 +91,6 @@ class Nearby extends React.Component{
     	var currentLongitude = position.coords.longitude; 
 
     	return position;
-	    //alert(currentLongitude+" and "+currentLatitude);
 	}
 
 	clickNearbyUser(nearbyUser){
@@ -126,6 +121,13 @@ class Nearby extends React.Component{
 
 		var clickNearbyUser = this.clickNearbyUser;
 		
+		const nameStyle ={
+			textOverflow : 'ellipsis',
+			flex: 1,
+			whiteSpace: 'nowrap',
+			overflow:'hidden'
+
+		}
 
 		return this.props.nearbyUsers.map(nearbyUser=>{
 			let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
@@ -134,12 +136,53 @@ class Nearby extends React.Component{
 				backgroundSize:'cover',
 				overflow:'hidden'
 			}
+			const squareWrapper = {
+					width:'calc(100%/3)',
+					paddingBottom:'calc(100%/3)',
+					height:0,
+					cursor: 'pointer',
+					position:'relative',
+					overflow:'hidden',			
+					'@media (min-width: 480px)':{
+						width:'calc(100%/6)',
+						paddingBottom:'calc(100%/6)',
+					}
+			}
+
+			const squareItem = {
+				position:'absolute',
+				top:0,
+				left:0,
+				width:'100%',
+				height:'100%',
+				display:'flex',
+				alignItems:'flex-end',
+				padding:'10px',
+				boxSizing:'border-box'
+			}
+			return( <div key = {nearbyUser._id} style= {[squareWrapper,backgroundStyle]} onClick ={()=>clickNearbyUser(nearbyUser)}>
+				<div style = {squareItem}>
+					<span style = {nameStyle}>
+						{nearbyUser.name}
+					</span>
+				</div>
+			</div>)
+		})			
+		/*let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
+			let backgroundStyle = {
+				backgroundImage : `url("${nearbyUser.avatarURL}")`,
+				backgroundSize:'cover',
+				overflow:'hidden'
+			}
 			return( <div key = {nearbyUser._id} className = {testStyle.squareWrapper} onClick ={()=>clickNearbyUser(nearbyUser)}>
 				<div className = {testStyle.squareItem} style = {backgroundStyle}>
-					{nearbyUser.name} dist {distance}
+					<span style = {nameStyle}>
+						{nearbyUser.name}
+					</span>
 				</div>
 			</div>)
 		})
+		*/
 		/*
 		var userNames = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33];
 		let backgroundStyle = {
@@ -186,7 +229,7 @@ class Nearby extends React.Component{
 
 		const conversationColumnStyle = {
 			display : 'none',
-			
+			zIndex:1,
 			'@media (min-width: 480px)':{
 				display : 'block',
 				maxWidth:240,
@@ -208,11 +251,23 @@ class Nearby extends React.Component{
 		const nearbyStyle = {
 			flex:1,
 			backgroundColor:'blue',
+			minWidth:0,
 			position:'relative'
 
 
 		}
 
+		const profileStyle = {
+			width:'100%',
+			position:'absolute', 
+			top:0, 
+			'@media (min-width: 480px)':{
+				width:'80%', 
+				position:'absolute', 
+				top:'100px', 
+				paddingBottom:'100px'
+			}
+		};
 
 		return (
 			<div style = {outerStyle}>
@@ -221,14 +276,51 @@ class Nearby extends React.Component{
 				</div>
 				<div style = {nearbyStyle}>
 					<div onClick = {(e)=>this.hideOnclickOutSide(e)} ref = {(el)=>{this.profile = el}} style={[{zIndex:1, overflowY: 'scroll',width:'100%', height:'100%', position:'absolute', justifyContent:'center',alignItems:'center'}, this.state.profileDisplay]}>
-						<div  className ='profile' style = {{width:'80%', position:'absolute', top:'100px', paddingBottom:'100px'}}>
+						<div  className ='profile' style = {profileStyle}>
 							<div style = {{width:'100%',backgroundColor:'white'}}>
 								<Profile nearbyUser = {this.state.nearbyUser} onCloseProfile = {this.closeProfile} onChatWindowDisplayChange = {this.chatWindowDisplayChange}/>
 							</div>
 						</div>
 					</div>
 					<div className = {testStyle.container} style = {[this.state.nearbyBlur, this.state.nearbyScroll]}>
-						{this.nearbyUsersList()}
+						{this.nearbyUsersList()}hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
+                    hi<br></br>
 					</div>
 				</div>	
 				<div style = {[chatWindowStyle, this.state.chatWindowDisplay]}>

@@ -22,7 +22,7 @@ export const initial = {
 	recipientConversationId:{}, 
 	searchedUsers:[],
 	conversations:[], 
-	conversationData: {conversationType: null, chosenId: null, messages:[],userInfo:[]},
+	conversationData: {conversationType: null, chosenId: null, messages:[],userInfo:[], recipient:''},
 	chosenConversation:null, 
 	currentConversation:[],
 	currentConversationId:null, 
@@ -73,6 +73,7 @@ export default function(state = initial, action){
 			conversationData.conversationType = 'RECIPIENT';
 			conversationData.chosenId = action.recipientId;
 			conversationData.messages = [];
+			conversationData.recipient=action.recipient;
 			console.log(conversationData); 
 			return {...state, conversationData:conversationData};
 		case CONVERSATION_MESSAGES:
@@ -82,6 +83,7 @@ export default function(state = initial, action){
 		    	console.log(state.conversationData);
 				var conversationData = Object.assign({},state.conversationData);
 		    	conversationData.messages = action.messages;
+		    	conversationData.recipient = action.recipient;
 		    	return {...state, conversationData: conversationData}
 		    }
 		case RECIEVE_NEW_MESSAGE: 
@@ -154,7 +156,7 @@ export default function(state = initial, action){
 			var conversationData = Object.assign({},state.conversationData);
 			var recipientConversationId = Object.assign({}, state.recipientConversationId);
 			var conversations = state.conversations.slice();
-
+			conversationData.recipient = action.recipient;
 			if (action.conversationType === 'RECIPIENT'){
 				if (!state.recipientConversationId[action.chosenId]){
 						console.log('in first if');
