@@ -45,23 +45,38 @@ class Layout extends React.Component{
 			height:40,
 			display:'flex',
 			backgroundColor: 'black',
-			zIndex:1,justifyContent:'space-evenly',
-				padding:'0 30px',
+			zIndex:1,
+			justifyContent:'space-evenly',
 			'@media (min-width : 480px)':{
 				justifyContent:'flex-end',
 				padding:'0 50px',
-				}
-				
 			}
-		const buttonStyle = {
-			margin:'auto 0',
-			padding:'0 10px',
-			color:'blue',
-			':hover': {
-     			 color:'orange'
-    		},
-    		cursor:'pointer'
+				
 		}
+
+		const buttonStyle = {
+			height:'100%',
+			display:'flex',
+	   		alignItems:'center',
+	   		justifyContent:'center',
+	   		color:'blue',
+	   		cursor:'pointer',
+	   		padding: '0 10px',
+	   		flex:1,
+			'@media (min-width : 480px)':{
+				flex:'none',
+				':hover': {
+     			 	backgroundColor:'orange'
+    			}	
+    		},
+    		':hover': {
+     			 color:'grey'
+    		},
+    		':active': {
+     			 backgroundColor:'red'
+    		}
+		}
+
 		const layoutStyle = {
 			height: '100%',
 			display:'flex',
@@ -78,8 +93,8 @@ class Layout extends React.Component{
 		return(
 			<div style = {layoutStyle}>
 				<div style = {navbarStyle}>
-					<div style={buttonStyle} key = 'user'>
-  						<i className="fa fa-user fa-2x fa-fw" onClick = {()=>{window.location.href = 'https://'+window.location.host+'/editProfile'}}></i>
+					<div key = 'user' style={buttonStyle} onClick = {()=>{window.location.href = 'https://'+window.location.host+'/editProfile'}}>
+  						<i className="fa fa-user fa-2x fa-fw"></i>
 					</div>
 					<div style={buttonStyle} key = 'messages' onClick = {()=>{window.location.href = 'https://'+window.location.host+'/message/messages'}}>
   						<i className="fa fa-comments-o fa-2x fa-fw"></i>

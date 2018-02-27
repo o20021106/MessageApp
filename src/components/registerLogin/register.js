@@ -160,13 +160,13 @@ export default class Register extends React.Component{
 							
 						</input>
 						<div ref ={(el)=>{this.userCheck = el}} style = {{visibility:'hidden'}}>user already exists</div>
-						<hr style = {[hrStyle, {marginTop:40,marginBottom:10}]}></hr>
+						<hr style = {[hrStyle, {marginTop:40}]}></hr>
 						<div style={[showIfBigInline,{width:'100%'}]}>
 							<div style = {{width:'100%', textAlign:'center'}}>
 								already have an acount? <a key = 'login' style={textButtonStyle} onClick = {()=>this.props.selectRL('login')}>log in</a>
 							</div>
 						</div>
-						<div style={[{width:'100%', textAlign:'center'},hideIfBig]}>
+						<div style={[{width:'100%', textAlign:'center',marginTop:40},hideIfBig]}>
 							<div key = 'loginSmall' style={[buttonStyle]} onClick = {()=>this.props.selectRL('login')}>
 								LOG IN
 							</div>

@@ -136,17 +136,21 @@ class Nearby extends React.Component{
 				backgroundSize:'cover',
 				overflow:'hidden'
 			}
+
+
+			const squareWidth = {
+				width:'calc(100%/3)',
+				'@media (min-width: 480px)':{
+					width:'calc(100%/6)'
+				}
+			}
 			const squareWrapper = {
-					width:'calc(100%/3)',
-					paddingBottom:'calc(100%/3)',
-					height:0,
-					cursor: 'pointer',
-					position:'relative',
-					overflow:'hidden',			
-					'@media (min-width: 480px)':{
-						width:'calc(100%/6)',
-						paddingBottom:'calc(100%/6)',
-					}
+				width:'100%',
+				paddingBottom:'100%',
+				height:0,
+				cursor: 'pointer',
+				position:'relative',
+				overflow:'hidden'		
 			}
 
 			const squareItem = {
@@ -160,13 +164,17 @@ class Nearby extends React.Component{
 				padding:'10px',
 				boxSizing:'border-box'
 			}
-			return( <div key = {nearbyUser._id} style= {[squareWrapper,backgroundStyle]} onClick ={()=>clickNearbyUser(nearbyUser)}>
-				<div style = {squareItem}>
-					<span style = {nameStyle}>
-						{nearbyUser.name}
-					</span>
-				</div>
-			</div>)
+
+			return( 
+				<div key = {nearbyUser._id} style = {squareWidth}>
+					<div style= {[squareWrapper,backgroundStyle]} onClick ={()=>clickNearbyUser(nearbyUser)}>
+						<div style = {squareItem}>
+							<span style = {nameStyle}>
+								{nearbyUser.name}
+							</span>
+						</div>
+					</div>
+				</div>)
 		})			
 		/*let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
 			let backgroundStyle = {
@@ -232,25 +240,23 @@ class Nearby extends React.Component{
 			zIndex:1,
 			'@media (min-width: 480px)':{
 				display : 'block',
-				maxWidth:240,
+				maxWidth:260,
 			}
 		}
 		const chatWindowStyle = {
-			backgroundColor: 'orange',
 			display:'none',
 			'@media (min-width : 480px)':{
-				backgroundColor: 'green',
 				height: 300,
 				width: 240,
 				position:'fixed',
 				right:50,
 				bottom:0,
-				zIndex:2
+				zIndex:2,
 			}
 		}
 		const nearbyStyle = {
 			flex:1,
-			backgroundColor:'blue',
+			backgroundColor:'white',
 			minWidth:0,
 			position:'relative'
 

@@ -50,13 +50,13 @@ class ConversationColumn extends React.Component{
 			const navLinkStyle = {
 				boxSizing: 'border-box',
 				display:'block',
-				paddingLeft : 12,
+				paddingLeft : 13,
 				display: 'flex',
 				height: 64, 
 				width : '100%',				
 				textDecoration: 'none',
-				fontSize:'16px',
-				color: 'white',
+				fontSize:'13px',
+				color: '#999999',
 				fontFamily: 'Helvetica Neue, Helvetica, Arial, sans-serif'
 
 			}
@@ -78,7 +78,9 @@ class ConversationColumn extends React.Component{
 				textOverflow : 'ellipsis',
 				flex: 1,
 				whiteSpace: 'nowrap',
-				overflow:'hidden'
+				overflow:'hidden',
+				fontSize:'15px',
+				color: 'black'
 
 			}
 			const nameTimeStyle = {
@@ -117,7 +119,7 @@ class ConversationColumn extends React.Component{
 							var navLinkDisplayStyle = navLinkStyle;
 							if(typeof(window)!=='undefined'){
 
-								navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'black'}:navLinkStyle;
+								navLinkDisplayStyle = window.innerWidth>=480 && chosenConversationId && conversation.conversation._id === chosenConversationId? {...navLinkStyle,backgroundColor:'#F2F2F2'}:navLinkStyle;
 							}
 							var participant = conversation.conversation.participants.filter(participant => {
 								return(participant._id.toString() !== user._id.toString());
@@ -279,7 +281,7 @@ class ConversationColumn extends React.Component{
 		const searchBarStyle = {
 			height:'30px',
 			width: '100%',
-			backgroundColor: 'red',
+			backgroundColor: '#F6F7F9',
 			padding: '0 28px',
 			borderRadius: '5px',
 			borderStyle: 'none'
@@ -295,13 +297,13 @@ class ConversationColumn extends React.Component{
 		}
 
 		return(
-			<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100%', width:'100%'}}>
+			<div style = {{flex:1,display:'flex',flexDirection:'column', height :'100%', width:'100%', borderRight:'solid 1px #cccccc'}}>
 						
 				<div style = {searchBoxStyle}>
-					<input ref = {(el)=>{this.input = el}} style ={searchBarStyle} type = 'search'  onChange = {(e)=>{this.insertKeyWord(e)}} onKeyUp = {(e) =>this.keyUpHandler(e)}></input>				
+					<input placeholder = 'search' ref = {(el)=>{this.input = el}} style ={searchBarStyle} type = 'search'  onChange = {(e)=>{this.insertKeyWord(e)}} onKeyUp = {(e) =>this.keyUpHandler(e)}></input>				
 				</div>
 											
-				<div style = {{flex:1, backgroundColor:'blue',overflowY:'scroll'}}>
+				<div style = {{flex:1, backgroundColor:'white',overflowY:'scroll'}}>
 					<div style = {searchedUsersListStyle}>
 						{this.searchedUsersList()}
 						 

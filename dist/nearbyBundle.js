@@ -38695,23 +38695,38 @@ var Layout = function (_React$Component) {
 				height: 40,
 				display: 'flex',
 				backgroundColor: 'black',
-				zIndex: 1, justifyContent: 'space-evenly',
-				padding: '0 30px',
+				zIndex: 1,
+				justifyContent: 'space-evenly',
 				'@media (min-width : 480px)': {
 					justifyContent: 'flex-end',
 					padding: '0 50px'
 				}
 
 			};
+
 			var buttonStyle = {
-				margin: 'auto 0',
-				padding: '0 10px',
+				height: '100%',
+				display: 'flex',
+				alignItems: 'center',
+				justifyContent: 'center',
 				color: 'blue',
-				':hover': {
-					color: 'orange'
+				cursor: 'pointer',
+				padding: '0 10px',
+				flex: 1,
+				'@media (min-width : 480px)': {
+					flex: 'none',
+					':hover': {
+						backgroundColor: 'orange'
+					}
 				},
-				cursor: 'pointer'
+				':hover': {
+					color: 'grey'
+				},
+				':active': {
+					backgroundColor: 'red'
+				}
 			};
+
 			var layoutStyle = {
 				height: '100%',
 				display: 'flex',
@@ -38733,10 +38748,10 @@ var Layout = function (_React$Component) {
 					{ style: navbarStyle },
 					_react2.default.createElement(
 						'div',
-						{ style: buttonStyle, key: 'user' },
-						_react2.default.createElement('i', { className: 'fa fa-user fa-2x fa-fw', onClick: function onClick() {
+						{ key: 'user', style: buttonStyle, onClick: function onClick() {
 								window.location.href = 'https://' + window.location.host + '/editProfile';
-							} })
+							} },
+						_react2.default.createElement('i', { className: 'fa fa-user fa-2x fa-fw' })
 					),
 					_react2.default.createElement(
 						'div',
@@ -39010,17 +39025,20 @@ var Nearby = function (_React$Component) {
 					backgroundSize: 'cover',
 					overflow: 'hidden'
 				};
-				var squareWrapper = {
+
+				var squareWidth = {
 					width: 'calc(100%/3)',
-					paddingBottom: 'calc(100%/3)',
+					'@media (min-width: 480px)': {
+						width: 'calc(100%/6)'
+					}
+				};
+				var squareWrapper = {
+					width: '100%',
+					paddingBottom: '100%',
 					height: 0,
 					cursor: 'pointer',
 					position: 'relative',
-					overflow: 'hidden',
-					'@media (min-width: 480px)': {
-						width: 'calc(100%/6)',
-						paddingBottom: 'calc(100%/6)'
-					}
+					overflow: 'hidden'
 				};
 
 				var squareItem = {
@@ -39034,9 +39052,10 @@ var Nearby = function (_React$Component) {
 					padding: '10px',
 					boxSizing: 'border-box'
 				};
-				return _react2.default.createElement('div', { key: nearbyUser._id, style: [squareWrapper, backgroundStyle], onClick: function onClick() {
+
+				return _react2.default.createElement('div', { key: nearbyUser._id, style: squareWidth }, _react2.default.createElement('div', { style: [squareWrapper, backgroundStyle], onClick: function onClick() {
 						return clickNearbyUser(nearbyUser);
-					} }, _react2.default.createElement('div', { style: squareItem }, _react2.default.createElement('span', { style: nameStyle }, nearbyUser.name)));
+					} }, _react2.default.createElement('div', { style: squareItem }, _react2.default.createElement('span', { style: nameStyle }, nearbyUser.name))));
 			});
 			/*let distance = typeof(nearbyUser.dis !== 'undefined')? nearbyUser.dis: '';
    	let backgroundStyle = {
@@ -39102,14 +39121,12 @@ var Nearby = function (_React$Component) {
 				zIndex: 1,
 				'@media (min-width: 480px)': {
 					display: 'block',
-					maxWidth: 240
+					maxWidth: 260
 				}
 			};
 			var chatWindowStyle = {
-				backgroundColor: 'orange',
 				display: 'none',
 				'@media (min-width : 480px)': {
-					backgroundColor: 'green',
 					height: 300,
 					width: 240,
 					position: 'fixed',
@@ -39120,7 +39137,7 @@ var Nearby = function (_React$Component) {
 			};
 			var nearbyStyle = {
 				flex: 1,
-				backgroundColor: 'blue',
+				backgroundColor: 'white',
 				minWidth: 0,
 				position: 'relative'
 
@@ -39253,8 +39270,8 @@ var ConversationColumn = function (_React$Component) {
 				var navLinkStyle = (_navLinkStyle = {
 					boxSizing: 'border-box',
 					display: 'block',
-					paddingLeft: 12
-				}, _defineProperty(_navLinkStyle, 'display', 'flex'), _defineProperty(_navLinkStyle, 'height', 64), _defineProperty(_navLinkStyle, 'width', '100%'), _defineProperty(_navLinkStyle, 'textDecoration', 'none'), _defineProperty(_navLinkStyle, 'fontSize', '16px'), _defineProperty(_navLinkStyle, 'color', 'white'), _defineProperty(_navLinkStyle, 'fontFamily', 'Helvetica Neue, Helvetica, Arial, sans-serif'), _navLinkStyle);
+					paddingLeft: 13
+				}, _defineProperty(_navLinkStyle, 'display', 'flex'), _defineProperty(_navLinkStyle, 'height', 64), _defineProperty(_navLinkStyle, 'width', '100%'), _defineProperty(_navLinkStyle, 'textDecoration', 'none'), _defineProperty(_navLinkStyle, 'fontSize', '13px'), _defineProperty(_navLinkStyle, 'color', '#999999'), _defineProperty(_navLinkStyle, 'fontFamily', 'Helvetica Neue, Helvetica, Arial, sans-serif'), _navLinkStyle);
 				var listStyle = {
 					padding: 0,
 					margin: 0,
@@ -39273,7 +39290,9 @@ var ConversationColumn = function (_React$Component) {
 					textOverflow: 'ellipsis',
 					flex: 1,
 					whiteSpace: 'nowrap',
-					overflow: 'hidden'
+					overflow: 'hidden',
+					fontSize: '15px',
+					color: 'black'
 
 				};
 				var nameTimeStyle = {
@@ -39315,7 +39334,7 @@ var ConversationColumn = function (_React$Component) {
 							var navLinkDisplayStyle = navLinkStyle;
 							if (typeof window !== 'undefined') {
 
-								navLinkDisplayStyle = window.innerWidth >= 480 && chosenConversationId && conversation.conversation._id === chosenConversationId ? _extends({}, navLinkStyle, { backgroundColor: 'black' }) : navLinkStyle;
+								navLinkDisplayStyle = window.innerWidth >= 480 && chosenConversationId && conversation.conversation._id === chosenConversationId ? _extends({}, navLinkStyle, { backgroundColor: '#F2F2F2' }) : navLinkStyle;
 							}
 							var participant = conversation.conversation.participants.filter(function (participant) {
 								return participant._id.toString() !== user._id.toString();
@@ -39505,7 +39524,7 @@ var ConversationColumn = function (_React$Component) {
 			var searchBarStyle = {
 				height: '30px',
 				width: '100%',
-				backgroundColor: 'red',
+				backgroundColor: '#F6F7F9',
 				padding: '0 28px',
 				borderRadius: '5px',
 				borderStyle: 'none'
@@ -39522,11 +39541,11 @@ var ConversationColumn = function (_React$Component) {
 
 			return _react2.default.createElement(
 				'div',
-				{ style: { flex: 1, display: 'flex', flexDirection: 'column', height: '100%', width: '100%' } },
+				{ style: { flex: 1, display: 'flex', flexDirection: 'column', height: '100%', width: '100%', borderRight: 'solid 1px #cccccc' } },
 				_react2.default.createElement(
 					'div',
 					{ style: searchBoxStyle },
-					_react2.default.createElement('input', { ref: function ref(el) {
+					_react2.default.createElement('input', { placeholder: 'search', ref: function ref(el) {
 							_this3.input = el;
 						}, style: searchBarStyle, type: 'search', onChange: function onChange(e) {
 							_this3.insertKeyWord(e);
@@ -39536,7 +39555,7 @@ var ConversationColumn = function (_React$Component) {
 				),
 				_react2.default.createElement(
 					'div',
-					{ style: { flex: 1, backgroundColor: 'blue', overflowY: 'scroll' } },
+					{ style: { flex: 1, backgroundColor: 'white', overflowY: 'scroll' } },
 					_react2.default.createElement(
 						'div',
 						{ style: searchedUsersListStyle },
@@ -39990,7 +40009,9 @@ var ChatWindow = function (_React$Component) {
 				clear: 'right',
 				maxWidth: '95%',
 				wordWrap: 'break-word',
-				backgroundColor: 'red'
+				backgroundColor: 'white',
+				border: 'solid 1px rgb(177, 146, 89)',
+				color: '#4b4f56'
 			};
 
 			var leftStyle = {
@@ -39998,7 +40019,8 @@ var ChatWindow = function (_React$Component) {
 				clear: 'left',
 				maxWidth: '95%',
 				wordWrap: 'break-word',
-				backgroundColor: 'green'
+				backgroundColor: 'rgb(177, 146, 89)',
+				color: 'white'
 
 			};
 			var avatarStyle = {
@@ -40017,20 +40039,28 @@ var ChatWindow = function (_React$Component) {
 
 				var dateLast = 0;
 				var yearLast = 0;
-				var dateDisplayStyle;
+				var dateDisplay;
+				var dateDisplayStyle = {
+					color: 'rgb(119, 119, 119)',
+					fontSize: 12,
+					padding: '5px 0',
+					width: '100%',
+					textAlign: 'center'
+				};
 				return messages.map(function (message, index, array) {
 					var outerBoxStyle = message.author._id === _this2.props.user._id ? rightOuterBoxStyle : leftOuterBoxStyle;
-					var innderBoxStyle = message.author._id === _this2.props.user._id ? rightStyle : leftStyle;
-					var timeStyle = message.author._id === _this2.props.user._id ? { float: 'right' } : { float: 'left' };
+					var innerBoxStyle = message.author._id === _this2.props.user._id ? rightStyle : leftStyle;
+					var timeStyle = { color: '#777777', fontSize: 11, marginBottom: 2 };
+					var timeStyleFloat = message.author._id === _this2.props.user._id ? { float: 'right' } : { float: 'left' };
 					var avatarDisplayStyle = message.author._id === _this2.props.user._id ? { display: 'none' } : avatarStyle;
 					var displayTime = getTime.getMessageTime(message.createdAt);
 					var createdTime = new Date(message.createdAt);
 					if (createdTime.getFullYear() !== yearLast || dateLast !== createdTime.getDate()) {
 						yearLast = createdTime.getFullYear();
 						dateLast = createdTime.getDate();
-						dateDisplayStyle = { display: 'block' };
+						dateDisplay = { display: 'block' };
 					} else {
-						dateDisplayStyle = { display: 'none' };
+						dateDisplay = { display: 'none' };
 					}
 
 					var space20 = false;
@@ -40048,7 +40078,7 @@ var ChatWindow = function (_React$Component) {
 						{ style: { width: '100%' }, key: message._id },
 						_react2.default.createElement(
 							'div',
-							{ style: [dateDisplayStyle, { width: '100%', textAlign: 'center' }] },
+							{ style: [dateDisplay, dateDisplayStyle] },
 							displayTime.date
 						),
 						_react2.default.createElement(
@@ -40060,19 +40090,19 @@ var ChatWindow = function (_React$Component) {
 								_react2.default.createElement(
 									'div',
 									{ style: { display: 'flex', alignItems: 'start' } },
-									_react2.default.createElement('img', { src: message.author.avatarURL, style: avatarDisplayStyle })
+									_react2.default.createElement('img', { src: message.author.avatarURL, style: [avatarDisplayStyle, { marginTop: 13 }] })
 								),
 								_react2.default.createElement(
 									'div',
 									{ style: { display: 'inline-block', flex: 1, minWidth: 0, paddingLeft: 10, paddingRight: 10 } },
 									_react2.default.createElement(
 										'div',
-										{ style: timeStyle },
+										{ style: [timeStyleFloat, timeStyle] },
 										displayTime.time
 									),
 									_react2.default.createElement(
 										'div',
-										{ style: [innderBoxStyle, { display: 'inline-block', alignItems: 'center', padding: '12px 16px', borderRadius: '6px' }] },
+										{ style: [innerBoxStyle, { display: 'inline-block', alignItems: 'center', padding: '5px 8px', borderRadius: '6px', fontSize: 12 }] },
 										_this2.messageComponent(message.body)
 									)
 								)
@@ -40093,8 +40123,7 @@ var ChatWindow = function (_React$Component) {
 		}
 	}, {
 		key: 'newMessageFromBox',
-		value: function newMessageFromBox(e) {
-			e.preventDefault();
+		value: function newMessageFromBox() {
 
 			if (!this.props.recipientConversationId[this.props.conversationData.chosenId]) {
 				this.props.newConversationSocket('RECIPIENT', this.inputBox.innerHTML, this.props.conversationData.chosenId);
@@ -40135,12 +40164,17 @@ var ChatWindow = function (_React$Component) {
 				height: '100%',
 				width: '100%',
 				display: 'flex',
-				flexDirection: 'column'
+				flexDirection: 'column',
+				backgroundColor: 'white',
+				borderRadius: '3px 3px 0px 0px',
+				boxShadow: '0 1px 4px rgba(0, 0, 0, .3)'
+
 			};
 			var conversationsStyle = {
 				flex: 1,
 				minWidth: 0,
-				overflowY: 'scroll'
+				overflowY: 'scroll',
+				marginBottom: 32
 
 			};
 			var inputBoxStyle = {
@@ -40159,12 +40193,15 @@ var ChatWindow = function (_React$Component) {
 			};
 
 			var chatWindowBarStyle = {
-				backgroundColor: 'yellow',
+				backgroundColor: 'rgb(177, 146, 89)',
 				height: 25,
 				display: 'flex',
 				justifyContent: 'flex-end',
 				alignItems: 'center',
-				padding: '0 5px 0px 15px'
+				padding: '0 5px 0px 15px',
+				borderRadius: '3px 3px 0px 0px',
+				boxShadow: '0 1px 2px rgba(0, 0, 0, .3)',
+				zIndex: 3
 			};
 
 			return _react2.default.createElement(
@@ -40182,12 +40219,12 @@ var ChatWindow = function (_React$Component) {
 					{ style: chatWindowBarStyle },
 					_react2.default.createElement(
 						'span',
-						{ style: { flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } },
+						{ style: { cursor: 'pointer', fontSize: 15, color: 'white', flex: 1, overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' } },
 						!this.props.conversationData.recipient ? '' : this.props.conversationData.recipient.name
 					),
 					_react2.default.createElement(
 						'div',
-						{ onClick: function onClick() {
+						{ style: { color: 'white', cursor: 'pointer' }, onClick: function onClick() {
 								return _this3.props.onChatWindowDisplayChange(false);
 							} },
 						_react2.default.createElement('i', { className: 'fa fa-times' })
@@ -40204,16 +40241,27 @@ var ChatWindow = function (_React$Component) {
 					'div',
 					null,
 					_react2.default.createElement(
-						'form',
-						{ onSubmit: function onSubmit(e) {
-								return _this3.newMessageFromBox(e);
-							} },
-						_react2.default.createElement('div', { ref: function ref(el) {
+						'div',
+						{ style: { position: 'relative' } },
+						_react2.default.createElement('div', { onBlur: function onBlur() {
+								_this3.behind.innerHTML = 'Type a message.';
+							}, onFocus: function onFocus() {
+								_this3.behind.innerHTML = '';
+							}, ref: function ref(el) {
 								_this3.inputBox = el;
-							}, suppressContentEditableWarning: 'true', contentEditable: 'true', style: { height: 50, overflowY: 'scroll', border: '1px solid black' }, onKeyPress: function onKeyPress(e) {
+							}, suppressContentEditableWarning: 'true', contentEditable: 'true', style: { zIndex: 3, position: 'absolute', width: '100%', padding: '8px 8px 10px 6px', bottom: 0, right: 0, minHeight: 30, maxHeight: 100, overflowY: 'scroll', color: 'rgb(75, 79, 86)', boxSizing: 'border-box', fontSize: 12, borderTop: '1px solid #bfbfbf' }, onKeyPress: function onKeyPress(e) {
 								return _this3.inputBoxKeyPress(e);
 							} }),
-						_react2.default.createElement('input', { type: 'submit', value: 'Submit' })
+						_react2.default.createElement('div', { ref: function ref(el) {
+								_this3.behind = el;
+							}, style: { boxSizing: 'border-box', position: 'absolute', width: '100%', height: 30, padding: '8px 8px 10px 6px', bottom: 0, right: 0, fontSize: 12, color: '#7777' } }),
+						_react2.default.createElement(
+							'div',
+							{ onClick: function onClick(e) {
+									return _this3.newMessageFromBox(e);
+								}, style: { position: 'absolute', bottom: 0, right: 0 } },
+							_react2.default.createElement('li', { className: 'fab fa-telegram-plane' })
+						)
 					)
 				)
 			);

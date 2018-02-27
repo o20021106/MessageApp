@@ -151,7 +151,9 @@ class ChatWindow extends React.Component{
 			clear: 'right',
 			maxWidth : '95%',
 			wordWrap:'break-word',
-			backgroundColor : 'red'
+			backgroundColor : 'white',
+			border:'solid 1px rgb(177, 146, 89)',
+			color:'#4b4f56'
 		}
 
 		const leftStyle = {
@@ -159,7 +161,8 @@ class ChatWindow extends React.Component{
 			clear: 'left',
 			maxWidth : '95%',
 			wordWrap:'break-word',
-			backgroundColor : 'green'
+			backgroundColor : 'rgb(177, 146, 89)',
+			color:'white'
 
 		}
 		const avatarStyle = {
@@ -179,21 +182,29 @@ class ChatWindow extends React.Component{
 			
 			var dateLast = 0;
 			var yearLast = 0;
-			var dateDisplayStyle;
+			var dateDisplay;
+			var dateDisplayStyle = {
+				color: 'rgb(119, 119, 119)',
+				fontSize: 12,
+				padding: '5px 0',
+				width:'100%', 
+				textAlign:'center'
+			}
 			return messages.map((message,index, array)=>{
 				const outerBoxStyle = message.author._id === this.props.user._id ? rightOuterBoxStyle : leftOuterBoxStyle;
-				const innderBoxStyle = message.author._id === this.props.user._id ? rightStyle : leftStyle;
-				const timeStyle = message.author._id === this.props.user._id ? {float: 'right'} : {float :'left'};
+				const innerBoxStyle = message.author._id === this.props.user._id ? rightStyle : leftStyle;
+				const timeStyle = {color:'#777777', fontSize:11, marginBottom:2};
+				const timeStyleFloat = message.author._id === this.props.user._id ? {float: 'right'} : {float :'left'};
 				const avatarDisplayStyle = message.author._id === this.props.user._id ?{display:'none'}: avatarStyle
 				const displayTime = getTime.getMessageTime(message.createdAt);
 				var createdTime = new Date(message.createdAt);
 				if (createdTime.getFullYear()!==yearLast ||dateLast!== createdTime.getDate()){
 					yearLast = createdTime.getFullYear();
 					dateLast = createdTime.getDate();
-					dateDisplayStyle = {display:'block'}
+					dateDisplay = {display:'block'}
 				}
 				else{
-					dateDisplayStyle = {display:'none'}
+					dateDisplay = {display:'none'}
 				}
 
 				var space20 =false;
@@ -208,19 +219,19 @@ class ChatWindow extends React.Component{
 
 				return (
 					<div style ={{width : '100%'}} key ={message._id}>
-						<div style = {[dateDisplayStyle,{width:'100%', textAlign:'center'}]} >
+						<div style = {[dateDisplay,dateDisplayStyle]} >
 							{displayTime.date}
 						</div>
 						<div  style = {messageStyle}>
 							<div style = {outerBoxStyle}>
 								<div style = {{display:'flex',alignItems:'start'}}>
-									<img src = {message.author.avatarURL} style ={avatarDisplayStyle}></img>
+									<img src = {message.author.avatarURL} style ={[avatarDisplayStyle,{marginTop:13}]}></img>
 								</div>
 								<div style = {{display:'inline-block',flex:1, minWidth:0,paddingLeft:10,paddingRight:10}}>
-									<div style = {timeStyle}>
+									<div style = {[timeStyleFloat,timeStyle]}>
 										{displayTime.time}
 									</div>
-									<div style = {[innderBoxStyle,{display:'inline-block', alignItems:'center',padding:'12px 16px', borderRadius:'6px'}]}>								
+									<div style = {[innerBoxStyle,{display:'inline-block', alignItems:'center',padding:'5px 8px', borderRadius:'6px',fontSize:12}]}>								
 										{this.messageComponent(message.body)}
 									</div>
 								</div>
@@ -240,8 +251,7 @@ class ChatWindow extends React.Component{
 		} 
 	}  
 
-	newMessageFromBox(e){
-		e.preventDefault();
+	newMessageFromBox(){
 
 		if(!this.props.recipientConversationId[this.props.conversationData.chosenId]){
 			this.props.newConversationSocket('RECIPIENT', this.inputBox.innerHTML, this.props.conversationData.chosenId);
@@ -283,11 +293,16 @@ class ChatWindow extends React.Component{
 				width:'100%',
 				display: 'flex',
 				flexDirection : 'column',
+				backgroundColor:'white',
+				borderRadius: '3px 3px 0px 0px',
+				boxShadow:'0 1px 4px rgba(0, 0, 0, .3)'
+
 			}
 			const conversationsStyle = {
 				flex:1, 
 				minWidth:0,
-				overflowY: 'scroll'
+				overflowY: 'scroll',
+				marginBottom:32
 
 			}
 			const inputBoxStyle = {
@@ -306,12 +321,15 @@ class ChatWindow extends React.Component{
 			}
 
 			const chatWindowBarStyle = {
-				backgroundColor:'yellow',
+				backgroundColor:'rgb(177, 146, 89)',
 				height: 25,
 				display:'flex',
 				justifyContent:'flex-end',
 				alignItems:'center',
-				padding : '0 5px 0px 15px'
+				padding : '0 5px 0px 15px',
+				borderRadius: '3px 3px 0px 0px',
+				boxShadow: '0 1px 2px rgba(0, 0, 0, .3)',
+				zIndex:3
 			}
 
 			return (
@@ -321,10 +339,10 @@ class ChatWindow extends React.Component{
 						new Message
 					</div>
 					<div style={chatWindowBarStyle}>
-						<span style ={{flex:1, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis'}}>
+						<span style ={{cursor:'pointer',fontSize:15, color:'white',flex:1, overflow:'hidden', whiteSpace:'nowrap', textOverflow:'ellipsis'}}>
 							{!this.props.conversationData.recipient?'':this.props.conversationData.recipient.name}
 						</span>
-						<div onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
+						<div style = {{color:'white',cursor:'pointer'}} onClick = {()=>this.props.onChatWindowDisplayChange(false)}>
 							<i className="fa fa-times"></i>
 						</div>
 					</div>
@@ -332,10 +350,13 @@ class ChatWindow extends React.Component{
 						{this.conversationDisplay()}
 				 	</div>
 				 	<div >
-				 		<form onSubmit = {(e) => this.newMessageFromBox(e)}>
-				 			<div ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{height:50, overflowY:'scroll', border:'1px solid black'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
-							<input type = 'submit' value="Submit" ></input>
-					 	</form>
+				 		<div style = {{position:'relative'}}>
+				 			<div onBlur ={()=>{this.behind.innerHTML='Type a message.'}} onFocus = {()=>{this.behind.innerHTML =''}} ref= {(el)=>{this.inputBox = el}} suppressContentEditableWarning='true' contentEditable ='true' style = {{zIndex:3,position:'absolute', width:'100%',padding:'8px 8px 10px 6px', bottom:0,right:0,minHeight:30, maxHeight:100, overflowY:'scroll',color:'rgb(75, 79, 86)',boxSizing:'border-box', fontSize:12, borderTop:'1px solid #bfbfbf'}} onKeyPress = {(e)=>this.inputBoxKeyPress(e)}></div>
+							<div ref ={(el)=>{this.behind =el}} style={{boxSizing:'border-box',position:'absolute', width:'100%',height:30, padding:'8px 8px 10px 6px', bottom:0,right:0,fontSize: 12, color:'#7777'}}></div>
+							<div  onClick = {(e) => this.newMessageFromBox(e)} style = {{position:'absolute',bottom:0,right:0}} >
+								<li className='fab fa-telegram-plane'></li>
+							</div>
+					 	</div>
 					 </div>
 				</div>
 

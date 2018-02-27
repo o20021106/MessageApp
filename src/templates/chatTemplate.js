@@ -10,9 +10,8 @@ export default (html, finalState, radiumProp,script) => {
 			<meta name= 'viewport' content = 'width = device-width, initial-scale=1'>
 			<script>window.__PRELOADED_STATE__ = ${JSON.stringify(finalState).replace(/</g, '\\u003c')}</script>
 			<script>window.__RADIUM_PROP__ = ${JSON.stringify(radiumProp).replace(/</g, '\\u003c')}</script>
-
-			</head>
-		<body style = 'width:100%; margin : 0px; height:100%'>
+		</head>
+		<body style = 'width:100%; margin : 0px; height:100%;font-family:"Helvetica Neue", Helvetica, Arial, sans-serif'>
 		<div id = 'root' style = 'width:100%; height:100%; margin : 0px'>${html}</div>
 		<script src = '/${script}.js'></script> 
 		</body>

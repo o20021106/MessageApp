@@ -87,13 +87,13 @@ export default class Login extends React.Component{
 						<input type='submit' value = 'LOG IN' style = {[buttonStyle,{marginTop:48},{font:'400 15px helvetica'}]}></input>
 					</div>
 
-					<hr style = {[hrStyle, {marginTop:40,marginBottom:10},]}></hr>
+					<hr style = {[hrStyle, {marginTop:40}]}></hr>
 					<div style={[showIfBigInline,{width:'100%'}]}>
 						<div style = {{width:'100%', textAlign:'center'}}>
 							new in town? <a key = 'registerBig' style={textButtonStyle} onClick = {()=>this.props.selectRL('register')}>register</a>
 						</div>
 					</div>
-					<div style={[{width:'100%', textAlign:'center'},hideIfBig]}>
+					<div style={[{width:'100%', textAlign:'center',marginTop:40},hideIfBig]}>
 						<div key = 'registerSmall' style={[buttonStyle]} onClick = {()=>this.props.selectRL('register')}>
 							REGISTER
 						</div>

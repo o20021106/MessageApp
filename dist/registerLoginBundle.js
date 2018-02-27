@@ -28060,7 +28060,7 @@ var Login = function (_React$Component) {
 						),
 						_react2.default.createElement('input', { type: 'submit', value: 'LOG IN', style: [_style.buttonStyle, { marginTop: 48 }, { font: '400 15px helvetica' }] })
 					),
-					_react2.default.createElement('hr', { style: [_style.hrStyle, { marginTop: 40, marginBottom: 10 }] }),
+					_react2.default.createElement('hr', { style: [_style.hrStyle, { marginTop: 40 }] }),
 					_react2.default.createElement(
 						'div',
 						{ style: [_style.showIfBigInline, { width: '100%' }] },
@@ -28079,7 +28079,7 @@ var Login = function (_React$Component) {
 					),
 					_react2.default.createElement(
 						'div',
-						{ style: [{ width: '100%', textAlign: 'center' }, _style.hideIfBig] },
+						{ style: [{ width: '100%', textAlign: 'center', marginTop: 40 }, _style.hideIfBig] },
 						_react2.default.createElement(
 							'div',
 							{ key: 'registerSmall', style: [_style.buttonStyle], onClick: function onClick() {
@@ -28811,7 +28811,7 @@ var Register = function (_React$Component) {
 							}, style: { visibility: 'hidden' } },
 						'user already exists'
 					),
-					_react2.default.createElement('hr', { style: [_style.hrStyle, { marginTop: 40, marginBottom: 10 }] }),
+					_react2.default.createElement('hr', { style: [_style.hrStyle, { marginTop: 40 }] }),
 					_react2.default.createElement(
 						'div',
 						{ style: [_style.showIfBigInline, { width: '100%' }] },
@@ -28830,7 +28830,7 @@ var Register = function (_React$Component) {
 					),
 					_react2.default.createElement(
 						'div',
-						{ style: [{ width: '100%', textAlign: 'center' }, _style.hideIfBig] },
+						{ style: [{ width: '100%', textAlign: 'center', marginTop: 40 }, _style.hideIfBig] },
 						_react2.default.createElement(
 							'div',
 							{ key: 'loginSmall', style: [_style.buttonStyle], onClick: function onClick() {

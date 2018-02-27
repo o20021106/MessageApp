@@ -194,17 +194,20 @@ var Nearby = function (_React$Component) {
 					backgroundSize: 'cover',
 					overflow: 'hidden'
 				};
-				var squareWrapper = {
+
+				var squareWidth = {
 					width: 'calc(100%/3)',
-					paddingBottom: 'calc(100%/3)',
+					'@media (min-width: 480px)': {
+						width: 'calc(100%/6)'
+					}
+				};
+				var squareWrapper = {
+					width: '100%',
+					paddingBottom: '100%',
 					height: 0,
 					cursor: 'pointer',
 					position: 'relative',
-					overflow: 'hidden',
-					'@media (min-width: 480px)': {
-						width: 'calc(100%/6)',
-						paddingBottom: 'calc(100%/6)'
-					}
+					overflow: 'hidden'
 				};
 
 				var squareItem = {
@@ -218,18 +221,23 @@ var Nearby = function (_React$Component) {
 					padding: '10px',
 					boxSizing: 'border-box'
 				};
+
 				return _react2.default.createElement(
 					'div',
-					{ key: nearbyUser._id, style: [squareWrapper, backgroundStyle], onClick: function onClick() {
-							return clickNearbyUser(nearbyUser);
-						} },
+					{ key: nearbyUser._id, style: squareWidth },
 					_react2.default.createElement(
 						'div',
-						{ style: squareItem },
+						{ style: [squareWrapper, backgroundStyle], onClick: function onClick() {
+								return clickNearbyUser(nearbyUser);
+							} },
 						_react2.default.createElement(
-							'span',
-							{ style: nameStyle },
-							nearbyUser.name
+							'div',
+							{ style: squareItem },
+							_react2.default.createElement(
+								'span',
+								{ style: nameStyle },
+								nearbyUser.name
+							)
 						)
 					)
 				);
@@ -298,14 +306,12 @@ var Nearby = function (_React$Component) {
 				zIndex: 1,
 				'@media (min-width: 480px)': {
 					display: 'block',
-					maxWidth: 240
+					maxWidth: 260
 				}
 			};
 			var chatWindowStyle = {
-				backgroundColor: 'orange',
 				display: 'none',
 				'@media (min-width : 480px)': {
-					backgroundColor: 'green',
 					height: 300,
 					width: 240,
 					position: 'fixed',
@@ -316,7 +322,7 @@ var Nearby = function (_React$Component) {
 			};
 			var nearbyStyle = {
 				flex: 1,
-				backgroundColor: 'blue',
+				backgroundColor: 'white',
 				minWidth: 0,
 				position: 'relative'
 
