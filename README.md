@@ -5,7 +5,10 @@ this is a social networking website with chatting application feature
 https://bromance.herokuapp.com/
 
 
---------features--------
+search user by email or user name on the search bar or simply click a nearby user's profile to start a conversation.
+
+
+features
 
 1. socket.io for instant messaging between users
 
@@ -15,4 +18,5 @@ https://bromance.herokuapp.com/
 
 4. jwt token for authentication
 
+5. fetch to handle http requests to server.
 
