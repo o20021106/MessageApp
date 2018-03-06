@@ -37,7 +37,8 @@ exports.register = {
 			email : req.body.email,
 			password: req.body.password,
 			name : req.body.name,
-			avatarURL: config.avatarDefault
+			avatarURL: config.avatarDefault,
+			loc: {type:'Point',coordinates:config.coordinatesDefault}
 		});
 		User.findOne({email:req.body.email}, function(err,existingUser){
 			if(existingUser){
@@ -45,7 +46,7 @@ exports.register = {
 			}
 			user.save(function(err, newUser){
 				if(err){
-					return res.json({error:'failed'});
+					return res.json({error:err});
 				}
 				else{
 					var token = jwt.sign({id : newUser._id}, config.secret, {
