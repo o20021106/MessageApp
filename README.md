@@ -10,13 +10,15 @@ search user by email or user name on the search bar or simply click a nearby use
 
 features
 
-1. socket.io for instant messaging between users
+1. react for client side, node.js/express for server, mongodb/mongoose(mlab) for database, cloudinary for image storage, and heroku for deployment.
 
-2. geolocation to sort and display nearby users
+2. socket.io for instant messaging between users
 
-3. server side rendering
+3. geolocation to sort and display nearby users
 
-4. jwt token for authentication
+4. server side rendering
 
-5. fetch to handle http requests to server.
+5. jwt token for authentication
+
+6. fetch to handle http requests to server.
 
